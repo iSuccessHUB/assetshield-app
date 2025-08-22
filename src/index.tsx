@@ -764,6 +764,93 @@ app.get('/', (c) => {
             <div id="education-content" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Education content will be loaded dynamically */}
             </div>
+            
+            <script dangerouslySetInnerHTML={{__html: `
+              // Initialize education center immediately when this section loads
+              document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                  const educationContainer = document.getElementById('education-content');
+                  if (educationContainer && !window.educationLoaded) {
+                    window.educationLoaded = true;
+                    console.log('Initializing Education Center...');
+                    
+                    // Load education content immediately
+                    fetch('/api/education/featured')
+                      .then(response => response.json())
+                      .then(data => {
+                        if (data && data.featured) {
+                          renderEducationContent(data.featured);
+                        }
+                      })
+                      .catch(error => {
+                        console.error('Failed to load education content:', error);
+                        // Show fallback message
+                        educationContainer.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-gray-500">Loading educational content...</p></div>';
+                      });
+                  }
+                }, 1000);
+              });
+              
+              function renderEducationContent(content) {
+                const container = document.getElementById('education-content');
+                if (!container || !content || content.length === 0) return;
+                
+                const getIconForType = (type) => {
+                  const icons = {
+                    article: 'file-alt',
+                    guide: 'book',
+                    video: 'play-circle',
+                    checklist: 'list-check',
+                    'case-study': 'briefcase'
+                  };
+                  return icons[type] || 'file';
+                };
+                
+                const getDifficultyColor = (level) => {
+                  const colors = {
+                    beginner: 'green',
+                    intermediate: 'blue',
+                    advanced: 'red'
+                  };
+                  return colors[level] || 'gray';
+                };
+                
+                container.innerHTML = content.map(item => \`
+                  <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="flex items-center mb-4">
+                      <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-\${getIconForType(item.content_type)} text-blue-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <span class="inline-block px-2 py-1 bg-\${getDifficultyColor(item.difficulty_level)}-100 text-\${getDifficultyColor(item.difficulty_level)}-800 text-xs rounded-full mb-1">
+                          \${item.difficulty_level || 'Beginner'}
+                        </span>
+                        <p class="text-sm text-gray-500">By \${item.author}</p>
+                      </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">\${item.title}</h3>
+                    <p class="text-gray-600 mb-4">\${item.description || ''}</p>
+                    <div class="flex items-center justify-between mb-4">
+                      <span class="text-sm text-gray-500">
+                        <i class="fas fa-clock mr-1"></i> \${item.reading_time} min read
+                      </span>
+                      <span class="text-sm text-gray-500">
+                        <i class="fas fa-eye mr-1"></i> \${item.view_count} views
+                      </span>
+                    </div>
+                    <button onclick="viewEducationContent(\${item.id})" class="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                      <i class="fas fa-arrow-right mr-2"></i>
+                      \${item.content_type === 'video' ? 'Watch Now' : 'Read Article'}
+                    </button>
+                  </div>
+                \`).join('');
+              }
+              
+              function viewEducationContent(id) {
+                alert('Educational content viewing would open here. Content ID: ' + id);
+                // In a real implementation, this would open a modal or navigate to the content
+              }
+            `}}></script>
           </div>
         </section>
 
