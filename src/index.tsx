@@ -641,7 +641,7 @@ app.get('/', (c) => {
                   </div>
 
                   <div className="flex justify-end">
-                    <button onclick="window.submitDirectAssessment()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <button id="submit-assessment-btn" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                       Get My Risk Assessment <i className="fas fa-arrow-right ml-2"></i>
                     </button>
                   </div>
@@ -649,102 +649,8 @@ app.get('/', (c) => {
               </div>
             </div>
             
-            {/* SCRIPT MOVED OUTSIDE assessment-container TO PREVENT SELF-DESTRUCTION */}
+            {/* Assessment JavaScript - Static form with event handlers */}
             <script dangerouslySetInnerHTML={{__html: `
-                // Assessment form loading function - DEFINE FIRST
-                function loadAssessmentForm() {
-                  const container = document.getElementById('assessment-form');
-                  const loading = document.getElementById('assessment-loading');
-                  if (container && loading && loading.parentNode === container) {
-                    console.log('Loading assessment form...');
-                    container.innerHTML = \`
-                      <div class="space-y-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Basic Information</h3>
-                        
-                        <div>
-                          <label class="block text-sm font-medium text-gray-700 mb-2">What is your profession?</label>
-                          <select id="profession" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
-                            <option value="">Select your profession</option>
-                            <option value="doctor">Doctor/Medical Professional</option>
-                            <option value="lawyer">Lawyer/Attorney</option>
-                            <option value="business_owner">Business Owner</option>
-                            <option value="real_estate">Real Estate Professional</option>
-                            <option value="executive">Corporate Executive</option>
-                            <option value="consultant">Consultant</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label class="block text-sm font-medium text-gray-700 mb-2">What is your approximate net worth?</label>
-                          <div class="space-y-2">
-                            <label class="flex items-center">
-                              <input type="radio" name="netWorth" value="under_500k" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>Under $500,000</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="netWorth" value="500k_1m" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>$500,000 - $1,000,000</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="netWorth" value="1m_5m" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>$1,000,000 - $5,000,000</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="netWorth" value="5m_10m" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>$5,000,000 - $10,000,000</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="netWorth" value="over_10m" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>Over $10,000,000</span>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label class="block text-sm font-medium text-gray-700 mb-2">Are you currently facing any legal threats or lawsuits?</label>
-                          <div class="space-y-2">
-                            <label class="flex items-center">
-                              <input type="radio" name="legalThreats" value="none" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>No current threats</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="legalThreats" value="potential" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>Potential threats on the horizon</span>
-                            </label>
-                            <label class="flex items-center">
-                              <input type="radio" name="legalThreats" value="active" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
-                              <span>Active litigation or threats</span>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div class="flex justify-end">
-                          <button onclick="nextAssessmentStep()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                            Next Step <i class="fas fa-arrow-right ml-2"></i>
-                          </button>
-                        </div>
-                      </div>
-                    \`;
-                  }
-                }
-                
-                // Immediate assessment form initialization - no delay
-                (function() {
-                  console.log('Assessment initialization starting...');
-                  const container = document.getElementById('assessment-form');
-                  const loading = document.getElementById('assessment-loading');
-                  if (container && loading) {
-                    console.log('Assessment container found, loading form immediately...');
-                    loadAssessmentForm();
-                  }
-                })();
-                
-                // Also try with a short delay as backup
-                setTimeout(function() {
-                  console.log('Fallback: Trying to load assessment form after delay...');
-                  loadAssessmentForm();
-                }, 500);
 
                 // Mobile menu toggle function
                 window.toggleMobileMenu = function() {
@@ -899,6 +805,24 @@ app.get('/', (c) => {
                   
                   console.log('Assessment functions defined successfully!');
                 })();
+                
+                // Add event listener to the assessment button - FIXED IMPLEMENTATION
+                document.addEventListener('DOMContentLoaded', function() {
+                  const submitBtn = document.getElementById('submit-assessment-btn');
+                  if (submitBtn) {
+                    submitBtn.addEventListener('click', function() {
+                      if (window.submitDirectAssessment) {
+                        window.submitDirectAssessment();
+                      } else {
+                        console.error('submitDirectAssessment function not found');
+                        alert('Assessment system not ready. Please refresh the page.');
+                      }
+                    });
+                    console.log('✅ Assessment button click handler attached successfully');
+                  } else {
+                    console.error('❌ Assessment submit button not found - ID: submit-assessment-btn');
+                  }
+                });
                 
                 // Enhanced language changing functionality - Always define
                 window.changeLanguage = function(lang) {
