@@ -6,6 +6,35 @@ interface CloudflareBindings {
 
 export const dashboardRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
+// Demo dashboard page (handles ?demo=... query params)
+dashboardRoutes.get('/', async (c) => {
+  try {
+    const demoId = c.req.query('demo')
+    const firmName = c.req.query('firm') || 'Demo Law Firm'
+    
+    if (!demoId) {
+      return c.redirect('/?error=invalid_demo')
+    }
+    
+    // Get demo dashboard data
+    const demoData = {
+      id: demoId,
+      firm_name: decodeURIComponent(firmName),
+      subscription_tier: 'professional',
+      owner_name: 'Demo Attorney',
+      owner_email: 'demo@example.com'
+    }
+    
+    const dashboardData = getMockDashboardData()
+    
+    return c.html(getDemoDashboardHTML(demoData, dashboardData))
+    
+  } catch (error) {
+    console.error('Demo dashboard error:', error)
+    return c.html('<h1>Error loading demo dashboard</h1>')
+  }
+})
+
 // Main dashboard page for law firms
 dashboardRoutes.get('/firm/:firmId', async (c) => {
   try {
@@ -577,6 +606,384 @@ function getDashboardHTML(lawFirm: any, dashboardData: any): string {
   
   function getRiskScoreColor(score: number): string {
     if (!score) return 'bg-gray-100 text-gray-800'
+    if (score < 50) return 'bg-green-100 text-green-800'
+    if (score < 75) return 'bg-yellow-100 text-yellow-800'
+    return 'bg-red-100 text-red-800'
+  }
+  
+  function getStatusColor(status: string): string {
+    switch (status) {
+      case 'new': return 'bg-blue-100 text-blue-800'
+      case 'qualified': return 'bg-green-100 text-green-800'
+      case 'consultation': return 'bg-yellow-100 text-yellow-800'
+      case 'converted': return 'bg-purple-100 text-purple-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+}
+
+function getMockDashboardData() {
+  return {
+    leadStats: {
+      total_leads: 25,
+      new_leads: 5,
+      qualified_leads: 12,
+      consultation_leads: 6,
+      converted_leads: 2,
+      avg_risk_score: 78.5,
+      total_pipeline_value: 15750000
+    },
+    recentLeads: [
+      {
+        contact_name: 'Sarah Johnson',
+        contact_email: 'sarah@example.com',
+        risk_score: 85,
+        estimated_value: 2500000,
+        status: 'consultation',
+        assigned_attorney_name: 'Demo Attorney',
+        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        contact_name: 'Michael Chen',
+        contact_email: 'michael@example.com', 
+        risk_score: 72,
+        estimated_value: 1800000,
+        status: 'qualified',
+        assigned_attorney_name: 'Demo Attorney',
+        created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        contact_name: 'Robert Davis',
+        contact_email: 'robert@example.com',
+        risk_score: 91,
+        estimated_value: 3200000,
+        status: 'new',
+        assigned_attorney_name: 'Demo Attorney',
+        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        contact_name: 'Lisa Williams',
+        contact_email: 'lisa@example.com',
+        risk_score: 68,
+        estimated_value: 1200000,
+        status: 'converted',
+        assigned_attorney_name: 'Demo Attorney',
+        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ]
+  }
+}
+
+function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
+  const branding = {
+    primary_color: '#1e40af',
+    secondary_color: '#3b82f6'
+  }
+  
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${lawFirm.firm_name} - AssetShield Demo Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '${branding.primary_color}',
+                        secondary: '${branding.secondary_color}'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Demo Banner -->
+    <div class="bg-orange-500 text-white px-4 py-2">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-play"></i>
+                <span class="font-medium">Live Demo Mode - Exploring AssetShield Pro for ${lawFirm.firm_name}</span>
+            </div>
+            <div class="text-sm">
+                <i class="fas fa-clock mr-1"></i>
+                14-day trial expires in 13 days
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">${lawFirm.firm_name}</h1>
+                    <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded">DEMO</span>
+                </div>
+                <nav class="flex items-center space-x-6">
+                    <a href="#dashboard" class="text-primary font-medium">Dashboard</a>
+                    <a href="#leads" class="text-gray-600 hover:text-primary">Leads</a>
+                    <a href="#analytics" class="text-gray-600 hover:text-primary">Analytics</a>
+                    <a href="#settings" class="text-gray-600 hover:text-primary">Settings</a>
+                    <button onclick="window.close()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-300">
+                        Exit Demo
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Message -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4 mt-1">
+                    <i class="fas fa-info-circle text-blue-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Welcome to Your AssetShield Pro Demo!</h3>
+                    <p class="text-blue-700 mb-4">
+                        You're now exploring a live version of the platform with sample data. This demonstrates exactly how 
+                        AssetShield Pro would work for ${lawFirm.firm_name} with real client data and workflows.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="flex items-center text-blue-700">
+                            <i class="fas fa-check mr-2"></i>
+                            Sample client assessments
+                        </div>
+                        <div class="flex items-center text-blue-700">
+                            <i class="fas fa-check mr-2"></i>
+                            Real analytics dashboard
+                        </div>
+                        <div class="flex items-center text-blue-700">
+                            <i class="fas fa-check mr-2"></i>
+                            Complete workflow simulation
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Total Leads</p>
+                            <p class="text-2xl font-bold text-gray-900">${dashboardData.leadStats.total_leads}</p>
+                            <p class="text-xs text-green-600">↑ 23% from last month</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Conversion Rate</p>
+                            <p class="text-2xl font-bold text-gray-900">${((dashboardData.leadStats.converted_leads / dashboardData.leadStats.total_leads) * 100).toFixed(1)}%</p>
+                            <p class="text-xs text-green-600">↑ 5.2% from last month</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Pipeline Value</p>
+                            <p class="text-2xl font-bold text-gray-900">$${(dashboardData.leadStats.total_pipeline_value / 1000000).toFixed(1)}M</p>
+                            <p class="text-xs text-green-600">↑ 18% from last month</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-shield-alt text-orange-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Avg Risk Score</p>
+                            <p class="text-2xl font-bold text-gray-900">${Math.round(dashboardData.leadStats.avg_risk_score)}</p>
+                            <p class="text-xs text-red-600">↑ 2.1 from last month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Conversion Funnel -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Conversion Funnel (Demo Data)</h3>
+                    <canvas id="funnelChart" width="400" height="300"></canvas>
+                </div>
+                
+                <!-- Lead Sources -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Lead Sources (Demo Data)</h3>
+                    <canvas id="sourceChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Leads Table -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Leads (Demo Data)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Score</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Est. Value</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${dashboardData.recentLeads.map(lead => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">${lead.contact_name}</div>
+                                        <div class="text-sm text-gray-500">${lead.contact_email}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRiskScoreColor(lead.risk_score)}">
+                                            ${lead.risk_score}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        $${(lead.estimated_value / 1000000).toFixed(1)}M
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.status)}">
+                                            ${lead.status}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        ${lead.assigned_attorney_name}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        ${new Date(lead.created_at).toLocaleDateString()}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h4 class="font-semibold text-gray-900 mb-2">Explore Assessment Tool</h4>
+                    <p class="text-gray-600 text-sm mb-4">See how clients assess their asset protection needs</p>
+                    <button class="w-full bg-primary text-white py-2 px-4 rounded hover:opacity-90">
+                        Try Assessment
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h4 class="font-semibold text-gray-900 mb-2">View Lead Pipeline</h4>
+                    <p class="text-gray-600 text-sm mb-4">Manage and track your client leads</p>
+                    <button class="w-full bg-primary text-white py-2 px-4 rounded hover:opacity-90">
+                        View Leads
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h4 class="font-semibold text-gray-900 mb-2">Customize Platform</h4>
+                    <p class="text-gray-600 text-sm mb-4">Brand the platform with your firm's identity</p>
+                    <button class="w-full bg-primary text-white py-2 px-4 rounded hover:opacity-90">
+                        Customize
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDemoCharts();
+        });
+        
+        function initializeDemoCharts() {
+            // Funnel Chart
+            const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+            new Chart(funnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Visitors', 'Started Assessment', 'Completed Assessment', 'Generated Lead', 'Consultation'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [450, 320, 180, 95, 42],
+                        backgroundColor: '${branding.primary_color}',
+                        borderColor: '${branding.secondary_color}',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Source Chart
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+            new Chart(sourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Website Assessment', 'Referrals', 'Social Media', 'Search Ads', 'Direct Contact'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            '${branding.primary_color}',
+                            '${branding.secondary_color}',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    </script>
+</body>
+</html>`
+
+  function getRiskScoreColor(score: number): string {
     if (score < 50) return 'bg-green-100 text-green-800'
     if (score < 75) return 'bg-yellow-100 text-yellow-800'
     return 'bg-red-100 text-red-800'

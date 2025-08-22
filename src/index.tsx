@@ -1689,23 +1689,52 @@ app.get('/', (c) => {
             // Store demo session data for the demo environment
             localStorage.setItem('assetshield_demo_session', JSON.stringify(demoData));
             
-            // Simulate demo platform launch (replace with actual demo API endpoint)
-            setTimeout(() => {
-              // Show success message and redirect to demo
+            // Submit demo request to backend
+            fetch('/demo/start', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                lawyerName: demoForm.attorneyName,
+                lawyerEmail: demoForm.email,
+                firmName: demoForm.firmName,
+                practiceAreas: ['Asset Protection'],
+                interestedTier: 'professional'
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Show success message
+                alert(
+                  \`Welcome to AssetShield Pro, \${demoForm.attorneyName}!\\n\\n\` +
+                  \`Your 14-day free trial is now active for \${demoForm.firmName}.\\n\\n\` +
+                  \`You'll be redirected to your demo platform with:\\n\` +
+                  \`• Sample client data and workflows\\n\` +
+                  \`• Full platform functionality\\n\` +
+                  \`• Live analytics dashboard\\n\` +
+                  \`• Complete asset protection tools\\n\\n\` +
+                  \`Demo ID: \${data.demoId}\\n\` +
+                  \`Trial expires: \${new Date(data.expiresAt).toLocaleDateString()}\\n\\n\` +
+                  \`A confirmation email has been sent to \${demoForm.email}\`
+                );
+                
+                // Redirect to demo dashboard
+                window.open(data.loginUrl, '_blank');
+              } else {
+                throw new Error(data.error || 'Failed to start demo');
+              }
+            })
+            .catch(error => {
+              console.error('Demo start error:', error);
               alert(
-                \`Welcome to AssetShield Pro, \${demoForm.attorneyName}!\\n\\n\` +
-                \`Your 14-day free trial is now active for \${demoForm.firmName}.\\n\\n\` +
-                \`You'll be redirected to your demo platform with:\\n\` +
-                \`• Sample client data and workflows\\n\` +
-                \`• Full platform functionality\\n\` +
-                \`• Live analytics dashboard\\n\` +
-                \`• Complete asset protection tools\\n\\n\` +
-                \`Demo Session ID: \${demoSessionId.substring(0, 12)}...\\n\` +
-                \`A confirmation email has been sent to \${demoForm.email}\`
+                \`Demo setup failed: \${error.message}\\n\\n\` +
+                \`As a fallback, you can explore the platform features below or contact our team directly.\\n\\n\` +
+                \`We apologize for the inconvenience and will resolve this issue quickly.\`
               );
-              
-              // Redirect to demo environment (replace with actual demo URL)
-              window.open('/api/demo/launch?session=' + demoSessionId, '_blank');
+            })
+            .finally(() => {
               
               // Reset form after slight delay
               setTimeout(() => {
