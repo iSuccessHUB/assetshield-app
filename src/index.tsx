@@ -599,7 +599,7 @@ app.get('/', (c) => {
                   </div>
 
                   <div className="flex justify-end">
-                    <button onclick="submitDirectAssessment()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <button onclick="if(typeof submitDirectAssessment === 'function') { submitDirectAssessment(); } else { alert('Function not loaded. Please refresh the page.'); }" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                       Get My Risk Assessment <i className="fas fa-arrow-right ml-2"></i>
                     </button>
                   </div>
