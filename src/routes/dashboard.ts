@@ -746,15 +746,38 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
                     <h1 class="text-xl font-bold text-gray-900">${lawFirm.firm_name}</h1>
                     <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded">DEMO</span>
                 </div>
-                <nav class="flex items-center space-x-6">
-                    <a href="#dashboard" class="text-primary font-medium">Dashboard</a>
-                    <a href="#leads" class="text-gray-600 hover:text-primary">Leads</a>
-                    <a href="#analytics" class="text-gray-600 hover:text-primary">Analytics</a>
-                    <a href="#settings" class="text-gray-600 hover:text-primary">Settings</a>
-                    <button onclick="window.close()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-300">
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="#dashboard" class="text-primary font-medium hover:text-blue-800 transition-colors">Dashboard</a>
+                    <a href="#leads" class="text-gray-600 hover:text-primary transition-colors">Leads</a>
+                    <a href="#analytics" class="text-gray-600 hover:text-primary transition-colors">Analytics</a>
+                    <a href="#settings" class="text-gray-600 hover:text-primary transition-colors">Settings</a>
+                    <button onclick="if(confirm('Exit demo and return to main site?')) { window.close(); }" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
                         Exit Demo
                     </button>
                 </nav>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-primary p-2">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobileMenu" class="md:hidden border-t border-gray-200 hidden">
+                <div class="px-4 pt-2 pb-3 space-y-1">
+                    <a href="#dashboard" class="block text-primary font-medium py-2">Dashboard</a>
+                    <a href="#leads" class="block text-gray-600 hover:text-primary py-2">Leads</a>
+                    <a href="#analytics" class="block text-gray-600 hover:text-primary py-2">Analytics</a>
+                    <a href="#settings" class="block text-gray-600 hover:text-primary py-2">Settings</a>
+                    <button onclick="if(confirm('Exit demo and return to main site?')) { window.close(); }" class="block w-full text-left bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-200 mt-3">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        Exit Demo
+                    </button>
+                </div>
+            </div>
             </div>
         </div>
     </header>
@@ -1050,25 +1073,47 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
     </footer>
 
     <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Demo dashboard loaded successfully');
             
+            // Add navigation functionality
+            const navLinks = document.querySelectorAll('nav a, #mobileMenu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const text = this.textContent.trim();
+                    
+                    if (text === 'Dashboard') {
+                        showDemoMessage('Dashboard', 'You\\'re currently viewing the main dashboard with key metrics, charts, and recent activity.');
+                    } else if (text === 'Leads') {
+                        showDemoMessage('Lead Management', 'This would show your complete lead pipeline with client details, risk scores, follow-up tasks, and conversion tracking.');
+                    } else if (text === 'Analytics') {
+                        showDemoMessage('Analytics Center', 'This would display detailed conversion funnels, ROI tracking, client acquisition costs, and performance metrics across all your marketing channels.');
+                    } else if (text === 'Settings') {
+                        showDemoMessage('Platform Settings', 'This would open your platform configuration including white-label branding, user management, integration settings, and billing preferences.');
+                    }
+                });
+            });
+            
             // Add hover effects to action cards
-            const actionButtons = document.querySelectorAll('button');
+            const actionButtons = document.querySelectorAll('button[class*="bg-primary"], button[class*="bg-green"]');
             actionButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
                     if (this.textContent.includes('Try Assessment')) {
-                        alert('Demo Feature: This would take you to the risk assessment tool where clients evaluate their asset protection needs.');
+                        e.preventDefault();
+                        showDemoMessage('Risk Assessment Tool', 'This would launch the interactive risk assessment where clients answer questions about their assets, business structure, and protection needs to receive a personalized risk score.');
                     } else if (this.textContent.includes('View Leads')) {
-                        alert('Demo Feature: This would show your complete lead management pipeline with client details and follow-up tasks.');
+                        e.preventDefault();
+                        showDemoMessage('Lead Pipeline', 'This would show your complete lead management system with client details, follow-up schedules, conversion tracking, and assignment management.');
                     } else if (this.textContent.includes('Customize')) {
-                        alert('Demo Feature: This would open the white-label customization panel where you can brand the platform with your firm\\'s colors, logo, and content.');
-                    } else if (this.textContent.includes('Exit Demo')) {
-                        if (confirm('Are you sure you want to exit the demo? This will close the demo window.')) {
-                            window.close();
-                        }
+                        e.preventDefault();
+                        showDemoMessage('Platform Customization', 'This would open the white-label customization panel where you can upload your firm\\'s logo, set brand colors, customize content, and configure your domain.');
                     }
                 });
             });
@@ -1081,6 +1126,35 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
                 }
             }, 1000);
         });
+        
+        function showDemoMessage(title, message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = \`
+                <div class="bg-white rounded-xl max-w-md w-full p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">\${title}</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-600 mb-6">\${message}</p>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
+                            Got it
+                        </button>
+                    </div>
+                </div>
+            \`;
+            document.body.appendChild(modal);
+            
+            // Close on background click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
         
         function showWelcomeMessage() {
             const banner = document.createElement('div');
