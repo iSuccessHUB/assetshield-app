@@ -445,10 +445,10 @@ app.get('/', (c) => {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors">Education</a>
-              <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')">For Law Firms</a>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors" data-translate="nav.riskAssessment">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors" data-translate="nav.strategies">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors" data-translate="nav.education">Education</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')" data-translate="nav.forLawFirms">For Law Firms</a>
               <div className="relative">
                 <button id="language-btn" onclick="toggleLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
                   <i className="fas fa-globe mr-2"></i>EN
@@ -470,10 +470,10 @@ app.get('/', (c) => {
           {/* Mobile Navigation */}
           <div id="mobile-menu" className="hidden md:hidden mt-4 pb-4 border-t border-white/20">
             <div className="flex flex-col space-y-3 mt-4">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2">Education</a>
-              <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')">For Law Firms</a>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.riskAssessment">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.strategies">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.education">Education</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')" data-translate="nav.forLawFirms">For Law Firms</a>
               <div className="flex items-center justify-between py-2">
                 <button id="mobile-language-btn" onclick="toggleMobileLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
                   <i className="fas fa-globe mr-2"></i>English
@@ -535,11 +535,11 @@ app.get('/', (c) => {
         <section id="assessment" className="px-6 py-20 bg-white">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                Discover Your Asset Protection Risk Level
+              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="assessment.title">
+                Asset Protection Risk Assessment
               </h2>
-              <p className="text-xl text-gray-600">
-                Complete our comprehensive assessment to receive personalized recommendations
+              <p className="text-xl text-gray-600" data-translate="assessment.subtitle">
+                Evaluate your current protection level in just 5 minutes
               </p>
             </div>
 
@@ -635,11 +635,137 @@ app.get('/', (c) => {
                   };
                 }
                 
-                // Ensure basic functions are available globally
+                // Enhanced language changing functionality
                 if (!window.changeLanguage) {
                   window.changeLanguage = function(lang) {
-                    console.log('Language change to:', lang);
-                    // Basic implementation until full app loads
+                    console.log('Changing language to:', lang);
+                    
+                    // Store language preference in localStorage
+                    localStorage.setItem('assetshield-language', lang);
+                    
+                    // Update language display in navigation
+                    const languageBtn = document.getElementById('language-btn');
+                    const mobileLanguageBtn = document.getElementById('mobile-language-btn');
+                    
+                    const languageNames = {
+                      'en': 'EN',
+                      'es': 'ES',
+                      'fr': 'FR',
+                      'de': 'DE'
+                    };
+                    
+                    const fullLanguageNames = {
+                      'en': 'English',
+                      'es': 'Español',
+                      'fr': 'Français',
+                      'de': 'Deutsch'
+                    };
+                    
+                    if (languageBtn) {
+                      languageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + languageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
+                    }
+                    if (mobileLanguageBtn) {
+                      mobileLanguageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + fullLanguageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
+                    }
+                    
+                    // Close the language menu
+                    const menu = document.getElementById('language-menu');
+                    const mobileMenu = document.getElementById('mobile-language-menu');
+                    if (menu) menu.classList.add('hidden');
+                    if (mobileMenu) mobileMenu.classList.add('hidden');
+                    
+                    // Basic translation system with fallback content
+                    const translations = {
+                      'en': {
+                        'hero.title': 'Complete Asset Protection Platform',
+                        'hero.subtitle': 'Discover your asset protection risk level, explore tailored strategies, and access comprehensive educational resources to safeguard your wealth.',
+                        'nav.riskAssessment': 'Risk Assessment',
+                        'nav.strategies': 'Strategies',
+                        'nav.education': 'Education',
+                        'nav.forLawFirms': 'For Law Firms',
+                        'assessment.title': 'Asset Protection Risk Assessment',
+                        'assessment.subtitle': 'Evaluate your current protection level in just 5 minutes',
+                        'strategies.title': 'Asset Protection Strategies',
+                        'strategies.subtitle': 'Comprehensive strategies to protect your wealth from creditors, lawsuits, and financial threats',
+                        'education.title': 'Asset Protection Education Center',
+                        'education.subtitle': 'Comprehensive resources to help you make informed decisions'
+                      },
+                      'es': {
+                        'hero.title': 'Plataforma Completa de Protección de Activos',
+                        'hero.subtitle': 'Descubra su nivel de riesgo de protección de activos, explore estrategias personalizadas y acceda a recursos educativos integrales para proteger su riqueza.',
+                        'nav.riskAssessment': 'Evaluación de Riesgo',
+                        'nav.strategies': 'Estrategias',
+                        'nav.education': 'Educación',
+                        'nav.forLawFirms': 'Para Bufetes',
+                        'assessment.title': 'Evaluación de Riesgo de Protección de Activos',
+                        'assessment.subtitle': 'Evalúe su nivel de protección actual en solo 5 minutos',
+                        'strategies.title': 'Estrategias de Protección de Activos',
+                        'strategies.subtitle': 'Estrategias integrales para proteger su riqueza de acreedores, demandas y amenazas financieras',
+                        'education.title': 'Centro de Educación de Protección de Activos',
+                        'education.subtitle': 'Recursos integrales para ayudarle a tomar decisiones informadas'
+                      },
+                      'fr': {
+                        'hero.title': 'Plateforme Complète de Protection d\'Actifs',
+                        'hero.subtitle': 'Découvrez votre niveau de risque de protection d\'actifs, explorez des stratégies sur mesure et accédez à des ressources éducatives complètes pour protéger votre patrimoine.',
+                        'nav.riskAssessment': 'Évaluation des Risques',
+                        'nav.strategies': 'Stratégies',
+                        'nav.education': 'Éducation',
+                        'nav.forLawFirms': 'Pour Cabinets',
+                        'assessment.title': 'Évaluation des Risques de Protection d\'Actifs',
+                        'assessment.subtitle': 'Évaluez votre niveau de protection actuel en seulement 5 minutes',
+                        'strategies.title': 'Stratégies de Protection d\'Actifs',
+                        'strategies.subtitle': 'Stratégies complètes pour protéger votre patrimoine des créanciers, poursuites et menaces financières',
+                        'education.title': 'Centre d\'Éducation de Protection d\'Actifs',
+                        'education.subtitle': 'Ressources complètes pour vous aider à prendre des décisions éclairées'
+                      },
+                      'de': {
+                        'hero.title': 'Vollständige Vermögensschutz-Plattform',
+                        'hero.subtitle': 'Entdecken Sie Ihr Risiko für den Vermögensschutz, erkunden Sie maßgeschneiderte Strategien und nutzen Sie umfassende Bildungsressourcen zum Schutz Ihres Vermögens.',
+                        'nav.riskAssessment': 'Risikobewertung',
+                        'nav.strategies': 'Strategien',
+                        'nav.education': 'Bildung',
+                        'nav.forLawFirms': 'Für Kanzleien',
+                        'assessment.title': 'Risikobewertung für Vermögensschutz',
+                        'assessment.subtitle': 'Bewerten Sie Ihr aktuelles Schutzniveau in nur 5 Minuten',
+                        'strategies.title': 'Vermögensschutz-Strategien',
+                        'strategies.subtitle': 'Umfassende Strategien zum Schutz Ihres Vermögens vor Gläubigern, Klagen und finanziellen Bedrohungen',
+                        'education.title': 'Bildungszentrum für Vermögensschutz',
+                        'education.subtitle': 'Umfassende Ressourcen für fundierte Entscheidungen'
+                      }
+                    };
+                    
+                    // Apply translations to elements with data-translate attribute
+                    const elementsToTranslate = document.querySelectorAll('[data-translate]');
+                    elementsToTranslate.forEach(element => {
+                      const key = element.getAttribute('data-translate');
+                      if (translations[lang] && translations[lang][key]) {
+                        element.textContent = translations[lang][key];
+                      }
+                    });
+                    
+                    // Show confirmation message
+                    const message = {
+                      'en': 'Language changed to English',
+                      'es': 'Idioma cambiado a Español', 
+                      'fr': 'Langue changée en Français',
+                      'de': 'Sprache geändert auf Deutsch'
+                    };
+                    
+                    // Create a temporary notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300';
+                    notification.textContent = message[lang] || message['en'];
+                    document.body.appendChild(notification);
+                    
+                    // Remove notification after 3 seconds
+                    setTimeout(() => {
+                      notification.style.opacity = '0';
+                      setTimeout(() => {
+                        if (notification.parentNode) {
+                          document.body.removeChild(notification);
+                        }
+                      }, 300);
+                    }, 3000);
                   };
                 }
                 
@@ -691,6 +817,27 @@ app.get('/', (c) => {
                   };
                 }
                 
+                // Initialize language from localStorage on page load
+                if (!window.initializeLanguage) {
+                  window.initializeLanguage = function() {
+                    const savedLanguage = localStorage.getItem('assetshield-language');
+                    if (savedLanguage && savedLanguage !== 'en') {
+                      // Apply the saved language
+                      setTimeout(() => {
+                        window.changeLanguage(savedLanguage);
+                      }, 100);
+                    }
+                  };
+                }
+                
+                // Initialize language when DOM is loaded
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', window.initializeLanguage);
+                } else {
+                  // DOM is already loaded
+                  window.initializeLanguage();
+                }
+                
 
               `}}></script>
             </div>
@@ -706,10 +853,10 @@ app.get('/', (c) => {
         <section id="education" className="px-6 py-20 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="education.title">
                 Asset Protection Education Center
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600" data-translate="education.subtitle">
                 Comprehensive resources to help you make informed decisions
               </p>
             </div>
@@ -892,6 +1039,211 @@ app.get('/', (c) => {
                 });
               });
             `}}></script>
+          </div>
+        </section>
+
+        {/* Asset Protection Strategies */}
+        <section id="strategies" className="px-6 py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="strategies.title">
+                Asset Protection Strategies
+              </h2>
+              <p className="text-xl text-gray-600" data-translate="strategies.subtitle">
+                Comprehensive strategies to protect your wealth from creditors, lawsuits, and financial threats
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8 mb-12">
+              {/* Domestic Protection */}
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all transform hover:scale-105">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-home text-blue-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Domestic Protection</h3>
+                  <p className="text-gray-600">U.S.-based asset protection structures</p>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start">
+                    <i className="fas fa-shield-alt text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Limited Liability Companies (LLCs)</strong>
+                      <p className="text-gray-600 text-sm">Multi-member LLCs with charging order protection</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-users text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Family Limited Partnerships</strong>
+                      <p className="text-gray-600 text-sm">Centralized family wealth management</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-landmark text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Domestic Asset Protection Trusts</strong>
+                      <p className="text-gray-600 text-sm">Self-settled spendthrift trusts in favorable states</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-university text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Homestead Exemptions</strong>
+                      <p className="text-gray-600 text-sm">Primary residence protection strategies</p>
+                    </div>
+                  </li>
+                </ul>
+                
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <i className="fas fa-info-circle mr-2"></i>
+                    <strong>Best for:</strong> Moderate risk exposure, cost-effective solutions, U.S. tax compliance
+                  </p>
+                </div>
+              </div>
+
+              {/* Offshore Protection */}
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all transform hover:scale-105">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-globe text-purple-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Offshore Protection</h3>
+                  <p className="text-gray-600">International asset protection structures</p>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start">
+                    <i className="fas fa-island-tropical text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Cook Islands Trusts</strong>
+                      <p className="text-gray-600 text-sm">World's strongest asset protection jurisdiction</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-mountain text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Nevis LLCs</strong>
+                      <p className="text-gray-600 text-sm">Creditor-proof offshore entities</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-coins text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Offshore Banking</strong>
+                      <p className="text-gray-600 text-sm">International banking relationships</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-balance-scale text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Foreign Judgments Protection</strong>
+                      <p className="text-gray-600 text-sm">Barriers to U.S. judgment enforcement</p>
+                    </div>
+                  </li>
+                </ul>
+                
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <p className="text-sm text-purple-800">
+                    <i className="fas fa-info-circle mr-2"></i>
+                    <strong>Best for:</strong> High-risk professionals, substantial assets, maximum protection
+                  </p>
+                </div>
+              </div>
+
+              {/* Business Protection */}
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all transform hover:scale-105">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-building text-green-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Business Protection</h3>
+                  <p className="text-gray-600">Protecting business assets and operations</p>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start">
+                    <i className="fas fa-layer-group text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Corporate Structures</strong>
+                      <p className="text-gray-600 text-sm">Multi-entity business organization</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-file-contract text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Operating Agreements</strong>
+                      <p className="text-gray-600 text-sm">Creditor-resistant business documents</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-umbrella text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Insurance Strategies</strong>
+                      <p className="text-gray-600 text-sm">Liability insurance optimization</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <i className="fas fa-handshake text-green-500 mr-3 mt-1"></i>
+                    <div>
+                      <strong className="text-gray-800">Management Agreements</strong>
+                      <p className="text-gray-600 text-sm">Independent management structures</p>
+                    </div>
+                  </li>
+                </ul>
+                
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-sm text-green-800">
+                    <i className="fas fa-info-circle mr-2"></i>
+                    <strong>Best for:</strong> Business owners, professional practices, operational continuity
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategy Selection Guide */}
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">Choose the Right Strategy</h3>
+                <p className="text-gray-600">Our assessment helps you identify the optimal protection approach for your situation</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-yellow-50 rounded-lg">
+                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                  </div>
+                  <h4 className="font-bold text-gray-800 mb-2">Low Risk</h4>
+                  <p className="text-sm text-gray-600">Basic domestic protection, insurance optimization, simple entity structures</p>
+                </div>
+                
+                <div className="text-center p-6 bg-orange-50 rounded-lg">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-shield-alt text-orange-600 text-xl"></i>
+                  </div>
+                  <h4 className="font-bold text-gray-800 mb-2">Medium Risk</h4>
+                  <p className="text-sm text-gray-600">Domestic trusts, advanced LLCs, multi-entity structures, enhanced insurance</p>
+                </div>
+                
+                <div className="text-center p-6 bg-red-50 rounded-lg">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-fort-awesome text-red-600 text-xl"></i>
+                  </div>
+                  <h4 className="font-bold text-gray-800 mb-2">High Risk</h4>
+                  <p className="text-sm text-gray-600">Offshore trusts, international entities, comprehensive asset protection plans</p>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <button onClick="navigateToSection('assessment')" className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                  <i className="fas fa-clipboard-list mr-2"></i>
+                  Start Risk Assessment
+                </button>
+                <p className="text-sm text-gray-500 mt-2">Get personalized strategy recommendations in 5 minutes</p>
+              </div>
+            </div>
           </div>
         </section>
 
