@@ -36,6 +36,12 @@ export const renderer = jsxRenderer(({ children }) => {
         <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
         <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
         
+        {/* Cache busting for critical fixes */}
+        <meta name="app-version" content="payment-fixes-v2.0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        
         {/* External Libraries */}
         <script src="https://cdn.tailwindcss.com"></script>
         <script dangerouslySetInnerHTML={{__html: `

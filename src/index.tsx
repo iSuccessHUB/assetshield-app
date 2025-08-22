@@ -2778,15 +2778,13 @@ app.get('/', (c) => {
             console.log('🔄 Closing payment modal...');
             const modal = document.getElementById('payment-modal');
             if (modal) {
-              // Add fade-out animation
-              modal.style.opacity = '0';
-              modal.style.transition = 'opacity 0.2s ease-out';
-              
+              // Immediate removal - no animation delay
+              modal.style.display = 'none';
               setTimeout(() => {
                 modal.remove();
                 document.body.style.overflow = '';
-                console.log('✅ Payment modal closed');
-              }, 200);
+                console.log('✅ Payment modal closed and removed');
+              }, 50);
             } else {
               console.log('⚠️ Payment modal not found');
             }
@@ -2842,26 +2840,28 @@ app.get('/', (c) => {
               
               const result = await response.json();
               
-              if (result.success) {
+              if (result.success && result.checkoutUrl) {
                 console.log('✅ Checkout session created:', result.sessionId);
                 console.log('🔗 Opening checkout URL:', result.checkoutUrl);
                 
-                // Close modal first
+                // Close modal immediately
                 closeProfessionalModal();
                 
-                // Small delay to ensure modal is closed, then open checkout
+                // Force show success message first
+                showCheckoutSuccessMessage();
+                
+                // Then try to open the checkout
                 setTimeout(() => {
-                  const opened = window.open(result.checkoutUrl, '_blank');
+                  const opened = window.open(result.checkoutUrl, '_blank', 'noopener,noreferrer');
                   console.log('🆕 New tab opened:', opened ? 'Success' : 'Blocked by popup blocker');
                   
-                  if (opened) {
-                    // Show success feedback if tab opened successfully
-                    showCheckoutSuccessMessage();
-                  } else {
+                  if (!opened) {
                     // Show fallback message if popup was blocked
                     showPopupBlockedMessage(result.checkoutUrl);
                   }
-                }, 100);
+                }, 200);
+              } else if (result.success && !result.checkoutUrl) {
+                throw new Error('Checkout session created but no URL returned');
               } else {
                 throw new Error(result.error || 'Failed to create checkout session');
               }
@@ -2891,8 +2891,8 @@ app.get('/', (c) => {
             
             // Create a prominent success message
             const successDiv = document.createElement('div');
-            successDiv.className = 'checkout-success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl z-[9999] flex items-center transform translate-x-full';
-            successDiv.style.cssText = 'position: fixed !important; top: 1rem !important; right: 1rem !important; z-index: 9999 !important; transform: translateX(100%);';
+            successDiv.className = 'checkout-success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center transform translate-x-full';
+            successDiv.style.cssText = 'position: fixed !important; top: 1rem !important; right: 1rem !important; z-index: 99999 !important; transform: translateX(100%) !important; background-color: #10b981 !important; color: white !important;';
             successDiv.innerHTML = \`
               <i class="fas fa-external-link-alt mr-3 text-xl"></i>
               <div>
@@ -2903,12 +2903,12 @@ app.get('/', (c) => {
             
             document.body.appendChild(successDiv);
             
-            // Animate in
+            // Animate in immediately
             setTimeout(() => {
-              successDiv.style.transform = 'translateX(0)';
-              successDiv.style.transition = 'transform 0.3s ease-out';
+              successDiv.style.transform = 'translateX(0) !important';
+              successDiv.style.transition = 'transform 0.3s ease-out !important';
               console.log('✅ Success message displayed');
-            }, 50);
+            }, 100);
             
             // Auto-remove after 6 seconds
             setTimeout(() => {
