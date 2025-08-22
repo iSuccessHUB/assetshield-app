@@ -566,8 +566,10 @@ app.get('/', (c) => {
                   <p className="text-gray-600">Loading assessment...</p>
                 </div>
               </div>
-              
-              <script dangerouslySetInnerHTML={{__html: `
+            </div>
+            
+            {/* SCRIPT MOVED OUTSIDE assessment-container TO PREVENT SELF-DESTRUCTION */}
+            <script dangerouslySetInnerHTML={{__html: `
                 // Assessment form loading function - DEFINE FIRST
                 function loadAssessmentForm() {
                   const container = document.getElementById('assessment-form');
@@ -964,7 +966,6 @@ app.get('/', (c) => {
                 
 
               `}}></script>
-            </div>
           </div>
         </section>
 
