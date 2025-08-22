@@ -64,7 +64,7 @@ app.get('/content/:id', async (c) => {
     if (!content) {
       const mockContent = [
         {
-          id: 'trust-basics',
+          id: 1,
           title: "Trust Fundamentals for Asset Protection",
           description: "Understanding the basic concepts and applications of trusts in asset protection planning.",
           content_type: "article",
@@ -381,7 +381,7 @@ app.get('/content/:id', async (c) => {
           `
         },
         {
-          id: 'llc-structures',
+          id: 2,
           title: "LLC Asset Protection Strategies",
           description: "Comprehensive guide to using Limited Liability Companies for effective asset protection.",
           content_type: "guide",
@@ -797,7 +797,7 @@ app.get('/content/:id', async (c) => {
           `
         },
         {
-          id: 'family-limited-partnerships',
+          id: 3,
           title: "Family Limited Partnerships for Wealth Protection", 
           description: "Learn how Family Limited Partnerships combine asset protection with estate planning benefits.",
           content_type: "guide",
@@ -808,7 +808,435 @@ app.get('/content/:id', async (c) => {
           view_count: 1920,
           created_at: new Date().toISOString(),
           excerpt: "Family Limited Partnerships offer unique advantages for families seeking both asset protection and tax-efficient wealth transfer...",
-          content: "Content for Family Limited Partnerships article would go here..."
+          content: `
+            <h1>Family Limited Partnerships for Wealth Protection</h1>
+            
+            <p>Family Limited Partnerships (FLPs) represent one of the most sophisticated and effective tools for combining asset protection with estate planning benefits. These structures allow families to transfer wealth across generations while maintaining control and providing substantial protection from creditors and lawsuits.</p>
+            
+            <h2>Understanding Family Limited Partnerships</h2>
+            
+            <h3>What is a Family Limited Partnership?</h3>
+            <p>A Family Limited Partnership is a limited partnership where family members are the only partners. The structure typically involves parents (or senior generation) as general partners who maintain control over partnership operations, while children or other family members hold limited partnership interests.</p>
+            
+            <h3>Key Components:</h3>
+            <ul>
+              <li><strong>General Partners:</strong> Usually parents, maintain management control (typically 1-2% ownership)</li>
+              <li><strong>Limited Partners:</strong> Children/beneficiaries, no management rights but receive economic benefits</li>
+              <li><strong>Partnership Assets:</strong> Family wealth transferred into the partnership</li>
+              <li><strong>Partnership Agreement:</strong> Governs operations, distributions, and transfer restrictions</li>
+            </ul>
+            
+            <h2>Asset Protection Benefits</h2>
+            
+            <h3>Charging Order Protection</h3>
+            <p>Similar to LLCs, partnerships provide charging order protection in most states:</p>
+            <ul>
+              <li>Personal creditors can only obtain charging orders against partnership interests</li>
+              <li>Creditors cannot force distributions or participate in management</li>
+              <li>Creates significant deterrent effect for potential litigants</li>
+              <li>May result in "phantom income" tax liability for creditors without distributions</li>
+            </ul>
+            
+            <h3>Management Control Retention</h3>
+            <ul>
+              <li>General partners maintain full operational control</li>
+              <li>Can decide timing and amounts of distributions</li>
+              <li>Ability to withhold distributions from problem beneficiaries</li>
+              <li>Retain authority over investment decisions</li>
+            </ul>
+            
+            <h2>Estate Planning Advantages</h2>
+            
+            <h3>Valuation Discounts</h3>
+            <p>FLPs can generate significant gift and estate tax savings through valuation discounts:</p>
+            
+            <h4>Marketability Discounts (20-35%):</h4>
+            <ul>
+              <li>Limited partnership interests are not easily marketable</li>
+              <li>No ready market exists for minority interests</li>
+              <li>Transfer restrictions limit ability to sell</li>
+            </ul>
+            
+            <h4>Minority Interest Discounts (10-25%):</h4>
+            <ul>
+              <li>Limited partners have no control over operations</li>
+              <li>Cannot force distributions or liquidation</li>
+              <li>Limited voice in partnership decisions</li>
+            </ul>
+            
+            <h3>Leveraged Gifting</h3>
+            <ul>
+              <li>Transfer larger amounts with same gift tax exemption</li>
+              <li>Future appreciation occurs outside taxable estate</li>
+              <li>Income shifting to beneficiaries in lower tax brackets</li>
+              <li>Potential for generation-skipping tax benefits</li>
+            </ul>
+            
+            <h2>Tax Considerations</h2>
+            
+            <h3>Partnership Tax Treatment</h3>
+            <ul>
+              <li>Pass-through taxation - no entity-level tax</li>
+              <li>K-1s issued to all partners</li>
+              <li>Income allocated based on partnership percentages</li>
+              <li>Potential for income shifting strategies</li>
+            </ul>
+            
+            <h3>Gift Tax Implications</h3>
+            <ul>
+              <li>Initial transfers to FLP may be taxable gifts</li>
+              <li>Subsequent gifts of partnership interests qualify for discounts</li>
+              <li>Annual exclusion gifts of small percentages</li>
+              <li>Lifetime exemption utilization with discounted values</li>
+            </ul>
+            
+            <h2>Common FLP Structures</h2>
+            
+            <h3>Traditional FLP Structure</h3>
+            <ul>
+              <li>Parents as general partners (1-2%)</li>
+              <li>Parents initially own all limited partnership interests</li>
+              <li>Gradual gifting of limited interests to children</li>
+              <li>Parents retain control during lifetime</li>
+            </ul>
+            
+            <h3>FLP with Management Company</h3>
+            <ul>
+              <li>Separate LLC serves as general partner</li>
+              <li>Family members own interests in management company</li>
+              <li>Additional layer of liability protection</li>
+              <li>More sophisticated governance structure</li>
+            </ul>
+            
+            <h3>Multiple Generation Structure</h3>
+            <ul>
+              <li>Trusts for grandchildren as limited partners</li>
+              <li>Generation-skipping tax planning</li>
+              <li>Dynasty trust integration</li>
+              <li>Long-term wealth preservation</li>
+            </ul>
+            
+            <h2>Asset Types Suitable for FLPs</h2>
+            
+            <h3>Ideal Assets:</h3>
+            <ul>
+              <li><strong>Investment Real Estate:</strong> Rental properties, commercial buildings</li>
+              <li><strong>Securities Portfolios:</strong> Stocks, bonds, mutual funds</li>
+              <li><strong>Business Interests:</strong> Operating companies, investment holdings</li>
+              <li><strong>Collectibles:</strong> Art, antiques, precious metals</li>
+              <li><strong>Investment Assets:</strong> Private equity, hedge funds</li>
+            </ul>
+            
+            <h3>Assets to Avoid:</h3>
+            <ul>
+              <li>Personal residences (homestead exemption loss)</li>
+              <li>Retirement accounts (tax-qualified status loss)</li>
+              <li>Subchapter S corporation stock (shareholder restrictions)</li>
+              <li>Assets needed for personal living expenses</li>
+            </ul>
+            
+            <h2>Partnership Agreement Essentials</h2>
+            
+            <h3>Management Provisions</h3>
+            <ul>
+              <li>General partner authority and responsibilities</li>
+              <li>Decision-making processes and voting rights</li>
+              <li>Compensation for management services</li>
+              <li>Succession planning for general partners</li>
+            </ul>
+            
+            <h3>Distribution Policies</h3>
+            <ul>
+              <li>Distribution standards and timing</li>
+              <li>Tax distribution requirements</li>
+              <li>General partner discretion over distributions</li>
+              <li>Priority distributions for different partner classes</li>
+            </ul>
+            
+            <h3>Transfer Restrictions</h3>
+            <ul>
+              <li>Right of first refusal provisions</li>
+              <li>Consent requirements for transfers</li>
+              <li>Valuation methods for forced transfers</li>
+              <li>Buy-sell agreement terms</li>
+            </ul>
+            
+            <h2>Valuation and Appraisal</h2>
+            
+            <h3>Professional Appraisals</h3>
+            <ul>
+              <li>Qualified appraisers essential for gift tax reporting</li>
+              <li>Regular updates for ongoing gift programs</li>
+              <li>Detailed documentation of discount factors</li>
+              <li>IRS audit defense preparation</li>
+            </ul>
+            
+            <h3>Factors Affecting Discounts</h3>
+            <ul>
+              <li>Partnership agreement restrictions</li>
+              <li>Asset types and liquidity</li>
+              <li>Partnership size and complexity</li>
+              <li>Market conditions and comparables</li>
+            </ul>
+            
+            <h2>Common Mistakes and Pitfalls</h2>
+            
+            <h3>Formation Mistakes</h3>
+            <ul>
+              <li><strong>Retained Benefits:</strong> Continuing to use partnership assets personally</li>
+              <li><strong>Inadequate Funding:</strong> Insufficient assets to justify structure</li>
+              <li><strong>Poor Timing:</strong> Formation too close to gift tax deadlines</li>
+              <li><strong>Wrong Asset Mix:</strong> Including inappropriate assets</li>
+            </ul>
+            
+            <h3>Operational Mistakes</h3>
+            <ul>
+              <li><strong>Ignoring Formalities:</strong> Not following partnership agreement</li>
+              <li><strong>Commingling Assets:</strong> Mixing personal and partnership funds</li>
+              <li><strong>Inadequate Records:</strong> Poor documentation of decisions</li>
+              <li><strong>Tax Non-compliance:</strong> Missing filing requirements</li>
+            </ul>
+            
+            <h2>IRS Challenges and Defense</h2>
+            
+            <h3>Common IRS Arguments</h3>
+            <ul>
+              <li>Lack of business purpose</li>
+              <li>Retained control and benefits</li>
+              <li>Step transaction doctrine</li>
+              <li>Inadequate non-tax purposes</li>
+            </ul>
+            
+            <h3>Best Practices for Defense</h3>
+            <ul>
+              <li>Document legitimate business purposes</li>
+              <li>Maintain operational independence</li>
+              <li>Follow all partnership formalities</li>
+              <li>Obtain professional appraisals</li>
+              <li>Keep detailed contemporaneous records</li>
+            </ul>
+            
+            <h2>Case Study: Successful FLP Implementation</h2>
+            
+            <h3>Background</h3>
+            <p>The Johnson family owns $10 million in investment real estate and securities, with estate tax concerns and potential liability from rental properties.</p>
+            
+            <h3>FLP Structure</h3>
+            <ul>
+              <li>Johnson FLP formed with parents as 1% general partners</li>
+              <li>$8 million in assets transferred to partnership</li>
+              <li>Parents initially own 99% limited partnership interests</li>
+              <li>Management LLC serves as general partner</li>
+            </ul>
+            
+            <h3>Implementation Strategy</h3>
+            <ul>
+              <li>Annual gifts of limited partnership interests to children</li>
+              <li>30% combined discounts applied to gift values</li>
+              <li>Professional appraisals obtained annually</li>
+              <li>Distributions made for tax liabilities and family needs</li>
+            </ul>
+            
+            <h3>Results</h3>
+            <ul>
+              <li>$2.8 million reduction in taxable estate over 5 years</li>
+              <li>Asset protection for rental property liability</li>
+              <li>Maintained control over investment decisions</li>
+              <li>Significant estate tax savings for next generation</li>
+            </ul>
+            
+            <h2>Alternatives and Comparisons</h2>
+            
+            <h3>FLP vs. Family LLC</h3>
+            <ul>
+              <li><strong>FLP Advantages:</strong> Established case law, traditional structure</li>
+              <li><strong>LLC Advantages:</strong> Operational flexibility, simpler governance</li>
+              <li><strong>Tax Treatment:</strong> Generally similar pass-through taxation</li>
+              <li><strong>Choice Factor:</strong> State law variations and preferences</li>
+            </ul>
+            
+            <h3>FLP vs. Trust Structures</h3>
+            <ul>
+              <li><strong>Control:</strong> FLP allows more retained control</li>
+              <li><strong>Flexibility:</strong> Partnerships easier to modify</li>
+              <li><strong>Protection:</strong> Trusts may provide stronger asset protection</li>
+              <li><strong>Complexity:</strong> Trusts generally more complex to administer</li>
+            </ul>
+            
+            <h2>Future Planning Considerations</h2>
+            
+            <h3>Exit Strategies</h3>
+            <ul>
+              <li>Partnership liquidation planning</li>
+              <li>Succession of general partner roles</li>
+              <li>Buy-out mechanisms for withdrawing partners</li>
+              <li>Conversion to other entity types</li>
+            </ul>
+            
+            <h3>Legislative Changes</h3>
+            <ul>
+              <li>Potential valuation discount limitations</li>
+              <li>Changes to estate and gift tax exemptions</li>
+              <li>New reporting requirements</li>
+              <li>State law modifications</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Family Limited Partnerships remain one of the most effective tools for combining asset protection with estate planning objectives. When properly structured and operated, FLPs can provide substantial tax savings, meaningful asset protection, and flexible wealth transfer mechanisms.</p>
+            
+            <p>Success with FLPs requires:</p>
+            <ul>
+              <li>Proper planning and professional guidance</li>
+              <li>Appropriate asset selection and structure design</li>
+              <li>Ongoing compliance with partnership formalities</li>
+              <li>Regular monitoring and adjustment as needed</li>
+              <li>Coordination with overall estate planning goals</li>
+            </ul>
+            
+            <p>While FLPs are not suitable for every family situation, they can be invaluable tools for those with substantial wealth, multiple generations to consider, and the commitment to proper ongoing administration.</p>
+          `
+        },
+        {
+          id: 4,
+          title: "Common Asset Protection Mistakes to Avoid",
+          description: "Identify and avoid the most frequent mistakes that can compromise your asset protection strategy.",
+          content_type: "checklist",
+          category: "planning",
+          author: "Jennifer Walsh, CPA",
+          reading_time: 6,
+          difficulty_level: "beginner",
+          view_count: 1750,
+          created_at: new Date().toISOString(),
+          excerpt: "Avoiding common pitfalls is essential for maintaining effective asset protection. Learn about the mistakes...",
+          content: `
+            <h1>Common Asset Protection Mistakes to Avoid</h1>
+            
+            <p>Asset protection planning is a complex field where even small mistakes can have devastating consequences. Learning from the errors of others can save you significant time, money, and stress while ensuring your wealth protection strategies remain effective. Here are the most common asset protection mistakes and how to avoid them.</p>
+            
+            <h2>Critical Timing Mistakes</h2>
+            
+            <h3>❌ Mistake #1: Waiting Until You're Already Being Sued</h3>
+            
+            <p><strong>The Problem:</strong> The single biggest mistake in asset protection is waiting too long to implement strategies. Once you're facing a lawsuit or creditor claim, your options become severely limited, and any transfers may be considered fraudulent.</p>
+            
+            <p><strong>Why It Happens:</strong></p>
+            <ul>
+              <li>People think "it won't happen to me"</li>
+              <li>Procrastination and lack of urgency</li>
+              <li>Not understanding the advance planning requirement</li>
+              <li>Believing insurance is sufficient protection</li>
+            </ul>
+            
+            <p><strong>The Solution:</strong></p>
+            <ul>
+              <li>Implement asset protection strategies when you don't need them</li>
+              <li>Plan during periods of financial calm</li>
+              <li>Review and update strategies regularly</li>
+              <li>Don't wait for warning signs of potential litigation</li>
+            </ul>
+            
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>⚠️ Remember:</strong> Asset protection planning must be done BEFORE you need it. Courts will scrutinize transfers made after legal troubles begin.
+            </div>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Asset protection mistakes can be expensive and difficult to correct, but they're often preventable with proper planning and professional guidance. The key is to learn from the experiences of others and avoid these common pitfalls.</p>
+            
+            <p>By avoiding these common mistakes and following best practices, you can build robust asset protection that will serve you well for years to come. Don't let preventable errors undermine your wealth protection goals—invest in doing it right from the start.</p>
+          `
+        },
+        {
+          id: 5,
+          title: "Estate Planning Integration with Asset Protection",
+          description: "Learn how to integrate asset protection strategies with your overall estate planning goals.",
+          content_type: "guide",
+          category: "estate-planning",
+          author: "Robert Chen, JD, LLM",
+          reading_time: 18,
+          difficulty_level: "advanced",
+          view_count: 1620,
+          created_at: new Date().toISOString(),
+          excerpt: "Effective estate planning requires coordination with asset protection strategies to ensure comprehensive...",
+          content: `
+            <h1>Estate Planning Integration with Asset Protection</h1>
+            
+            <p>Estate planning and asset protection are two sides of the same coin—both focused on preserving and transferring wealth effectively. However, these strategies can sometimes work at cross-purposes if not properly coordinated. This comprehensive guide explores how to integrate estate planning with asset protection to create a unified wealth preservation strategy.</p>
+            
+            <h2>Understanding the Intersection</h2>
+            
+            <h3>Estate Planning Goals</h3>
+            <ul>
+              <li>Minimizing estate and gift taxes</li>
+              <li>Controlling distribution of assets after death</li>
+              <li>Providing for family members</li>
+              <li>Maintaining family harmony</li>
+              <li>Supporting charitable causes</li>
+              <li>Succession planning for businesses</li>
+            </ul>
+            
+            <h3>Asset Protection Goals</h3>
+            <ul>
+              <li>Protecting assets from creditors and lawsuits</li>
+              <li>Preserving wealth during lifetime</li>
+              <li>Maintaining privacy and confidentiality</li>
+              <li>Providing flexibility for changing circumstances</li>
+              <li>Reducing liability exposure</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Integrating estate planning with asset protection requires sophisticated planning and expert guidance, but the benefits can be substantial. By coordinating these strategies, families can achieve multiple objectives simultaneously while maximizing efficiency and minimizing costs.</p>
+            
+            <p>As laws and circumstances continue to evolve, maintaining flexibility and staying current with new developments will be essential for long-term success. The investment in integrated planning pays dividends through enhanced protection, tax savings, and peace of mind for generations to come.</p>
+          `
+        },
+        {
+          id: 6,
+          title: "Asset Protection for Medical Professionals",
+          description: "Specialized asset protection strategies tailored for doctors, surgeons, and healthcare practitioners.",
+          content_type: "case-study",
+          category: "professionals",
+          author: "Dr. Amanda Foster, MD, JD",
+          reading_time: 10,
+          difficulty_level: "intermediate",
+          view_count: 1480,
+          created_at: new Date().toISOString(),
+          excerpt: "Medical professionals face unique liability risks that require specialized asset protection approaches...",
+          content: `
+            <h1>Asset Protection for Medical Professionals</h1>
+            
+            <p>Medical professionals face some of the highest liability risks of any profession. From malpractice lawsuits to regulatory actions, doctors, surgeons, and healthcare practitioners need robust asset protection strategies tailored to their unique circumstances. This comprehensive guide explores specialized approaches for protecting medical professionals' wealth.</p>
+            
+            <h2>Understanding Medical Professional Risks</h2>
+            
+            <h3>Primary Risk Categories</h3>
+            
+            <h4>1. Malpractice Liability</h4>
+            <ul>
+              <li><strong>Professional negligence claims:</strong> Allegations of substandard care resulting in patient harm</li>
+              <li><strong>Surgical complications:</strong> Unexpected outcomes from surgical procedures</li>
+              <li><strong>Diagnostic errors:</strong> Missed or delayed diagnoses leading to patient injury</li>
+              <li><strong>Medication errors:</strong> Wrong prescriptions, dosages, or drug interactions</li>
+              <li><strong>Informed consent issues:</strong> Failure to adequately inform patients of risks</li>
+            </ul>
+            
+            <h4>2. Regulatory and Administrative Risks</h4>
+            <ul>
+              <li><strong>Medical board actions:</strong> License suspension or revocation</li>
+              <li><strong>Medicare/Medicaid fraud investigations:</strong> Billing and coding disputes</li>
+              <li><strong>DEA violations:</strong> Controlled substance prescribing issues</li>
+              <li><strong>HIPAA violations:</strong> Patient privacy breaches</li>
+              <li><strong>Anti-kickback statute violations:</strong> Improper referral arrangements</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Asset protection for medical professionals requires specialized strategies that address their unique risk profile and professional circumstances. By implementing comprehensive protection plans that combine insurance, legal structures, and professional best practices, medical professionals can safeguard their wealth while focusing on providing excellent patient care.</p>
+            
+            <p>The key to successful medical professional asset protection is early implementation, regular review and updates, and working with professionals who understand the unique challenges facing healthcare providers in today's litigious environment.</p>
+          `
         }
       ];
       
