@@ -225,6 +225,15 @@ app.get('/offline.html', (c) => {
 app.use(renderer)
 
 // API Routes
+// Import new routes
+import { demoRoutes } from './routes/demo'
+import { dashboardRoutes } from './routes/dashboard'
+import { officesRoutes } from './routes/offices'
+import { integrationsRoutes } from './routes/integrations'
+import { provisioningRoutes } from './routes/provisioning'
+import { stripeCheckoutRoutes } from './routes/stripe-checkout'
+
+// API Routes
 app.route('/api/assessment', assessmentRoutes)
 app.route('/api/payments', paymentRoutes)
 app.route('/api/lawfirm', lawFirmRoutes)
@@ -237,6 +246,182 @@ app.route('/api/compliance', complianceRoutes)
 app.route('/api/analytics', analyticsRoutes)
 app.route('/api/documents', documentsRoutes)
 app.route('/api/i18n', i18nRoutes)
+
+// New feature routes
+app.route('/demo', demoRoutes)
+app.route('/dashboard', dashboardRoutes) 
+app.route('/offices', officesRoutes)
+app.route('/integrations', integrationsRoutes)
+app.route('/provisioning', provisioningRoutes)
+app.route('/stripe-checkout', stripeCheckoutRoutes)
+
+// Automated purchase success routes
+app.get('/purchase-success', (c) => c.redirect('/stripe-checkout/purchase-success?' + c.req.url.split('?')[1]))
+app.get('/demo-checkout', (c) => c.redirect('/stripe-checkout/demo-checkout?' + c.req.url.split('?')[1]))
+
+// Test route for modal formatting
+app.get('/test-modal', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal Formatting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* CSS styling from renderer.tsx */
+        .article-content {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: #374151;
+            max-width: none;
+        }
+
+        .article-content h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 0.75rem;
+        }
+
+        .article-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.3;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+        }
+
+        .article-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .article-content p {
+            margin-bottom: 1.25rem;
+            font-size: 1.125rem;
+            line-height: 1.7;
+        }
+
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .article-content li {
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        .article-content li strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Test Modal Content Formatting</h1>
+        
+        <button id="testButton" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+            Test Modal with Article Content
+        </button>
+
+        <div class="mt-4">
+            <a href="/" class="text-blue-600 hover:underline">← Back to main app</a>
+        </div>
+
+        <div id="testModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-button" onclick="closeModal()">Close</button>
+                <div id="modalContent" class="article-content">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadArticleContent() {
+            try {
+                const response = await fetch('/api/education/content/1');
+                const data = await response.json();
+                
+                if (data.content) {
+                    document.getElementById('modalContent').innerHTML = data.content.content;
+                    document.getElementById('testModal').style.display = 'flex';
+                } else {
+                    alert('Failed to load article content');
+                }
+            } catch (error) {
+                console.error('Error loading article:', error);
+                alert('Error loading article content');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('testModal').style.display = 'none';
+        }
+
+        document.getElementById('testButton').addEventListener('click', loadArticleContent);
+
+        // Close modal when clicking outside
+        document.getElementById('testModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>`)
+})
 
 // Main landing page
 app.get('/', (c) => {
@@ -263,7 +448,7 @@ app.get('/', (c) => {
               <a href="#assessment" className="text-white/90 hover:text-white transition-colors">Risk Assessment</a>
               <a href="#strategies" className="text-white/90 hover:text-white transition-colors">Strategies</a>
               <a href="#education" className="text-white/90 hover:text-white transition-colors">Education</a>
-              <a href="#law-firms" className="text-white/90 hover:text-white transition-colors">For Law Firms</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')">For Law Firms</a>
               <div className="relative">
                 <button id="language-btn" onclick="toggleLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
                   <i className="fas fa-globe mr-2"></i>EN
@@ -288,7 +473,7 @@ app.get('/', (c) => {
               <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2">Risk Assessment</a>
               <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2">Strategies</a>
               <a href="#education" className="text-white/90 hover:text-white transition-colors py-2">Education</a>
-              <a href="#law-firms" className="text-white/90 hover:text-white transition-colors py-2">For Law Firms</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')">For Law Firms</a>
               <div className="flex items-center justify-between py-2">
                 <button id="mobile-language-btn" onclick="toggleMobileLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
                   <i className="fas fa-globe mr-2"></i>English
@@ -341,13 +526,6 @@ app.get('/', (c) => {
               >
                 <i className="fas fa-chart-line mr-2"></i>
                 <span data-translate="hero.start_assessment">Start Risk Assessment</span>
-              </button>
-              <button 
-                onclick="scrollToStrategies()" 
-                className="px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all text-sm sm:text-base"
-              >
-                <i className="fas fa-info-circle mr-2"></i>
-                <span data-translate="hero.learn_more">Learn More</span>
               </button>
               <button 
                 onclick="showConsultationModal()" 
@@ -530,224 +708,10 @@ app.get('/', (c) => {
           </div>
         </section>
 
-        {/* Asset Protection Strategies */}
-        <section id="strategies" className="px-6 py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                Asset Protection Strategies
-              </h2>
-              <p className="text-xl text-gray-600">
-                Explore our comprehensive protection solutions tailored to your needs
-              </p>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-                <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                  <i className="fas fa-building text-blue-600 text-2xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">Limited Liability Company</h3>
-                <p className="text-gray-600 mb-6">Protect your personal assets from business liabilities with a properly structured LLC.</p>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-3xl font-bold text-blue-600">$5,000</span>
-                  <span className="text-sm text-gray-500">Starting price</span>
-                </div>
-                <ul className="space-y-2 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Personal asset protection
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Tax benefits
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Business flexibility
-                  </li>
-                </ul>
-                <button 
-                  onclick="purchaseService('llc')" 
-                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Learn More
-                </button>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow border-2 border-orange-200">
-                <div className="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
-                  <i className="fas fa-university text-orange-600 text-2xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">Domestic Asset Protection Trust</h3>
-                <p className="text-gray-600 mb-6">Advanced trust structures for high-net-worth individuals seeking maximum protection.</p>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-3xl font-bold text-orange-600">$15,000</span>
-                  <span className="text-sm text-gray-500">Starting price</span>
-                </div>
-                <ul className="space-y-2 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Creditor protection
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Estate planning benefits
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Tax optimization
-                  </li>
-                </ul>
-                <button 
-                  onclick="purchaseService('trust')" 
-                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
-                >
-                  Learn More
-                </button>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-                <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mb-6">
-                  <i className="fas fa-globe text-green-600 text-2xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">Offshore Asset Protection</h3>
-                <p className="text-gray-600 mb-6">International structures for ultimate asset protection and privacy.</p>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-3xl font-bold text-green-600">$25,000</span>
-                  <span className="text-sm text-gray-500">Starting price</span>
-                </div>
-                <ul className="space-y-2 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Maximum protection
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    International privacy
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <i className="fas fa-check text-green-500 mr-2"></i>
-                    Diversification benefits
-                  </li>
-                </ul>
-                <button 
-                  onclick="purchaseService('offshore')" 
-                  className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Learn More
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Premium Upgrade Section */}
-        <section className="px-6 py-20 bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="mb-12">
-              <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i className="fas fa-crown text-white text-3xl"></i>
-              </div>
-              <h2 className="text-4xl font-bold text-white mb-6">
-                Tired of Ads? Go Premium! ✨
-              </h2>
-              <p className="text-xl text-purple-100 mb-8 max-w-3xl mx-auto">
-                Remove all advertisements and unlock exclusive premium features for the ultimate AssetShield experience.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-                <h3 className="text-2xl font-bold text-white mb-6">
-                  <i className="fas fa-ban text-red-400 mr-3"></i>
-                  With Ads (Free Version)
-                </h3>
-                <ul className="space-y-3 text-purple-100">
-                  <li className="flex items-center">
-                    <i className="fas fa-times text-red-400 mr-3"></i>
-                    Advertisements throughout the platform
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-times text-red-400 mr-3"></i>
-                    Distracting banner and sidebar ads
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-times text-red-400 mr-3"></i>
-                    Limited access to premium features
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-times text-red-400 mr-3"></i>
-                    Standard support response time
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur-md rounded-xl p-8 border-2 border-yellow-400/50 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-1 rounded-full text-sm font-bold">
-                  PREMIUM
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-6">
-                  <i className="fas fa-crown text-yellow-400 mr-3"></i>
-                  Ad-Free Premium Experience
-                </h3>
-                <ul className="space-y-3 text-purple-100">
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Complete removal of all advertisements
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Clean, distraction-free interface
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Exclusive premium features & content
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Priority customer support
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Advanced legal document templates
-                  </li>
-                  <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Direct attorney consultation access
-                  </li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20 max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold text-white mb-4">Ready to Upgrade?</h3>
-              <p className="text-purple-100 mb-6">
-                Join thousands of professionals who've upgraded to our ad-free premium experience.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
-                  onclick="showAdFreeUpgrade()" 
-                  className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-105 shadow-xl"
-                >
-                  <i className="fas fa-crown mr-2"></i>
-                  Remove Ads Now - Starting at $29.99
-                </button>
-                <button 
-                  onclick="document.querySelector('#assessment').scrollIntoView({behavior: 'smooth'})" 
-                  className="px-8 py-4 bg-white/20 backdrop-blur-md text-white font-semibold rounded-lg border border-white/30 hover:bg-white/30 transition-all"
-                >
-                  Continue with Ads
-                </button>
-              </div>
-              
-              <div className="mt-6 text-sm text-purple-200">
-                <i className="fas fa-lock mr-2"></i>
-                Secure payment powered by Stripe • 30-day money-back guarantee
-              </div>
-            </div>
-          </div>
-        </section>
+
 
         {/* Education Center */}
         <section id="education" className="px-6 py-20 bg-white">
@@ -846,122 +810,534 @@ app.get('/', (c) => {
                 \`).join('');
               }
               
-              function viewEducationContent(id) {
-                alert('Educational content viewing would open here. Content ID: ' + id);
-                // In a real implementation, this would open a modal or navigate to the content
+              async function viewEducationContent(id) {
+                try {
+                  // Show loading state
+                  const modal = document.getElementById('educationModal');
+                  const modalTitle = document.getElementById('modalTitle');
+                  const modalContent = document.getElementById('modalContent');
+                  const loadingState = document.getElementById('modalLoading');
+                  
+                  // Reset modal state
+                  modalTitle.textContent = 'Loading...';
+                  modalContent.style.display = 'none';
+                  loadingState.style.display = 'block';
+                  modal.style.display = 'flex';
+                  document.body.style.overflow = 'hidden';
+                  
+                  // Fetch the full article content
+                  const response = await fetch('/api/education/content/' + id);
+                  const data = await response.json();
+                  
+                  if (data.content) {
+                    // Update modal with content
+                    modalTitle.textContent = data.content.title;
+                    modalContent.innerHTML = data.content.content;
+                    
+                    // Show content, hide loading
+                    loadingState.style.display = 'none';
+                    modalContent.style.display = 'block';
+                  } else {
+                    throw new Error('Content not found');
+                  }
+                } catch (error) {
+                  console.error('Error loading content:', error);
+                  const modalContent = document.getElementById('modalContent');
+                  const loadingState = document.getElementById('modalLoading');
+                  
+                  loadingState.style.display = 'none';
+                  modalContent.style.display = 'block';
+                  modalContent.innerHTML = '<p class="text-red-600">Error loading content. Please try again later.</p>';
+                }
               }
+              
+              function closeEducationModal() {
+                const modal = document.getElementById('educationModal');
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+              }
+              
+              // Navigation function for footer links
+              function navigateToSection(sectionId) {
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                  targetSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                  
+                  // Update URL hash without triggering page reload
+                  history.pushState(null, null, '#' + sectionId);
+                  
+                  // Add a slight delay to ensure smooth scroll completes
+                  setTimeout(() => {
+                    // Trigger any section-specific initialization if needed
+                    if (sectionId === 'education') {
+                      // Ensure education content is loaded
+                      const educationContainer = document.getElementById('education-content');
+                      if (educationContainer && !window.educationLoaded) {
+                        window.educationLoaded = true;
+                        fetch('/api/education/featured')
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data && data.featured) {
+                              renderEducationContent(data.featured);
+                            }
+                          })
+                          .catch(error => console.error('Failed to load education content:', error));
+                      }
+                    }
+                  }, 500);
+                } else {
+                  console.warn('Section not found:', sectionId);
+                }
+              }
+              
+              // Close modal when clicking outside
+              document.addEventListener('DOMContentLoaded', function() {
+                const modal = document.getElementById('educationModal');
+                modal.addEventListener('click', function(e) {
+                  if (e.target === modal) {
+                    closeEducationModal();
+                  }
+                });
+              });
             `}}></script>
           </div>
         </section>
 
-        {/* Law Firm Section */}
-        <section id="law-firms" className="px-6 py-20 bg-gray-900 text-white">
+        {/* Platform Pricing for Law Firms */}
+        <section id="pricing" className="px-6 py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">
-                AssetShield App for Law Firms
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                White-Label Platform Pricing
               </h2>
-              <p className="text-xl text-gray-300">
-                Transform your practice with our complete lead generation and client management platform
+              <p className="text-xl text-gray-600">
+                Transform your practice with our complete asset protection platform - fully branded for your law firm
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 mb-16">
-              <div className="bg-gray-800 rounded-xl p-8">
-                <h3 className="text-2xl font-bold mb-4">Professional</h3>
-                <div className="text-4xl font-bold text-blue-400 mb-6">$5,000</div>
-                <p className="text-gray-300 mb-6">One-time setup fee</p>
+            <div className="grid lg:grid-cols-3 gap-8 mb-16">
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-rocket text-blue-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Starter</h3>
+                  <p className="text-gray-600">Perfect for solo practitioners</p>
+                </div>
+                
+                <div className="text-center mb-6">
+                  <div className="text-4xl font-bold text-blue-600 mb-2">$5,000</div>
+                  <p className="text-gray-500 mb-1">One-time setup fee</p>
+                  <div className="text-2xl font-bold text-gray-800">$500<span className="text-lg text-gray-500">/month</span></div>
+                </div>
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Risk Assessment Tool
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Complete white-label branding</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Lead Capture
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Risk assessment tool</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Basic Analytics
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Lead capture & management</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Email Integration
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Educational content library</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Basic analytics dashboard</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Up to 100 clients/month</span>
                   </li>
                 </ul>
+
                 <button 
-                  onclick="requestDemo('professional')" 
+                  onClick="purchasePlatform('starter', 5000, 500)"
                   className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Schedule Demo
+                  <i className="fas fa-credit-card mr-2"></i>
+                  Buy Now - Instant Access
                 </button>
               </div>
 
-              <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-xl p-8 transform scale-105">
-                <div className="text-center mb-4">
-                  <span className="bg-white text-orange-600 px-3 py-1 rounded-full text-sm font-bold">Most Popular</span>
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 transform scale-105 text-white relative">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold">Most Popular</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Enterprise</h3>
-                <div className="text-4xl font-bold mb-6">$10,000</div>
-                <p className="text-orange-100 mb-6">One-time setup fee</p>
+                
+                <div className="text-center mb-6 mt-4">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-building text-white text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">Professional</h3>
+                  <p className="text-blue-100">For growing law firms</p>
+                </div>
+                
+                <div className="text-center mb-6">
+                  <div className="text-4xl font-bold mb-2">$10,000</div>
+                  <p className="text-blue-100 mb-1">One-time setup fee</p>
+                  <div className="text-2xl font-bold">$1,200<span className="text-lg text-blue-100">/month</span></div>
+                </div>
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
                     <i className="fas fa-check text-white mr-3"></i>
-                    All Professional features
+                    <span className="text-white">Everything in Starter</span>
                   </li>
                   <li className="flex items-center">
                     <i className="fas fa-check text-white mr-3"></i>
-                    Calendar Booking
+                    <span className="text-white">Advanced customization</span>
                   </li>
                   <li className="flex items-center">
                     <i className="fas fa-check text-white mr-3"></i>
-                    PDF Report Generation
+                    <span className="text-white">Multiple attorney accounts</span>
                   </li>
                   <li className="flex items-center">
                     <i className="fas fa-check text-white mr-3"></i>
-                    Email Automation
+                    <span className="text-white">Document automation</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-white mr-3"></i>
+                    <span className="text-white">Advanced analytics & reporting</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-white mr-3"></i>
+                    <span className="text-white">Up to 500 clients/month</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-white mr-3"></i>
+                    <span className="text-white">Priority support</span>
                   </li>
                 </ul>
+
                 <button 
-                  onclick="requestDemo('enterprise')" 
-                  className="w-full py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                  onClick="purchasePlatform('professional', 10000, 1200)"
+                  className="w-full py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  Schedule Demo
+                  <i className="fas fa-credit-card mr-2"></i>
+                  Buy Now - Instant Access
                 </button>
               </div>
 
-              <div className="bg-gray-800 rounded-xl p-8">
-                <h3 className="text-2xl font-bold mb-4">Custom</h3>
-                <div className="text-4xl font-bold text-green-400 mb-6">$15,000+</div>
-                <p className="text-gray-300 mb-6">Custom development</p>
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i className="fas fa-crown text-purple-600 text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Enterprise</h3>
+                  <p className="text-gray-600">For large firms & networks</p>
+                </div>
+                
+                <div className="text-center mb-6">
+                  <div className="text-4xl font-bold text-blue-600 mb-2">$25,000</div>
+                  <p className="text-gray-500 mb-1">One-time setup fee</p>
+                  <div className="text-2xl font-bold text-gray-800">$2,500<span className="text-lg text-gray-500">/month</span></div>
+                </div>
+
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    All Enterprise features
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Everything in Professional</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    CRM Integration
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Multi-office deployment</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    White-label Licensing
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Custom integrations</span>
                   </li>
                   <li className="flex items-center">
-                    <i className="fas fa-check text-green-400 mr-3"></i>
-                    Dedicated Support
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">White-label mobile app</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Unlimited clients</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">Dedicated account manager</span>
+                  </li>
+                  <li className="flex items-center">
+                    <i className="fas fa-check text-green-500 mr-3"></i>
+                    <span className="text-gray-700">24/7 priority support</span>
                   </li>
                 </ul>
+
                 <button 
-                  onclick="requestDemo('custom')" 
-                  className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                  onClick="purchasePlatform('enterprise', 25000, 2500)"
+                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Schedule Demo
+                  <i className="fas fa-credit-card mr-2"></i>
+                  Buy Now - Instant Access
                 </button>
+              </div>
+            </div>
+
+            {/* Live Demo Section */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-8 mb-16 text-white">
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold mb-4">Try a Live Demo with Real Data</h3>
+                <p className="text-xl text-blue-100">Experience the platform exactly as your clients will - see how leads are captured, managed, and converted</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h4 className="text-xl font-bold mb-6">What You'll Experience:</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i className="fas fa-user-plus text-white text-sm"></i>
+                      </div>
+                      <span>Real client data and lead generation</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i className="fas fa-chart-line text-white text-sm"></i>
+                      </div>
+                      <span>Live analytics dashboard with actual metrics</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i className="fas fa-file-alt text-white text-sm"></i>
+                      </div>
+                      <span>Document generation and automation</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i className="fas fa-mobile-alt text-white text-sm"></i>
+                      </div>
+                      <span>Full mobile experience (Enterprise)</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i className="fas fa-building text-white text-sm"></i>
+                      </div>
+                      <span>Multi-office management (Enterprise)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+                  <form id="demoRequestForm" className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Your Name</label>
+                      <input type="text" name="lawyerName" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Email Address</label>
+                      <input type="email" name="lawyerEmail" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Phone Number</label>
+                      <input type="tel" name="lawyerPhone" className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Law Firm Name</label>
+                      <input type="text" name="firmName" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Interested Tier</label>
+                      <select name="interestedTier" className="w-full p-3 border border-white/20 rounded-lg bg-white/10 text-white">
+                        <option value="starter">Starter ($5K + $500/month)</option>
+                        <option value="professional" selected>Professional ($10K + $1,200/month)</option>
+                        <option value="enterprise">Enterprise ($25K + $2,500/month)</option>
+                      </select>
+                    </div>
+                    <button type="submit" className="w-full py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                      <i className="fas fa-play mr-2"></i>Start Live Demo (Free 14 Days)
+                    </button>
+                  </form>
+                  
+                  <div className="mt-4 text-center text-sm text-white/80">
+                    <i className="fas fa-shield-alt mr-1"></i>
+                    No credit card required • Full access • Real data experience
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ROI Calculator Section */}
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-16">
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">Calculate Your ROI</h3>
+                <p className="text-xl text-gray-600">See how quickly the platform pays for itself</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h4 className="text-xl font-bold text-gray-800 mb-6">Typical Law Firm Results:</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Average client fee:</span>
+                      <span className="text-2xl font-bold text-blue-600">$7,500</span>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">New clients per month:</span>
+                      <span className="text-2xl font-bold text-blue-600">15-25</span>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                      <span className="font-semibold text-gray-700">Monthly revenue increase:</span>
+                      <span className="text-2xl font-bold text-green-600">$112K - $187K</span>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                      <span className="font-semibold text-gray-700">ROI Timeline:</span>
+                      <span className="text-2xl font-bold text-blue-600">2-4 weeks</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-xl p-8 text-white">
+                  <h4 className="text-2xl font-bold mb-6">Why Law Firms Choose Us:</h4>
+                  <ul className="space-y-4">
+                    <li className="flex items-start">
+                      <i className="fas fa-chart-line text-green-200 mr-3 mt-1"></i>
+                      <span>300% average increase in qualified leads</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-clock text-green-200 mr-3 mt-1"></i>
+                      <span>75% reduction in client intake time</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-dollar-sign text-green-200 mr-3 mt-1"></i>
+                      <span>Average fee increase of 40%</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-users text-green-200 mr-3 mt-1"></i>
+                      <span>95% client satisfaction rate</span>
+                    </li>
+                    <li className="flex items-start">
+                      <i className="fas fa-shield-alt text-green-200 mr-3 mt-1"></i>
+                      <span>Your brand, your clients, your success</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Transform Your Practice?</h3>
+              <p className="text-xl text-gray-600 mb-8">
+                Schedule a personalized demo and see how our platform can work for your firm
+              </p>
+              <button 
+                onClick="navigateToSection('consultation')"
+                className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <i className="fas fa-calendar-check mr-2"></i>
+                Schedule Your Demo
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Law Firm Demo Section */}
+        <section id="consultation" className="px-6 py-20 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                Schedule Your Platform Demo
+              </h2>
+              <p className="text-xl text-gray-600">
+                See how our white-label platform can transform your asset protection practice
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Your 30-Minute Demo Includes:</h3>
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                      <i className="fas fa-desktop text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Full Platform Walkthrough</h4>
+                      <p className="text-gray-600">See the complete white-label platform in action with your firm's branding applied in real-time.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                      <i className="fas fa-chart-line text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">ROI Analysis for Your Practice</h4>
+                      <p className="text-gray-600">Custom revenue projections based on your current client volume and fee structure.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                      <i className="fas fa-cogs text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Implementation Plan</h4>
+                      <p className="text-gray-600">Step-by-step setup timeline, training schedule, and go-live strategy for your firm.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 rounded-xl p-6">
+                  <div className="flex items-center mb-4">
+                    <i className="fas fa-handshake text-blue-600 text-2xl mr-3"></i>
+                    <h4 className="text-lg font-semibold text-gray-800">No Obligation Demo</h4>
+                  </div>
+                  <p className="text-gray-600">This demo is designed to show you exactly how our platform can grow your practice. No pressure, just results.</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Schedule Your Demo</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Attorney Name</label>
+                    <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your full name" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Law Firm Name</label>
+                    <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your firm name" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your email" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input type="tel" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your phone number" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Practice Details</label>
+                    <textarea className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-none" placeholder="Tell us about your current practice size, client volume, and main challenges..."></textarea>
+                  </div>
+                  <button 
+                    onClick="submitDemoRequest()"
+                    className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <i className="fas fa-play mr-2"></i>
+                    Schedule Platform Demo
+                  </button>
+                </div>
+                
+                <div className="mt-6 text-center text-sm text-gray-500">
+                  <i className="fas fa-shield-alt mr-1"></i>
+                  Attorney-client confidentiality respected
+                </div>
               </div>
             </div>
           </div>
         </section>
+
+
 
         {/* Footer */}
         <footer className="bg-gray-800 text-gray-300 px-6 py-12">
@@ -979,129 +1355,337 @@ app.get('/', (c) => {
                 </p>
               </div>
               <div>
-                <h4 className="text-white font-semibold mb-4">Services</h4>
+                <h4 className="text-white font-semibold mb-4">Platform Features</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Risk Assessment</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">LLC Formation</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Asset Protection Trusts</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Offshore Protection</a></li>
+                  <li><a href="#assessment" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('assessment')">Risk Assessment</a></li>
+                  <li><a href="#strategies" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('strategies')">Protection Strategies</a></li>
+                  <li><a href="#pricing" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('pricing')">White-Label Licensing</a></li>
+                  <li><a href="#education" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('education')">Client Education Tools</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-white font-semibold mb-4">Education</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Articles</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Guides</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Case Studies</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Checklists</a></li>
+                  <li><a href="#education" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('education')">Articles</a></li>
+                  <li><a href="#education" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('education')">Guides</a></li>
+                  <li><a href="#education" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('education')">Case Studies</a></li>
+                  <li><a href="#education" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('education')">Checklists</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-white font-semibold mb-4">Law Firms</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-white transition-colors">Platform Overview</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Schedule Demo</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                  <li><a href="/portal" className="hover:text-white transition-colors cursor-pointer">Platform Overview</a></li>
+                  <li><a href="#pricing" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('pricing')">Pricing</a></li>
+                  <li><a href="#consultation" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('consultation')">Schedule Demo</a></li>
+                  <li><a href="mailto:support@assetshieldapp.com" className="hover:text-white transition-colors cursor-pointer">Support</a></li>
                 </ul>
               </div>
             </div>
             <div className="border-t border-gray-700 mt-8 pt-8 text-center">
-              <p>&copy; {new Date().getFullYear()} AssetShield App. All rights reserved.</p>
+              <p>&copy; 2025 The iSuccessHUB Group, LLC. All Rights Reserved</p>
             </div>
           </div>
         </footer>
-      </div>
-    </div>
-  )
-})
+        
+        {/* Global Navigation Script */}
+        <script dangerouslySetInnerHTML={{__html: `
+          // Global navigation function for footer and header links
+          window.navigateToSection = function(sectionId) {
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+              targetSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+              });
+              
+              // Update URL hash without triggering page reload
+              history.pushState(null, null, '#' + sectionId);
+              
+              // Add a slight delay to ensure smooth scroll completes
+              setTimeout(() => {
+                // Trigger any section-specific initialization if needed
+                if (sectionId === 'education') {
+                  // Ensure education content is loaded
+                  const educationContainer = document.getElementById('education-content');
+                  if (educationContainer && !window.educationLoaded) {
+                    window.educationLoaded = true;
+                    fetch('/api/education/featured')
+                      .then(response => response.json())
+                      .then(data => {
+                        if (data && data.featured) {
+                          renderEducationContent(data.featured);
+                        }
+                      })
+                      .catch(error => console.error('Failed to load education content:', error));
+                  }
+                }
+              }, 500);
+            } else {
+              console.warn('Section not found:', sectionId);
+            }
+          };
+          
+          // Handle live demo form submission
+          document.getElementById('demoRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const demoData = Object.fromEntries(formData);
+            
+            // Show loading state
+            const button = e.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Setting Up Your Demo...';
+            button.disabled = true;
+            
+            try {
+              const response = await fetch('/demo/start', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(demoData)
+              });
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                // Success - redirect to demo dashboard
+                alert(
+                  \`🎉 Your live demo is ready!\\n\\n\` +
+                  \`Demo ID: \${result.demoId}\\n\` +
+                  \`Expires: \${new Date(result.expiresAt).toLocaleDateString()}\\n\\n\` +
+                  \`You'll now see the platform with real data to explore all features.\\n\` +
+                  \`This includes lead management, analytics, and document generation.\`
+                );
+                
+                // Redirect to demo dashboard
+                window.location.href = result.loginUrl;
+              } else {
+                throw new Error(result.error || 'Failed to create demo');
+              }
+              
+            } catch (error) {
+              console.error('Demo creation error:', error);
+              alert(
+                \`Sorry, there was an error setting up your demo.\\n\\n\` +
+                \`Please try again or contact support at demo@assetshield.app\\n\\n\` +
+                \`Error: \${error.message}\`
+              );
+              
+              // Reset button
+              button.innerHTML = originalText;
+              button.disabled = false;
+            }
+          });
+          
+          // Handle platform purchases with Stripe checkout
+          window.purchasePlatform = async function(tier, setupFee, monthlyFee) {
+            // Show purchase confirmation modal
+            const confirmPurchase = confirm(
+              \`Purchase AssetShield \${tier.charAt(0).toUpperCase() + tier.slice(1)} Platform?\\n\\n\` +
+              \`💰 Setup Fee: $\${setupFee.toLocaleString()}\\n\` +
+              \`📅 Monthly: $\${monthlyFee.toLocaleString()}/month\\n\\n\` +
+              \`✅ Instant platform activation\\n\` +
+              \`✅ Full white-label branding\\n\` +
+              \`✅ 24/7 automated delivery\\n\` +
+              \`✅ No human interaction required\\n\\n\` +
+              \`Click OK to proceed to secure checkout.\`
+            );
+            
+            if (!confirmPurchase) return;
+            
+            // Get firm information from user
+            const firmName = prompt('Enter your law firm name:');
+            if (!firmName) return;
+            
+            const lawyerName = prompt('Enter your full name:');
+            if (!lawyerName) return;
+            
+            const lawyerEmail = prompt('Enter your email address:');
+            if (!lawyerEmail || !lawyerEmail.includes('@')) {
+              alert('Please enter a valid email address.');
+              return;
+            }
+            
+            const lawyerPhone = prompt('Enter your phone number (optional):') || '';
+            
+            try {
+              // Create Stripe checkout session
+              const response = await fetch(\`/stripe-checkout/create-checkout/\${tier}\`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  lawyerName,
+                  lawyerEmail,
+                  lawyerPhone,
+                  firmName,
+                  setupFee,
+                  monthlyFee
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                // Redirect to Stripe checkout
+                window.location.href = result.checkoutUrl;
+              } else {
+                throw new Error(result.error || 'Failed to create checkout session');
+              }
+              
+            } catch (error) {
+              console.error('Purchase error:', error);
+              alert(
+                \`Sorry, there was an error processing your purchase.\\n\\n\` +
+                \`Please try again or contact support at sales@assetshield.com\\n\\n\` +
+                \`Error: \${error.message}\`
+              );
+            }
+          };
 
-// Law Firm Portal
-app.get('/portal', (c) => {
-  return c.render(
-    <div>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                <i className="fas fa-shield-alt text-white"></i>
-              </div>
-              <span className="text-xl font-bold text-gray-800">AssetShield App</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Law Firm Portal</span>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Logout
+          // Handle demo requests for different platform tiers (legacy)
+          window.requestDemo = function(planType) {
+            const planNames = {
+              'starter': 'Starter Platform ($5,000 setup + $500/month)',
+              'professional': 'Professional Platform ($10,000 setup + $1,200/month)',
+              'enterprise': 'Enterprise Platform ($25,000 setup + $2,500/month)'
+            };
+            
+            const planName = planNames[planType] || planType;
+            
+            // Show confirmation modal with plan details
+            const confirmed = confirm(
+              \`Request a demo of the \${planName}?\\n\\n\` +
+              \`Click OK to schedule your personalized demo where we'll:\\n\` +
+              \`• Show the complete platform with your firm's branding\\n\` +
+              \`• Calculate ROI specific to your practice\\n\` +
+              \`• Provide implementation timeline and support\\n\\n\` +
+              \`This demo is completely free with no obligation.\`
+            );
+            
+            if (confirmed) {
+              // Navigate to demo section with plan pre-selected
+              window.selectedPlatformTier = { type: planType, name: planName };
+              navigateToSection('consultation');
+              
+              // Pre-fill demo form if elements exist
+              setTimeout(() => {
+                const descriptionField = document.querySelector('textarea[placeholder*=\"practice size\"]');
+                if (descriptionField && window.selectedPlatformTier) {
+                  descriptionField.value = \`I'm interested in the \${window.selectedPlatformTier.name}. I'd like to see how this would work for my law firm and understand the implementation process.\`;
+                  descriptionField.focus();
+                }
+              }, 1000);
+            }
+          };
+          
+          // Handle demo request form submission
+          window.submitDemoRequest = function() {
+            const form = {
+              name: document.querySelector('input[placeholder*="full name"]')?.value || '',
+              firmName: document.querySelector('input[placeholder*="firm name"]')?.value || '',
+              email: document.querySelector('input[placeholder*="email"]')?.value || '',
+              phone: document.querySelector('input[placeholder*="phone"]')?.value || '',
+              description: document.querySelector('textarea[placeholder*="practice size"]')?.value || ''
+            };
+            
+            // Basic validation
+            if (!form.name || !form.email || !form.firmName) {
+              alert('Please fill in your name, firm name, and email address to continue.');
+              return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+            if (!emailRegex.test(form.email)) {
+              alert('Please enter a valid email address.');
+              return;
+            }
+            
+            // Prepare demo request data
+            const demoData = {
+              ...form,
+              selectedPlatformTier: window.selectedPlatformTier || null,
+              timestamp: new Date().toISOString(),
+              source: 'platform_pricing_page'
+            };
+            
+            // Show loading state
+            const button = document.querySelector('button[onclick="submitDemoRequest()"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Scheduling...';
+            button.disabled = true;
+            
+            // Simulate API call (replace with actual API endpoint)
+            setTimeout(() => {
+              // Success message
+              alert(
+                \`Thank you, \${form.name}! Your demo request has been received.\\n\\n\` +
+                \`We'll contact you within 24 hours at \${form.email} to schedule your personalized platform demo.\\n\\n\` +
+                \`During your 30-minute demo, we'll:\\n\` +
+                \`• Show the complete platform with \${form.firmName}'s branding\\n\` +
+                \`• Calculate specific ROI projections for your practice\\n\` +
+                \`• Provide implementation timeline and next steps\` +
+                (window.selectedPlatformTier ? \`\\n• Focus on the \${window.selectedPlatformTier.name} features\` : '')
+              );
+              
+              // Reset form
+              document.querySelector('input[placeholder*="full name"]').value = '';
+              document.querySelector('input[placeholder*="firm name"]').value = '';
+              document.querySelector('input[placeholder*="email"]').value = '';
+              document.querySelector('input[placeholder*="phone"]').value = '';
+              document.querySelector('textarea[placeholder*="practice size"]').value = '';
+              
+              // Reset button
+              button.innerHTML = originalText;
+              button.disabled = false;
+              
+              // Clear selected platform tier
+              window.selectedPlatformTier = null;
+              
+            }, 2000); // Simulate network delay
+          };
+          
+          // Handle initial page load with hash
+          document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash) {
+              const sectionId = window.location.hash.substring(1);
+              setTimeout(() => {
+                window.navigateToSection(sectionId);
+              }, 1000); // Delay to ensure page is fully loaded
+            }
+          });
+        `}}></script>
+
+        {/* Education Content Modal */}
+        <div id="educationModal" className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style={{display: 'none'}}>
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 id="modalTitle" className="text-2xl font-bold text-gray-800">Article Title</h2>
+              <button onClick="closeEducationModal()" className="text-gray-500 hover:text-gray-700 text-2xl">
+                <i className="fas fa-times"></i>
               </button>
             </div>
-          </div>
-        </nav>
-
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
-            <p className="text-gray-600">Manage your leads, analytics, and client education tools</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Total Leads</p>
-                  <p className="text-3xl font-bold text-blue-600" id="total-leads">0</p>
-                </div>
-                <i className="fas fa-users text-blue-600 text-2xl"></i>
+            
+            <div className="flex-1 overflow-y-auto p-6">
+              <div id="modalLoading" className="text-center py-12">
+                <i className="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+                <p className="text-gray-600">Loading article...</p>
+              </div>
+              
+              <div id="modalContent" className="article-content" style={{display: 'none'}}>
+                {/* Article content will be loaded here */}
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">This Month</p>
-                  <p className="text-3xl font-bold text-green-600" id="monthly-leads">0</p>
-                </div>
-                <i className="fas fa-chart-line text-green-600 text-2xl"></i>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Conversion Rate</p>
-                  <p className="text-3xl font-bold text-orange-600" id="conversion-rate">0%</p>
-                </div>
-                <i className="fas fa-percentage text-orange-600 text-2xl"></i>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Revenue</p>
-                  <p className="text-3xl font-bold text-purple-600" id="revenue">$0</p>
-                </div>
-                <i className="fas fa-dollar-sign text-purple-600 text-2xl"></i>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-800">Recent Leads</h3>
-              </div>
-              <div className="p-6">
-                <div id="recent-leads">
-                  <p className="text-gray-500 text-center py-8">No leads yet</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-800">Analytics</h3>
-              </div>
-              <div className="p-6">
-                <canvas id="analytics-chart" width="400" height="200"></canvas>
-              </div>
+            
+            <div className="border-t border-gray-200 p-6">
+              <button onClick="closeEducationModal()" className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i className="fas fa-times mr-2"></i>Close
+              </button>
             </div>
           </div>
         </div>
@@ -1109,6 +1693,8 @@ app.get('/portal', (c) => {
     </div>
   )
 })
+
+// Portal routes are now handled by the dashboard module
 
 // Login Page
 app.get('/login', (c) => {
