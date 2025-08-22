@@ -1363,7 +1363,7 @@ app.get('/', (c) => {
                   <li><a href="/portal" className="hover:text-white transition-colors cursor-pointer">Platform Overview</a></li>
                   <li><a href="#pricing" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('pricing')">Pricing</a></li>
                   <li><a href="#consultation" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('consultation')">Schedule Demo</a></li>
-                  <li><a href="mailto:support@assetshieldapp.com" className="hover:text-white transition-colors cursor-pointer">Support</a></li>
+                  <li><a href="mailto:support@isuccesshub.com" className="hover:text-white transition-colors cursor-pointer">Support</a></li>
                 </ul>
               </div>
             </div>
