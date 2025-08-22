@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json", 
-  "name": "assetshield-app",
+  "name": "assetshieldapp",
   "compatibility_date": "2025-08-22",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": ["nodejs_compat"]

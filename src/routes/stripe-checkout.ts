@@ -52,7 +52,7 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
             product_data: {
               name: `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Platform`,
               description: `One-time setup fee for ${firmName}`,
-              images: ['https://your-domain.com/assetshield-logo.png']
+              images: ['https://assetshieldapp.com/static/assetshield-logo.png']
             }
           },
           quantity: 1
