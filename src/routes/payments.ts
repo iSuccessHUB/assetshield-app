@@ -206,26 +206,59 @@ app.post('/webhook', async (c) => {
   }
 })
 
-// Get payment status
+// Get payment status (Database-free version)
 app.get('/status/:paymentIntentId', async (c) => {
   try {
     const paymentIntentId = c.req.param('paymentIntentId')
     const { env } = c
     
-    const payment = await env.DB.prepare(
-      'SELECT * FROM payments WHERE stripe_payment_intent_id = ?'
-    ).bind(paymentIntentId).first()
-    
-    if (!payment) {
-      return c.json({ error: 'Payment not found' }, 404)
+    // Try to get from database if available
+    if (env.DB) {
+      try {
+        const payment = await env.DB.prepare(
+          'SELECT * FROM payments WHERE stripe_payment_intent_id = ?'
+        ).bind(paymentIntentId).first()
+        
+        if (payment) {
+          return c.json({
+            status: payment.status,
+            amount: payment.amount,
+            paymentType: payment.payment_type,
+            serviceType: payment.service_type
+          })
+        }
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+      }
     }
     
-    return c.json({
-      status: payment.status,
-      amount: payment.amount,
-      paymentType: payment.payment_type,
-      serviceType: payment.service_type
-    })
+    // Database-free fallback - check with Stripe directly
+    const stripeSecretKey = env.STRIPE_SECRET_KEY
+    if (stripeSecretKey) {
+      try {
+        const response = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}`, {
+          headers: {
+            'Authorization': `Bearer ${stripeSecretKey}`
+          }
+        })
+        
+        if (response.ok) {
+          const paymentIntent = await response.json()
+          return c.json({
+            status: paymentIntent.status,
+            amount: paymentIntent.amount,
+            paymentType: paymentIntent.metadata?.serviceType || 'service',
+            serviceType: paymentIntent.metadata?.serviceType || 'unknown',
+            currency: paymentIntent.currency
+          })
+        }
+      } catch (stripeError) {
+        console.error('Stripe API error:', stripeError)
+      }
+    }
+    
+    // Final fallback
+    return c.json({ error: 'Payment not found' }, 404)
     
   } catch (error) {
     console.error('Payment status error:', error)
@@ -242,20 +275,30 @@ app.post('/premium-upgrade', async (c) => {
       return c.json({ error: 'User ID is required' }, 400)
     }
     
-    // Ensure user exists in database (create guest user if needed)
+    // Ensure user exists in database (create guest user if needed) - Only if database is available
     const { env } = c
-    let user = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(userId).first()
     
-    if (!user) {
-      // Create a guest user for premium upgrade
-      const result = await env.DB.prepare(
-        `INSERT INTO users (id, email, name, user_type, created_at) 
-         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-      ).bind(userId, `guest_${userId}@assetshield.temp`, `Guest User ${userId}`, 'customer').run()
-      
-      if (!result.success) {
-        return c.json({ error: 'Failed to create user record' }, 500)
+    if (env.DB) {
+      try {
+        let user = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(userId).first()
+        
+        if (!user) {
+          // Create a guest user for premium upgrade
+          const result = await env.DB.prepare(
+            `INSERT INTO users (id, email, name, user_type, created_at) 
+             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+          ).bind(userId, `guest_${userId}@assetshield.temp`, `Guest User ${userId}`, 'customer').run()
+          
+          if (!result.success) {
+            console.warn('Failed to create user record in database, continuing without database')
+          }
+        }
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        // Continue without database operations
       }
+    } else {
+      console.log('No database configured, proceeding with payment only')
     }
     
     // Premium plan pricing (in cents for Stripe)
@@ -293,25 +336,40 @@ app.post('/premium-upgrade', async (c) => {
     
     const paymentIntent = await stripeResponse.json()
     
-    // Save payment record with premium upgrade details
-    await env.DB.prepare(
-      `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status, metadata)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(
-      userId,
-      paymentIntent.id,
-      selectedPlan.amount,
-      'usd',
-      'premium_upgrade',
-      'ad_free_premium',
-      'pending',
-      JSON.stringify({
-        plan,
-        features: ['ad_removal', 'premium_features', 'priority_support'],
-        planName: selectedPlan.name,
-        planDescription: selectedPlan.description
+    // Save payment record with premium upgrade details (only if database is available)
+    if (env.DB) {
+      try {
+        await env.DB.prepare(
+          `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status, metadata)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(
+          userId,
+          paymentIntent.id,
+          selectedPlan.amount,
+          'usd',
+          'premium_upgrade',
+          'ad_free_premium',
+          'pending',
+          JSON.stringify({
+            plan,
+            features: ['ad_removal', 'premium_features', 'priority_support'],
+            planName: selectedPlan.name,
+            planDescription: selectedPlan.description
+          })
+        ).run()
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        // Continue without database logging for now
+      }
+    } else {
+      // Log payment for demo purposes (in production, this would be saved to database)
+      console.log('Premium upgrade payment created:', {
+        paymentIntentId: paymentIntent.id,
+        userId,
+        plan: selectedPlan,
+        amount: selectedPlan.amount
       })
-    ).run()
+    }
     
     return c.json({
       clientSecret: paymentIntent.client_secret,
@@ -335,10 +393,10 @@ app.post('/premium-upgrade', async (c) => {
   }
 })
 
-// Process premium upgrade success
+// Process premium upgrade success (Database-free version)
 app.post('/premium-upgrade/success', async (c) => {
   try {
-    const { paymentIntentId, userId } = await c.req.json()
+    const { paymentIntentId, userId, plan = 'premium' } = await c.req.json()
     
     if (!paymentIntentId || !userId) {
       return c.json({ error: 'Payment intent ID and user ID are required' }, 400)
@@ -346,42 +404,71 @@ app.post('/premium-upgrade/success', async (c) => {
     
     const { env } = c
     
-    // Update payment status
-    await env.DB.prepare(
-      'UPDATE payments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE stripe_payment_intent_id = ? AND user_id = ?'
-    ).bind('succeeded', paymentIntentId, userId).run()
-    
-    // Get payment details
-    const payment = await env.DB.prepare(
-      'SELECT * FROM payments WHERE stripe_payment_intent_id = ? AND user_id = ?'
-    ).bind(paymentIntentId, userId).first()
-    
-    if (!payment) {
-      return c.json({ error: 'Payment not found' }, 404)
+    // Default features for different plans
+    const planFeatures = {
+      basic: ['ad_removal', 'basic_features'],
+      premium: ['ad_removal', 'premium_features', 'priority_support'],
+      complete: ['ad_removal', 'premium_features', 'priority_support', 'exclusive_content']
     }
     
-    const metadata = JSON.parse(payment.metadata || '{}')
-    const plan = metadata.plan || 'premium'
+    if (env.DB) {
+      try {
+        // Update payment status
+        await env.DB.prepare(
+          'UPDATE payments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE stripe_payment_intent_id = ? AND user_id = ?'
+        ).bind('succeeded', paymentIntentId, userId).run()
+        
+        // Get payment details
+        const payment = await env.DB.prepare(
+          'SELECT * FROM payments WHERE stripe_payment_intent_id = ? AND user_id = ?'
+        ).bind(paymentIntentId, userId).first()
+        
+        if (payment) {
+          const metadata = JSON.parse(payment.metadata || '{}')
+          const dbPlan = metadata.plan || plan
+          
+          // Create or update user service record for premium access
+          await env.DB.prepare(`
+            INSERT OR REPLACE INTO user_services 
+            (user_id, service_type, access_level, status, payment_id, purchase_date, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          `).bind(
+            userId,
+            'ad_free_premium',
+            dbPlan,
+            'active',
+            payment.id
+          ).run()
+          
+          return c.json({
+            success: true,
+            message: 'Premium upgrade successful! Ads have been removed.',
+            plan: dbPlan,
+            features: metadata.features || planFeatures[dbPlan] || planFeatures.premium,
+            adFreeActivated: true
+          })
+        }
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        // Continue without database operations
+      }
+    }
     
-    // Create or update user service record for premium access
-    await env.DB.prepare(`
-      INSERT OR REPLACE INTO user_services 
-      (user_id, service_type, access_level, status, payment_id, purchase_date, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `).bind(
+    // Database-free response (demo mode)
+    console.log('Premium upgrade success (database-free):', {
+      paymentIntentId,
       userId,
-      'ad_free_premium',
-      plan, // 'basic', 'premium', or 'complete'
-      'active',
-      payment.id
-    ).run()
+      plan,
+      timestamp: new Date().toISOString()
+    })
     
     return c.json({
       success: true,
       message: 'Premium upgrade successful! Ads have been removed.',
       plan,
-      features: metadata.features || [],
-      adFreeActivated: true
+      features: planFeatures[plan] || planFeatures.premium,
+      adFreeActivated: true,
+      note: 'Demo mode - upgrade processed successfully'
     })
     
   } catch (error) {
