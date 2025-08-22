@@ -1,5 +1,23 @@
 import { Hono } from 'hono'
-import type { CloudflareBindings, RiskAssessment, User, AssessmentFormData, RiskResult } from '../types'
+import type { CloudflareBindings } from '../types'
+
+// Simple types for the assessment (no external dependency)
+interface AssessmentFormData {
+  name: string
+  email: string
+  profession: string
+  netWorth: string
+  legalThreats: string
+  hasRealEstate?: boolean
+  legalHistory?: string[]
+  currentProtection?: string[]
+}
+
+interface RiskResult {
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH'
+  wealthAtRisk: number
+  recommendations: string[]
+}
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -24,19 +42,27 @@ function calculateRiskLevel(data: AssessmentFormData): RiskResult {
     riskScore += 3
   }
   
+  // Handle legal threats from simplified form
+  if (data.legalThreats === 'active') {
+    riskScore += 4
+  } else if (data.legalThreats === 'potential') {
+    riskScore += 2
+  }
+  
+  // Optional fields handling
   if (data.hasRealEstate) {
     riskScore += 2
   }
   
-  if (data.legalHistory.includes('lawsuit') || data.legalHistory.includes('divorce')) {
+  if (data.legalHistory?.includes('lawsuit') || data.legalHistory?.includes('divorce')) {
     riskScore += 3
   }
   
-  if (data.legalHistory.includes('bankruptcy')) {
+  if (data.legalHistory?.includes('bankruptcy')) {
     riskScore += 4
   }
   
-  if (data.currentProtection.length === 0 || data.currentProtection.includes('none')) {
+  if (!data.currentProtection || data.currentProtection.length === 0 || data.currentProtection.includes('none')) {
     riskScore += 2
   }
   

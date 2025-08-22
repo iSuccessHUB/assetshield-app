@@ -536,10 +536,73 @@ app.get('/', (c) => {
               </div>
 
               <div id="assessment-form">
-                {/* Assessment form will be loaded dynamically */}
-                <div id="assessment-loading" className="text-center py-12">
-                  <i className="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
-                  <p className="text-gray-600">Loading assessment...</p>
+                {/* Direct HTML Assessment Form - No Dynamic Loading */}
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Basic Information</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">What is your profession?</label>
+                    <select id="profession" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
+                      <option value="">Select your profession</option>
+                      <option value="doctor">Doctor/Medical Professional</option>
+                      <option value="lawyer">Lawyer/Attorney</option>
+                      <option value="business_owner">Business Owner</option>
+                      <option value="real_estate">Real Estate Professional</option>
+                      <option value="executive">Corporate Executive</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">What is your approximate net worth?</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input type="radio" name="netWorth" value="under_500k" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>Under $500,000</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="netWorth" value="500k_1m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>$500,000 - $1,000,000</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="netWorth" value="1m_5m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>$1,000,000 - $5,000,000</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="netWorth" value="5m_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>$5,000,000 - $10,000,000</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="netWorth" value="over_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>Over $10,000,000</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Are you currently facing any legal threats or lawsuits?</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input type="radio" name="legalThreats" value="none" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>No current threats</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="legalThreats" value="potential" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>Potential threats on the horizon</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input type="radio" name="legalThreats" value="active" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <span>Active litigation or threats</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button onclick="nextAssessmentStep()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                      Next Step <i className="fas fa-arrow-right ml-2"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1899,7 +1962,7 @@ app.get('/', (c) => {
               console.error('Purchase error:', error);
               alert(
                 \`Sorry, there was an error processing your purchase.\\n\\n\` +
-                \`Please try again or contact support at sales@assetshield.com\\n\\n\` +
+                \`Please try again or contact support at support@isuccesshub.com\\n\\n\` +
                 \`Error: \${error.message}\`
               );
             }
