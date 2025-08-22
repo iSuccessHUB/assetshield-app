@@ -1,7 +1,9 @@
 import { Hono } from 'hono'
 
 interface CloudflareBindings {
-  DB: D1Database;
+  DB?: D1Database;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_PUBLISHABLE_KEY: string;
 }
 
 export const stripeCheckoutRoutes = new Hono<{ Bindings: CloudflareBindings }>()
@@ -81,21 +83,55 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
       }
     }
     
-    // In production, create actual Stripe checkout session
-    // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-    // const session = await stripe.checkout.sessions.create(checkoutSession)
-    
-    // For demo, return mock session
-    const mockSession = {
-      id: `cs_mock_${Date.now()}`,
-      url: `/demo-checkout?tier=${tier}&firm=${encodeURIComponent(firmName)}&email=${encodeURIComponent(lawyerEmail)}&name=${encodeURIComponent(lawyerName)}&setup=${tierPricing.setup}&monthly=${tierPricing.monthly}`,
-      payment_intent: `pi_mock_${Date.now()}`
+    // Create actual Stripe checkout session
+    const stripeSecretKey = c.env.STRIPE_SECRET_KEY
+    if (!stripeSecretKey) {
+      return c.json({ error: 'Stripe not configured' }, 500)
     }
+    
+    // Create Stripe checkout session using fetch API
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'payment_method_types[]': 'card',
+        mode: 'subscription',
+        success_url: `${c.req.url.split('/').slice(0, 3).join('/')}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${c.req.url.split('/').slice(0, 3).join('/')}/#pricing`,
+        customer_email: lawyerEmail,
+        'line_items[0][price_data][currency]': 'usd',
+        'line_items[0][price_data][unit_amount]': (tierPricing.setup * 100).toString(),
+        'line_items[0][price_data][product_data][name]': `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Setup Fee`,
+        'line_items[0][price_data][product_data][description]': `One-time setup fee for ${firmName}`,
+        'line_items[0][quantity]': '1',
+        'subscription_data[items][0][price_data][currency]': 'usd',
+        'subscription_data[items][0][price_data][unit_amount]': (tierPricing.monthly * 100).toString(),
+        'subscription_data[items][0][price_data][recurring][interval]': 'month',
+        'subscription_data[items][0][price_data][product_data][name]': `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Monthly`,
+        'subscription_data[items][0][price_data][product_data][description]': `Monthly subscription for ${firmName}`,
+        'metadata[tier]': tier,
+        'metadata[lawyerName]': lawyerName,
+        'metadata[lawyerEmail]': lawyerEmail,
+        'metadata[lawyerPhone]': lawyerPhone || '',
+        'metadata[firmName]': firmName,
+        'metadata[type]': 'platform_purchase'
+      })
+    })
+    
+    if (!response.ok) {
+      console.error('Stripe checkout creation error:', await response.text())
+      return c.json({ error: 'Failed to create checkout session' }, 500)
+    }
+    
+    const session = await response.json()
     
     return c.json({
       success: true,
-      sessionId: mockSession.id,
-      checkoutUrl: mockSession.url
+      sessionId: session.id,
+      checkoutUrl: session.url
     })
     
   } catch (error) {

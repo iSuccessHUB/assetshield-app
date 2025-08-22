@@ -14,41 +14,60 @@ app.post('/create-intent', async (c) => {
       return c.json({ error: 'Missing required fields' }, 400)
     }
     
-    // In a real implementation, you would:
-    // const stripe = new Stripe(c.env.STRIPE_SECRET_KEY)
-    // const paymentIntent = await stripe.paymentIntents.create({
-    //   amount,
-    //   currency: 'usd',
-    //   metadata: { serviceType, userId }
-    // })
-    
-    // For demo purposes, we'll simulate a payment intent
-    const mockPaymentIntent = {
-      id: `pi_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      client_secret: `pi_${Date.now()}_secret_${Math.random().toString(36).substring(7)}`,
-      amount,
-      currency: 'usd',
-      status: 'requires_payment_method'
+    // Create real Stripe payment intent
+    const stripeSecretKey = c.env.STRIPE_SECRET_KEY
+    if (!stripeSecretKey) {
+      return c.json({ error: 'Stripe not configured' }, 500)
     }
     
-    // Save payment record
+    // Create Stripe payment intent using fetch API (Cloudflare Workers compatible)
+    const response = await fetch('https://api.stripe.com/v1/payment_intents', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        amount: amount.toString(),
+        currency: 'usd',
+        'metadata[serviceType]': serviceType,
+        'metadata[userId]': userId.toString(),
+        'automatic_payment_methods[enabled]': 'true'
+      })
+    })
+    
+    if (!response.ok) {
+      console.error('Stripe API error:', await response.text())
+      return c.json({ error: 'Failed to create payment intent' }, 500)
+    }
+    
+    const paymentIntent = await response.json()
+    
+    // Save payment record (only if database is available)
     const { env } = c
-    await env.DB.prepare(
-      `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    ).bind(
-      userId,
-      mockPaymentIntent.id,
-      amount,
-      'usd',
-      'service',
-      serviceType,
-      'pending'
-    ).run()
+    if (env.DB) {
+      try {
+        await env.DB.prepare(
+          `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        ).bind(
+          userId,
+          paymentIntent.id,
+          amount,
+          'usd',
+          'service',
+          serviceType,
+          'pending'
+        ).run()
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        // Continue without database logging for now
+      }
+    }
     
     return c.json({
-      clientSecret: mockPaymentIntent.client_secret,
-      paymentIntentId: mockPaymentIntent.id
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
     })
     
   } catch (error) {
@@ -68,8 +87,9 @@ app.post('/setup-fee', async (c) => {
     
     // Setup fee amounts
     const setupFees = {
-      professional: 500000, // $5,000
-      enterprise: 1000000,  // $10,000
+      starter: 500000,     // $5,000 
+      professional: 1000000, // $10,000
+      enterprise: 2500000,    // $25,000
       custom: 1500000       // $15,000
     }
     
@@ -78,33 +98,60 @@ app.post('/setup-fee', async (c) => {
       return c.json({ error: 'Invalid tier' }, 400)
     }
     
-    // Simulate Stripe payment intent creation
-    const mockPaymentIntent = {
-      id: `pi_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      client_secret: `pi_${Date.now()}_secret_${Math.random().toString(36).substring(7)}`,
-      amount,
-      currency: 'usd',
-      status: 'requires_payment_method'
+    // Create real Stripe payment intent for setup fee
+    const stripeSecretKey = c.env.STRIPE_SECRET_KEY
+    if (!stripeSecretKey) {
+      return c.json({ error: 'Stripe not configured' }, 500)
     }
     
-    // Save payment record
+    const response = await fetch('https://api.stripe.com/v1/payment_intents', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        amount: amount.toString(),
+        currency: 'usd',
+        'metadata[tier]': tier,
+        'metadata[userId]': userId.toString(),
+        'metadata[type]': 'setup_fee',
+        'automatic_payment_methods[enabled]': 'true'
+      })
+    })
+    
+    if (!response.ok) {
+      console.error('Stripe API error:', await response.text())
+      return c.json({ error: 'Failed to create payment intent' }, 500)
+    }
+    
+    const paymentIntent = await response.json()
+    
+    // Save payment record (only if database is available) 
     const { env } = c
-    await env.DB.prepare(
-      `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    ).bind(
-      userId,
-      mockPaymentIntent.id,
-      amount,
-      'usd',
-      'setup_fee',
-      tier,
-      'pending'
-    ).run()
+    if (env.DB) {
+      try {
+        await env.DB.prepare(
+          `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, payment_type, service_type, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        ).bind(
+          userId,
+          paymentIntent.id,
+          amount,
+          'usd',
+          'setup_fee',
+          tier,
+          'pending'
+        ).run()
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        // Continue without database logging for now
+      }
+    }
     
     return c.json({
-      clientSecret: mockPaymentIntent.client_secret,
-      paymentIntentId: mockPaymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
       amount
     })
     
@@ -114,30 +161,40 @@ app.post('/setup-fee', async (c) => {
   }
 })
 
-// Webhook handler for Stripe events (simplified)
+// Webhook handler for Stripe events
 app.post('/webhook', async (c) => {
   try {
     // In a real implementation, you would verify the webhook signature
+    // const sig = c.req.header('stripe-signature')
+    // const webhookSecret = c.env.STRIPE_WEBHOOK_SECRET
     const event = await c.req.json()
+    
+    console.log('Stripe webhook event:', event.type, event.data?.object?.id)
     
     if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object
       
-      // Update payment status
+      // Update payment status (only if database is available)
       const { env } = c
-      await env.DB.prepare(
-        'UPDATE payments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE stripe_payment_intent_id = ?'
-      ).bind('succeeded', paymentIntent.id).run()
-      
-      // If it's a setup fee, activate the law firm subscription
-      const payment = await env.DB.prepare(
-        'SELECT * FROM payments WHERE stripe_payment_intent_id = ?'
-      ).bind(paymentIntent.id).first()
-      
-      if (payment && payment.payment_type === 'setup_fee') {
-        await env.DB.prepare(
-          'UPDATE law_firms SET setup_fee_paid = TRUE, subscription_status = "active" WHERE user_id = ?'
-        ).bind(payment.user_id).run()
+      if (env.DB) {
+        try {
+          await env.DB.prepare(
+            'UPDATE payments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE stripe_payment_intent_id = ?'
+          ).bind('succeeded', paymentIntent.id).run()
+          
+          // If it's a setup fee, activate the law firm subscription
+          const payment = await env.DB.prepare(
+            'SELECT * FROM payments WHERE stripe_payment_intent_id = ?'
+          ).bind(paymentIntent.id).first()
+          
+          if (payment && payment.payment_type === 'setup_fee') {
+            await env.DB.prepare(
+              'UPDATE law_firms SET setup_fee_paid = TRUE, subscription_status = "active" WHERE user_id = ?'
+            ).bind(payment.user_id).run()
+          }
+        } catch (dbError) {
+          console.error('Database update error:', dbError)
+        }
       }
     }
     
