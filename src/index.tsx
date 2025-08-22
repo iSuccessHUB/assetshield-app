@@ -2833,9 +2833,12 @@ app.get('/', (c) => {
               const result = await response.json();
               
               if (result.success) {
-                // Close modal and redirect to Stripe checkout
+                // Close modal and open Stripe checkout in new tab
                 closeProfessionalModal();
-                window.location.href = result.checkoutUrl;
+                window.open(result.checkoutUrl, '_blank');
+                
+                // Show success feedback
+                showCheckoutSuccessMessage();
               } else {
                 throw new Error(result.error || 'Failed to create checkout session');
               }
@@ -2855,6 +2858,33 @@ app.get('/', (c) => {
               );
             }
           };
+          
+          function showCheckoutSuccessMessage() {
+            // Create a subtle success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 flex items-center';
+            successDiv.innerHTML = \`
+              <i class="fas fa-check-circle mr-3 text-xl"></i>
+              <div>
+                <div class="font-semibold">Checkout Opened</div>
+                <div class="text-sm text-green-100">Complete your purchase in the new tab</div>
+              </div>
+            \`;
+            
+            document.body.appendChild(successDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+              if (successDiv.parentNode) {
+                successDiv.style.opacity = '0';
+                successDiv.style.transform = 'translateX(100%)';
+                successDiv.style.transition = 'all 0.3s ease-out';
+                setTimeout(() => {
+                  successDiv.remove();
+                }, 300);
+              }
+            }, 5000);
+          }
           
           function showErrorModal(title, message, contactEmail) {
             const errorModalHTML = \`
