@@ -599,7 +599,7 @@ app.get('/', (c) => {
                   </div>
 
                   <div className="flex justify-end">
-                    <button onclick="if(typeof submitDirectAssessment === 'function') { submitDirectAssessment(); } else { alert('Function not loaded. Please refresh the page.'); }" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <button onclick="window.submitDirectAssessment()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                       Get My Risk Assessment <i className="fas fa-arrow-right ml-2"></i>
                     </button>
                   </div>
@@ -739,112 +739,124 @@ app.get('/', (c) => {
                   }
                 };
                 
-                // Simple direct assessment submission - WORKING IMPLEMENTATION
-                window.submitDirectAssessment = function() {
-                  console.log('Direct assessment submission starting...');
+                // Define functions immediately and globally - GUARANTEED TO LOAD
+                (function() {
+                  console.log('Defining assessment functions immediately...');
                   
-                  const profession = document.getElementById('assessment-profession')?.value;
-                  const netWorth = document.querySelector('input[name="assessmentNetWorth"]:checked')?.value;
-                  const legalThreats = document.querySelector('input[name="assessmentLegalThreats"]:checked')?.value;
-                  
-                  // Validation
-                  if (!profession) {
-                    alert('Please select your profession');
-                    return;
-                  }
-                  if (!netWorth) {
-                    alert('Please select your net worth range');
-                    return;
-                  }
-                  if (!legalThreats) {
-                    alert('Please indicate your legal threat status');
-                    return;
-                  }
-                  
-                  // Show loading state
-                  const button = event.target;
-                  const originalText = button.innerHTML;
-                  button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-                  button.disabled = true;
-                  
-                  // Prepare assessment data
-                  const assessmentData = {
-                    name: 'Anonymous User',
-                    email: 'anonymous@example.com',
-                    profession,
-                    netWorth,
-                    legalThreats
+                  // Simple direct assessment submission - WORKING IMPLEMENTATION
+                  window.submitDirectAssessment = function() {
+                    console.log('Direct assessment submission starting...');
+                    
+                    const profession = document.getElementById('assessment-profession')?.value;
+                    const netWorth = document.querySelector('input[name="assessmentNetWorth"]:checked')?.value;
+                    const legalThreats = document.querySelector('input[name="assessmentLegalThreats"]:checked')?.value;
+                    
+                    // Validation
+                    if (!profession) {
+                      alert('Please select your profession');
+                      return;
+                    }
+                    if (!netWorth) {
+                      alert('Please select your net worth range');
+                      return;
+                    }
+                    if (!legalThreats) {
+                      alert('Please indicate your legal threat status');
+                      return;
+                    }
+                    
+                    // Show loading state
+                    const button = event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                    button.disabled = true;
+                    
+                    // Prepare assessment data
+                    const assessmentData = {
+                      name: 'Anonymous User',
+                      email: 'anonymous@example.com',
+                      profession,
+                      netWorth,
+                      legalThreats
+                    };
+                    
+                    console.log('Submitting assessment data:', assessmentData);
+                    
+                    // Submit to API using fetch (always available)
+                    fetch('/api/assessment/submit', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(assessmentData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Assessment submitted successfully:', data);
+                      if (data.success) {
+                        window.showDirectAssessmentResults(data);
+                      } else {
+                        throw new Error(data.error || 'Assessment failed');
+                      }
+                    })
+                    .catch(error => {
+                      console.error('Assessment submission failed:', error);
+                      button.innerHTML = originalText;
+                      button.disabled = false;
+                      alert('Failed to submit assessment. Please try again.');
+                    });
                   };
                   
-                  console.log('Submitting assessment data:', assessmentData);
-                  
-                  // Submit to API
-                  if (typeof axios !== 'undefined') {
-                    axios.post('/api/assessment/submit', assessmentData)
-                      .then(response => {
-                        console.log('Assessment submitted successfully:', response.data);
-                        showDirectAssessmentResults(response.data);
-                      })
-                      .catch(error => {
-                        console.error('Assessment submission failed:', error);
-                        button.innerHTML = originalText;
-                        button.disabled = false;
-                        alert('Failed to submit assessment. Please try again.');
-                      });
-                  } else {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                    alert('Assessment system unavailable. Please refresh the page and try again.');
-                  }
-                };
-                
-                // Show assessment results - WORKING IMPLEMENTATION
-                function showDirectAssessmentResults(data) {
-                  console.log('Displaying assessment results:', data);
-                  
-                  const container = document.getElementById('assessment-form');
-                  if (container) {
-                    const riskColorClass = data.riskLevel === 'HIGH' ? 'text-red-600' : 
-                                         data.riskLevel === 'MEDIUM' ? 'text-yellow-600' : 'text-green-600';
+                  // Show assessment results - WORKING IMPLEMENTATION
+                  window.showDirectAssessmentResults = function(data) {
+                    console.log('Displaying assessment results:', data);
                     
-                    container.innerHTML = \`
-                      <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    const container = document.getElementById('assessment-form');
+                    if (container) {
+                      const riskColorClass = data.riskLevel === 'HIGH' ? 'text-red-600' : 
+                                           data.riskLevel === 'MEDIUM' ? 'text-yellow-600' : 'text-green-600';
+                      
+                      container.innerHTML = \`
+                        <div class="text-center py-8">
+                          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                          </div>
+                          <h3 class="text-2xl font-bold text-gray-800 mb-4">Assessment Complete!</h3>
+                          <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left max-w-2xl mx-auto">
+                            <h4 class="font-semibold text-lg mb-2">
+                              Risk Level: <span class="\${riskColorClass}">\${data.riskLevel}</span>
+                            </h4>
+                            <p class="text-gray-700 mb-4">
+                              Estimated Wealth at Risk: <strong class="text-red-600">$\${data.wealthAtRisk.toLocaleString()}</strong>
+                            </p>
+                            <h5 class="font-semibold mb-2 text-gray-800">Recommended Actions:</h5>
+                            <ul class="list-disc list-inside space-y-1">
+                              \${data.recommendations.map(rec => \`<li class="text-gray-700">\${rec}</li>\`).join('')}
+                            </ul>
+                          </div>
+                          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="location.reload()" class="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors">
+                              Take Assessment Again
+                            </button>
+                            <button onclick="window.scrollToPricing()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                              Get Professional Help
+                            </button>
+                          </div>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Assessment Complete!</h3>
-                        <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left max-w-2xl mx-auto">
-                          <h4 class="font-semibold text-lg mb-2">
-                            Risk Level: <span class="\${riskColorClass}">\${data.riskLevel}</span>
-                          </h4>
-                          <p class="text-gray-700 mb-4">
-                            Estimated Wealth at Risk: <strong class="text-red-600">$\${data.wealthAtRisk.toLocaleString()}</strong>
-                          </p>
-                          <h5 class="font-semibold mb-2 text-gray-800">Recommended Actions:</h5>
-                          <ul class="list-disc list-inside space-y-1">
-                            \${data.recommendations.map(rec => \`<li class="text-gray-700">\${rec}</li>\`).join('')}
-                          </ul>
-                        </div>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                          <button onclick="location.reload()" class="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors">
-                            Take Assessment Again
-                          </button>
-                          <button onclick="scrollToPricing()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                            Get Professional Help
-                          </button>
-                        </div>
-                      </div>
-                    \`;
-                  }
-                }
-                
-                // Scroll to pricing section
-                window.scrollToPricing = function() {
-                  const pricingSection = document.getElementById('pricing');
-                  if (pricingSection) {
-                    pricingSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                };
+                      \`;
+                    }
+                  };
+                  
+                  // Scroll to pricing section
+                  window.scrollToPricing = function() {
+                    const pricingSection = document.getElementById('pricing');
+                    if (pricingSection) {
+                      pricingSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  };
+                  
+                  console.log('Assessment functions defined successfully!');
+                })();
                 
                 // Enhanced language changing functionality - Always define
                 window.changeLanguage = function(lang) {
