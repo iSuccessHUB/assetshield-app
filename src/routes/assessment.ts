@@ -54,15 +54,18 @@ function calculateRiskLevel(data: AssessmentFormData): RiskResult {
     riskScore += 2
   }
   
-  if (data.legalHistory?.includes('lawsuit') || data.legalHistory?.includes('divorce')) {
-    riskScore += 3
+  if (data.legalHistory && Array.isArray(data.legalHistory)) {
+    if (data.legalHistory.includes('lawsuit') || data.legalHistory.includes('divorce')) {
+      riskScore += 3
+    }
+    
+    if (data.legalHistory.includes('bankruptcy')) {
+      riskScore += 4
+    }
   }
   
-  if (data.legalHistory?.includes('bankruptcy')) {
-    riskScore += 4
-  }
-  
-  if (!data.currentProtection || data.currentProtection.length === 0 || data.currentProtection.includes('none')) {
+  if (!data.currentProtection || !Array.isArray(data.currentProtection) || 
+      data.currentProtection.length === 0 || data.currentProtection.includes('none')) {
     riskScore += 2
   }
   

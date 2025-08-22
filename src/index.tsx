@@ -750,6 +750,24 @@ app.get('/', (c) => {
                         </div>
                         
                         <div class="max-w-2xl mx-auto space-y-6">
+                          <!-- Contact Information -->
+                          <div class="grid md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>Your Name
+                              </label>
+                              <input type="text" name="name" id="assessment-name" placeholder="John Doe" 
+                                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors" required>
+                            </div>
+                            <div>
+                              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-envelope mr-2 text-blue-600"></i>Email Address
+                              </label>
+                              <input type="email" name="email" id="assessment-email" placeholder="john@example.com" 
+                                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors" required>
+                            </div>
+                          </div>
+                          
                           <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-3">
                               <i class="fas fa-briefcase mr-2 text-blue-600"></i>What is your profession?
@@ -982,27 +1000,51 @@ app.get('/', (c) => {
                     // Step 1 listeners
                     const step1Next = document.getElementById('step1-next');
                     const professionInputs = document.querySelectorAll('input[name="profession"]');
+                    const nameInput = document.getElementById('assessment-name');
+                    const emailInput = document.getElementById('assessment-email');
+                    
+                    // Validation function for step 1
+                    const validateStep1 = () => {
+                      const selectedProfession = document.querySelector('input[name="profession"]:checked');
+                      const hasName = nameInput && nameInput.value.trim().length > 0;
+                      const hasEmail = emailInput && emailInput.value.trim().length > 0 && emailInput.value.includes('@');
+                      
+                      if (step1Next) {
+                        step1Next.disabled = !(selectedProfession && hasName && hasEmail);
+                      }
+                    };
                     
                     if (professionInputs.length > 0) {
                       professionInputs.forEach(input => {
                         input.addEventListener('change', () => {
-                          if (step1Next) {
-                            step1Next.disabled = false;
-                            // Add visual feedback
-                            document.querySelectorAll('.profession-option').forEach(option => {
-                              option.classList.remove('border-blue-500', 'bg-blue-50');
-                            });
-                            input.closest('.profession-option').classList.add('border-blue-500', 'bg-blue-50');
-                          }
+                          // Add visual feedback
+                          document.querySelectorAll('.profession-option').forEach(option => {
+                            option.classList.remove('border-blue-500', 'bg-blue-50');
+                          });
+                          input.closest('.profession-option').classList.add('border-blue-500', 'bg-blue-50');
+                          validateStep1();
                         });
                       });
+                    }
+                    
+                    // Add listeners for name and email inputs
+                    if (nameInput) {
+                      nameInput.addEventListener('input', validateStep1);
+                    }
+                    if (emailInput) {
+                      emailInput.addEventListener('input', validateStep1);
                     }
                     
                     if (step1Next) {
                       step1Next.addEventListener('click', () => {
                         const selectedProfession = document.querySelector('input[name="profession"]:checked');
-                        if (selectedProfession) {
+                        const name = nameInput ? nameInput.value.trim() : '';
+                        const email = emailInput ? emailInput.value.trim() : '';
+                        
+                        if (selectedProfession && name && email) {
                           this.assessmentData.profession = selectedProfession.value;
+                          this.assessmentData.name = name;
+                          this.assessmentData.email = email;
                           this.showStep(2);
                         }
                       });
@@ -1083,8 +1125,6 @@ app.get('/', (c) => {
                       console.log('🚀 Submitting professional assessment:', this.assessmentData);
                       
                       const assessmentData = {
-                        name: 'Anonymous User',
-                        email: 'anonymous@example.com',
                         ...this.assessmentData
                       };
                       
