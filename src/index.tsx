@@ -599,7 +599,7 @@ app.get('/', (c) => {
                   </div>
 
                   <div className="flex justify-end">
-                    <button onclick="nextAssessmentStep()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <button onclick="if(window.assessment) { window.assessment.nextStep(); } else { nextAssessmentStep(); }" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                       Next Step <i className="fas fa-arrow-right ml-2"></i>
                     </button>
                   </div>
@@ -721,11 +721,22 @@ app.get('/', (c) => {
                 
                 console.log('Mobile navigation functions defined successfully');
                 
-                // Simple next step function as fallback
-                if (!window.nextAssessmentStep) {
-                  window.nextAssessmentStep = function() {
-                    alert('Assessment Step 2 would load here. The full assessment system is being loaded...');
-                  };
+                // Initialize Assessment Form when container is available
+                window.nextAssessmentStep = function() {
+                  console.log('Initializing AssessmentForm...');
+                  if (window.initAssessmentForm) {
+                    window.assessment = window.initAssessmentForm();
+                  } else {
+                    console.error('AssessmentForm not loaded yet');
+                    alert('Loading assessment system...');
+                  }
+                };
+                
+                // Auto-initialize assessment form if container exists
+                const assessmentContainer = document.getElementById('assessment-form');
+                if (assessmentContainer && window.initAssessmentForm) {
+                  console.log('Auto-initializing AssessmentForm...');
+                  window.assessment = window.initAssessmentForm();
                 }
                 
                 // Enhanced language changing functionality - Always define
