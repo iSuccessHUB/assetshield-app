@@ -701,10 +701,16 @@ app.get('/', (c) => {
                   }
                   
                   showStep(step) {
+                    console.log('📍 Risk Assessment showStep called:', step);
                     this.currentStep = step;
                     const container = document.getElementById('assessment-form');
                     
-                    if (!container) return;
+                    if (!container) {
+                      console.log('❌ Assessment form container not found');
+                      return;
+                    }
+                    
+                    console.log('✅ Container found, rendering step', step);
                     
                     let content = '';
                     
@@ -1239,8 +1245,25 @@ app.get('/', (c) => {
                 // Initialize the assessment system
                 let riskAssessment;
                 document.addEventListener('DOMContentLoaded', function() {
-                  console.log('🎯 Starting Professional Risk Assessment System');
-                  riskAssessment = new RiskAssessment();
+                  console.log('🎯 DOM Loaded - Starting Professional Risk Assessment System');
+                  
+                  // Check if assessment container exists
+                  const container = document.getElementById('assessment-form');
+                  if (container) {
+                    console.log('✅ Assessment container found, initializing...');
+                    riskAssessment = new RiskAssessment();
+                  } else {
+                    console.log('❌ Assessment container not found');
+                    setTimeout(() => {
+                      const delayedContainer = document.getElementById('assessment-form');
+                      if (delayedContainer) {
+                        console.log('✅ Assessment container found after delay, initializing...');
+                        riskAssessment = new RiskAssessment();
+                      } else {
+                        console.log('❌ Assessment container still not found after delay');
+                      }
+                    }, 1000);
+                  }
                 });
                 
                 // Global function for scrolling to pricing
