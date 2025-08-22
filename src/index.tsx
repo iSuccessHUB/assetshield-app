@@ -519,20 +519,13 @@ app.get('/', (c) => {
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <button 
                 onclick="scrollToAssessment()" 
-                className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-xl text-sm sm:text-base"
+                className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-xl text-lg"
               >
                 <i className="fas fa-chart-line mr-2"></i>
                 <span data-translate="hero.start_assessment">Start Risk Assessment</span>
-              </button>
-              <button 
-                onclick="showConsultationModal()" 
-                className="px-6 sm:px-8 py-3 sm:py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all text-sm sm:text-base"
-              >
-                <i className="fas fa-calendar mr-2"></i>
-                <span data-translate="consultation.schedule">Free Consultation</span>
               </button>
             </div>
           </div>
@@ -698,11 +691,7 @@ app.get('/', (c) => {
                   };
                 }
                 
-                if (!window.showConsultationModal) {
-                  window.showConsultationModal = function() {
-                    alert('Consultation booking functionality is being loaded...');
-                  };
-                }
+
               `}}></script>
             </div>
           </div>
