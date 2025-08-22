@@ -1118,30 +1118,30 @@ app.get('/', (c) => {
                   </div>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+                <div className="bg-white/15 backdrop-blur-md rounded-lg p-6 border border-white/20">
                   <form id="demoRequestForm" className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Your Name</label>
-                      <input type="text" name="lawyerName" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                      <label className="block text-sm font-medium mb-2 text-white">Your Name</label>
+                      <input type="text" name="lawyerName" required className="w-full p-3 border border-white/30 rounded-lg bg-white/20 placeholder-white/80 text-white focus:bg-white/30 focus:ring-2 focus:ring-white/50 focus:border-transparent" placeholder="Enter your full name" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Email Address</label>
-                      <input type="email" name="lawyerEmail" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                      <label className="block text-sm font-medium mb-2 text-white">Email Address</label>
+                      <input type="email" name="lawyerEmail" required className="w-full p-3 border border-white/30 rounded-lg bg-white/20 placeholder-white/80 text-white focus:bg-white/30 focus:ring-2 focus:ring-white/50 focus:border-transparent" placeholder="your@lawfirm.com" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Phone Number</label>
-                      <input type="tel" name="lawyerPhone" className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                      <label className="block text-sm font-medium mb-2 text-white">Phone Number</label>
+                      <input type="tel" name="lawyerPhone" className="w-full p-3 border border-white/30 rounded-lg bg-white/20 placeholder-white/80 text-white focus:bg-white/30 focus:ring-2 focus:ring-white/50 focus:border-transparent" placeholder="(555) 123-4567" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Law Firm Name</label>
-                      <input type="text" name="firmName" required className="w-full p-3 border border-white/20 rounded-lg bg-white/10 placeholder-white/70 text-white" />
+                      <label className="block text-sm font-medium mb-2 text-white">Law Firm Name</label>
+                      <input type="text" name="firmName" required className="w-full p-3 border border-white/30 rounded-lg bg-white/20 placeholder-white/80 text-white focus:bg-white/30 focus:ring-2 focus:ring-white/50 focus:border-transparent" placeholder="Your Law Firm" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Interested Tier</label>
-                      <select name="interestedTier" className="w-full p-3 border border-white/20 rounded-lg bg-white/10 text-white">
-                        <option value="starter">Starter ($5K + $500/month)</option>
-                        <option value="professional" selected>Professional ($10K + $1,200/month)</option>
-                        <option value="enterprise">Enterprise ($25K + $2,500/month)</option>
+                      <label className="block text-sm font-medium mb-2 text-white">Interested Tier</label>
+                      <select name="interestedTier" className="w-full p-3 border border-white/30 rounded-lg bg-white text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+                        <option value="starter" className="bg-white text-gray-800 py-2">Starter ($5K + $500/month)</option>
+                        <option value="professional" selected className="bg-white text-gray-800 py-2">Professional ($10K + $1,200/month)</option>
+                        <option value="enterprise" className="bg-white text-gray-800 py-2">Enterprise ($25K + $2,500/month)</option>
                       </select>
                     </div>
                     <button type="submit" className="w-full py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
