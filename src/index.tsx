@@ -2358,7 +2358,7 @@ app.get('/', (c) => {
                 Try our live demo instantly and see how our platform can work for your firm
               </p>
               <button 
-                onClick="startLiveDemo()"
+                onClick="showDemoModal()"
                 className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <i className="fas fa-play mr-2"></i>
@@ -2778,13 +2778,21 @@ app.get('/', (c) => {
             console.log('🔄 Closing payment modal...');
             const modal = document.getElementById('payment-modal');
             if (modal) {
-              // Immediate removal - no animation delay
-              modal.style.display = 'none';
+              // Force immediate removal with better cleanup
+              modal.style.display = 'none !important';
+              modal.style.visibility = 'hidden !important';
+              modal.style.opacity = '0 !important';
+              modal.style.pointerEvents = 'none !important';
+              
+              // Remove from DOM immediately
               setTimeout(() => {
-                modal.remove();
+                if (modal.parentNode) {
+                  modal.parentNode.removeChild(modal);
+                }
                 document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
                 console.log('✅ Payment modal closed and removed');
-              }, 50);
+              }, 10);
             } else {
               console.log('⚠️ Payment modal not found');
             }
@@ -2889,38 +2897,41 @@ app.get('/', (c) => {
             const existingMessages = document.querySelectorAll('.checkout-success-message');
             existingMessages.forEach(msg => msg.remove());
             
-            // Create a prominent success message
+            // Create a prominent success message with better positioning
             const successDiv = document.createElement('div');
-            successDiv.className = 'checkout-success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center transform translate-x-full';
-            successDiv.style.cssText = 'position: fixed !important; top: 1rem !important; right: 1rem !important; z-index: 99999 !important; transform: translateX(100%) !important; background-color: #10b981 !important; color: white !important;';
+            successDiv.className = 'checkout-success-message';
+            successDiv.style.cssText = 'position: fixed !important; top: 20px !important; right: 20px !important; z-index: 999999 !important; background: linear-gradient(135deg, #10b981, #059669) !important; color: white !important; padding: 16px 24px !important; border-radius: 12px !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important; display: flex !important; align-items: center !important; font-family: system-ui, -apple-system, sans-serif !important; font-size: 14px !important; max-width: 350px !important; transform: translateX(100%) !important; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;';
+            
             successDiv.innerHTML = \`
-              <i class="fas fa-external-link-alt mr-3 text-xl"></i>
+              <div style="margin-right: 12px; font-size: 20px;">
+                <i class="fas fa-external-link-alt"></i>
+              </div>
               <div>
-                <div class="font-semibold">Payment Tab Opened!</div>
-                <div class="text-sm text-green-100">Complete your secure checkout in the new tab</div>
+                <div style="font-weight: 600; margin-bottom: 4px;">Payment Tab Opened!</div>
+                <div style="font-size: 12px; opacity: 0.9;">Complete your secure checkout in the new tab</div>
               </div>
             \`;
             
             document.body.appendChild(successDiv);
             
-            // Animate in immediately
+            // Animate in with a slight delay
             setTimeout(() => {
               successDiv.style.transform = 'translateX(0) !important';
-              successDiv.style.transition = 'transform 0.3s ease-out !important';
-              console.log('✅ Success message displayed');
-            }, 100);
+              console.log('✅ Success message displayed and animated in');
+            }, 50);
             
-            // Auto-remove after 6 seconds
+            // Auto-remove after 8 seconds
             setTimeout(() => {
-              if (successDiv.parentNode) {
-                successDiv.style.transform = 'translateX(100%)';
-                successDiv.style.transition = 'transform 0.3s ease-out';
+              if (successDiv && successDiv.parentNode) {
+                successDiv.style.transform = 'translateX(100%) !important';
                 setTimeout(() => {
-                  successDiv.remove();
-                  console.log('🗑️ Success message removed');
-                }, 300);
+                  if (successDiv.parentNode) {
+                    successDiv.remove();
+                    console.log('🗑️ Success message removed');
+                  }
+                }, 400);
               }
-            }, 6000);
+            }, 8000);
           }
           
           function showPopupBlockedMessage(checkoutUrl) {
@@ -3005,6 +3016,41 @@ app.get('/', (c) => {
           
           window.closeErrorModal = function() {
             const modal = document.getElementById('error-modal');
+            if (modal) modal.remove();
+          };
+          
+          function showSuccessModal(title, message, onConfirm) {
+            const successModalHTML = \`
+              <div id="success-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+                  <div class="bg-green-600 text-white p-6 rounded-t-2xl">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-check text-xl"></i>
+                      </div>
+                      <h3 class="text-xl font-bold">\${title}</h3>
+                    </div>
+                  </div>
+                  <div class="p-6">
+                    <p class="text-gray-700 mb-6 whitespace-pre-line">\${message}</p>
+                    <div class="flex gap-3">
+                      <button onclick="closeSuccessModal()" class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                        Close
+                      </button>
+                      <button onclick="closeSuccessModal(); \${onConfirm ? '(' + onConfirm + ')()' : ''}" class="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        Continue
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            \`;
+            
+            document.body.insertAdjacentHTML('beforeend', successModalHTML);
+          }
+          
+          window.closeSuccessModal = function() {
+            const modal = document.getElementById('success-modal');
             if (modal) modal.remove();
           };
 
@@ -3111,8 +3157,173 @@ app.get('/', (c) => {
             }, 2000); // Simulate network delay
           };
           
-          // Handle live demo launch
-          window.startLiveDemo = function() {
+          // Professional Demo Modal System
+          window.showDemoModal = function() {
+            console.log('🎯 Opening Professional Demo Modal');
+            
+            // Remove any existing modals
+            const existingModal = document.getElementById('demo-modal');
+            if (existingModal) {
+              existingModal.remove();
+            }
+            
+            const modalHTML = \`
+              <div id="demo-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all">
+                  <!-- Modal Header -->
+                  <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-t-2xl p-6">
+                    <div class="flex justify-between items-center text-white">
+                      <div class="flex items-center">
+                        <i class="fas fa-rocket text-2xl mr-4"></i>
+                        <div>
+                          <h2 class="text-2xl font-bold">Try AssetShield Pro Demo</h2>
+                          <p class="text-green-100">14-Day Free Trial • No Credit Card Required</p>
+                        </div>
+                      </div>
+                      <button onclick="closeDemoModal()" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Modal Content -->
+                  <div class="p-8">
+                    <!-- Demo Benefits -->
+                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 mb-6 border border-green-200">
+                      <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-star text-green-600 mr-3"></i>
+                        What's Included in Your Demo
+                      </h3>
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div class="flex items-start">
+                          <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                          <div>
+                            <strong class="text-gray-800">Full Platform Access</strong>
+                            <p class="text-gray-600 text-sm">Complete AssetShield Pro functionality</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                          <div>
+                            <strong class="text-gray-800">Sample Client Data</strong>
+                            <p class="text-gray-600 text-sm">Real workflows and analytics</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                          <div>
+                            <strong class="text-gray-800">Live Support</strong>
+                            <p class="text-gray-600 text-sm">Personal onboarding assistance</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start">
+                          <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                          <div>
+                            <strong class="text-gray-800">No Commitments</strong>
+                            <p class="text-gray-600 text-sm">Cancel anytime during trial</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Demo Form -->
+                    <div class="space-y-4">
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user text-blue-600 mr-2"></i>Attorney Name *
+                          </label>
+                          <input type="text" id="demo-attorney-name" 
+                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                                 placeholder="Enter your full name" required />
+                        </div>
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-building text-blue-600 mr-2"></i>Law Firm Name *
+                          </label>
+                          <input type="text" id="demo-firm-name" 
+                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                                 placeholder="Enter your firm name" required />
+                        </div>
+                      </div>
+                      
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-envelope text-blue-600 mr-2"></i>Professional Email *
+                          </label>
+                          <input type="email" id="demo-email" 
+                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                                 placeholder="your@lawfirm.com" required />
+                        </div>
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-id-badge text-blue-600 mr-2"></i>State Bar Number
+                          </label>
+                          <input type="text" id="demo-bar-number" 
+                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                                 placeholder="Optional" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Security Notice -->
+                    <div class="bg-blue-50 rounded-lg p-4 mt-6">
+                      <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-blue-600 text-xl mr-3"></i>
+                        <div>
+                          <h4 class="font-bold text-blue-800">Secure Professional Demo</h4>
+                          <p class="text-blue-700 text-sm">
+                            🔒 Your information is secure • ⚡ Instant access • 📞 Live support included
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Modal Footer -->
+                  <div class="bg-gray-50 px-8 py-6 rounded-b-2xl border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                      <button type="button" onclick="closeDemoModal()" 
+                              class="flex-1 py-3 px-6 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Page
+                      </button>
+                      <button type="button" onclick="processLiveDemoStart()" 
+                              class="flex-1 py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-blue-700 transition-all transform hover:scale-105">
+                        <i class="fas fa-rocket mr-2"></i>Start Demo - Free 14 Days
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            \`;
+            
+            // Add modal to DOM
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Focus first input
+            setTimeout(() => {
+              document.getElementById('demo-attorney-name')?.focus();
+            }, 100);
+          };
+          
+          window.closeDemoModal = function() {
+            console.log('🔄 Closing demo modal...');
+            const modal = document.getElementById('demo-modal');
+            if (modal) {
+              modal.style.display = 'none';
+              setTimeout(() => {
+                modal.remove();
+                document.body.style.overflow = '';
+                console.log('✅ Demo modal closed and removed');
+              }, 50);
+            }
+          };
+          
+          window.processLiveDemoStart = function() {
             // Collect demo form data
             const demoForm = {
               attorneyName: document.getElementById('demo-attorney-name')?.value || '',
@@ -3121,25 +3332,34 @@ app.get('/', (c) => {
               barNumber: document.getElementById('demo-bar-number')?.value || ''
             };
             
-            // Basic validation for required fields
+            // Professional validation with modal error display
             if (!demoForm.attorneyName || !demoForm.email || !demoForm.firmName) {
-              alert('Please fill in your name, firm name, and email address to start the demo.');
+              showErrorModal(
+                'Required Information Missing',
+                'Please fill in your name, firm name, and email address to start the demo.',
+                null
+              );
               return;
             }
             
             // Email validation
             const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
             if (!emailRegex.test(demoForm.email)) {
-              alert('Please enter a valid email address.');
+              showErrorModal(
+                'Invalid Email Address',
+                'Please enter a valid professional email address to continue.',
+                null
+              );
               return;
             }
             
             // Show loading state
-            const buttons = document.querySelectorAll('button[onclick="startLiveDemo()"]');
-            buttons.forEach(button => {
-              button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Launching Demo...';
-              button.disabled = true;
-            });
+            const button = document.querySelector('[onclick="processLiveDemoStart()"]');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Launching Demo Platform...';
+            button.disabled = true;
+            
+
             
             // Prepare demo session data
             const demoSessionId = 'demo_' + Date.now() + '_' + Math.random().toString(36).substring(7);
@@ -3171,51 +3391,69 @@ app.get('/', (c) => {
             .then(response => response.json())
             .then(data => {
               if (data.success) {
-                // Show success message
-                alert(
-                  \`Welcome to AssetShield Pro, \${demoForm.attorneyName}!\\n\\n\` +
-                  \`Your 14-day free trial is now active for \${demoForm.firmName}.\\n\\n\` +
-                  \`You'll be redirected to your demo platform with:\\n\` +
-                  \`• Sample client data and workflows\\n\` +
-                  \`• Full platform functionality\\n\` +
-                  \`• Live analytics dashboard\\n\` +
-                  \`• Complete asset protection tools\\n\\n\` +
-                  \`Demo ID: \${data.demoId}\\n\` +
-                  \`Trial expires: \${new Date(data.expiresAt).toLocaleDateString()}\\n\\n\` +
-                  \`A confirmation email has been sent to \${demoForm.email}\`
-                );
+                // Close demo modal
+                closeDemoModal();
                 
-                // Redirect to demo dashboard
-                window.open(data.loginUrl, '_blank');
+                // Show professional success modal
+                showSuccessModal(
+                  'Demo Platform Ready!',
+                  \`Welcome to AssetShield Pro, \${demoForm.attorneyName}!\\n\\nYour 14-day free trial is now active for \${demoForm.firmName}.\\n\\nYou'll be redirected to your demo platform with:\\n• Sample client data and workflows\\n• Full platform functionality\\n• Live analytics dashboard\\n• Complete asset protection tools\\n\\nDemo ID: \${data.demoId}\\nTrial expires: \${new Date(data.expiresAt).toLocaleDateString()}\\n\\nA confirmation email has been sent to \${demoForm.email}\`,
+                  () => {
+                    // Redirect to demo dashboard
+                    window.open(data.loginUrl, '_blank');
+                  }
+                );
               } else {
                 throw new Error(data.error || 'Failed to start demo');
               }
             })
             .catch(error => {
               console.error('Demo start error:', error);
-              alert(
-                \`Demo setup failed: \${error.message}\\n\\n\` +
-                \`As a fallback, you can explore the platform features below or contact our team directly.\\n\\n\` +
-                \`We apologize for the inconvenience and will resolve this issue quickly.\`
+              
+              // Reset button
+              button.innerHTML = originalHTML;
+              button.disabled = false;
+              
+              // Show professional error modal
+              showErrorModal(
+                'Demo Setup Error',
+                \`Demo setup failed: \${error.message}\\n\\nAs a fallback, you can explore the platform features below or contact our team directly.\\n\\nWe apologize for the inconvenience and will resolve this issue quickly.\`,
+                'support@isuccesshub.com'
               );
             })
             .finally(() => {
-              
-              // Reset form after slight delay
+              // Reset form after slight delay (only if modal still exists)
               setTimeout(() => {
-                document.getElementById('demo-attorney-name').value = '';
-                document.getElementById('demo-firm-name').value = '';
-                document.getElementById('demo-email').value = '';
-                document.getElementById('demo-bar-number').value = '';
-                
-                // Reset buttons
-                buttons.forEach(button => {
-                  button.innerHTML = '<i class="fas fa-play mr-2"></i>Try the Demo - Free 14 Days';
-                  button.disabled = false;
-                });
+                const modal = document.getElementById('demo-modal');
+                if (modal) {
+                  document.getElementById('demo-attorney-name').value = '';
+                  document.getElementById('demo-firm-name').value = '';
+                  document.getElementById('demo-email').value = '';
+                  document.getElementById('demo-bar-number').value = '';
+                  
+                  // Reset button
+                  if (button && !button.disabled) {
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                  }
+                }
               }, 1000);
-              
-            }, 2500); // Simulate platform setup time
+            });
+          };
+          
+          // Legacy function for backward compatibility
+          window.startLiveDemo = function() {
+            // Check if we're in a modal context or regular page context
+            const demoInputs = document.querySelectorAll('#demo-attorney-name, #demo-firm-name, #demo-email');
+            const hasVisibleInputs = Array.from(demoInputs).some(input => input.offsetParent !== null);
+            
+            if (hasVisibleInputs) {
+              // We have visible demo inputs, process directly
+              processLiveDemoStart();
+            } else {
+              // No visible inputs, show the professional modal
+              showDemoModal();
+            }
           };
           
           // Handle initial page load with hash
