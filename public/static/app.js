@@ -596,6 +596,7 @@ window.AppState = AppState
 window.changeLanguage = changeLanguage
 window.trackPerformance = trackPerformance
 window.saveUserPreference = saveUserPreference
+window.AssessmentForm = AssessmentForm  // Export AssessmentForm class globally
 
 console.log('Enhanced AssetShield App features loaded')// AssetShield App JavaScript Application
 

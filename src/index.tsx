@@ -536,13 +536,13 @@ app.get('/', (c) => {
               </div>
 
               <div id="assessment-form">
-                {/* Direct HTML Assessment Form - No Dynamic Loading */}
+                {/* Working Assessment Form - Direct Implementation */}
                 <div className="space-y-6">
                   <h3 className="text-2xl font-bold text-gray-800 mb-6">Basic Information</h3>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">What is your profession?</label>
-                    <select id="profession" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
+                    <select id="assessment-profession" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
                       <option value="">Select your profession</option>
                       <option value="doctor">Doctor/Medical Professional</option>
                       <option value="lawyer">Lawyer/Attorney</option>
@@ -558,23 +558,23 @@ app.get('/', (c) => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">What is your approximate net worth?</label>
                     <div className="space-y-2">
                       <label className="flex items-center">
-                        <input type="radio" name="netWorth" value="under_500k" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentNetWorth" value="under_500k" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>Under $500,000</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="netWorth" value="500k_1m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentNetWorth" value="500k_1m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>$500,000 - $1,000,000</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="netWorth" value="1m_5m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentNetWorth" value="1m_5m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>$1,000,000 - $5,000,000</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="netWorth" value="5m_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentNetWorth" value="5m_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>$5,000,000 - $10,000,000</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="netWorth" value="over_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentNetWorth" value="over_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>Over $10,000,000</span>
                       </label>
                     </div>
@@ -584,23 +584,23 @@ app.get('/', (c) => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Are you currently facing any legal threats or lawsuits?</label>
                     <div className="space-y-2">
                       <label className="flex items-center">
-                        <input type="radio" name="legalThreats" value="none" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentLegalThreats" value="none" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>No current threats</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="legalThreats" value="potential" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentLegalThreats" value="potential" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>Potential threats on the horizon</span>
                       </label>
                       <label className="flex items-center">
-                        <input type="radio" name="legalThreats" value="active" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
+                        <input type="radio" name="assessmentLegalThreats" value="active" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
                         <span>Active litigation or threats</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="flex justify-end">
-                    <button onclick="if(window.assessment) { window.assessment.nextStep(); } else { nextAssessmentStep(); }" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                      Next Step <i className="fas fa-arrow-right ml-2"></i>
+                    <button onclick="submitDirectAssessment()" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                      Get My Risk Assessment <i className="fas fa-arrow-right ml-2"></i>
                     </button>
                   </div>
                 </div>
@@ -723,21 +723,128 @@ app.get('/', (c) => {
                 
                 // Initialize Assessment Form when container is available
                 window.nextAssessmentStep = function() {
-                  console.log('Initializing AssessmentForm...');
-                  if (window.initAssessmentForm) {
+                  console.log('nextAssessmentStep called...');
+                  if (window.assessment && window.assessment.nextStep) {
+                    console.log('Using existing assessment instance');
+                    window.assessment.nextStep();
+                  } else if (window.initAssessmentForm) {
+                    console.log('Initializing new AssessmentForm...');
                     window.assessment = window.initAssessmentForm();
+                    if (window.assessment && window.assessment.nextStep) {
+                      window.assessment.nextStep();
+                    }
                   } else {
                     console.error('AssessmentForm not loaded yet');
                     alert('Loading assessment system...');
                   }
                 };
                 
-                // Auto-initialize assessment form if container exists
-                const assessmentContainer = document.getElementById('assessment-form');
-                if (assessmentContainer && window.initAssessmentForm) {
-                  console.log('Auto-initializing AssessmentForm...');
-                  window.assessment = window.initAssessmentForm();
+                // Simple direct assessment submission - WORKING IMPLEMENTATION
+                window.submitDirectAssessment = function() {
+                  console.log('Direct assessment submission starting...');
+                  
+                  const profession = document.getElementById('assessment-profession')?.value;
+                  const netWorth = document.querySelector('input[name="assessmentNetWorth"]:checked')?.value;
+                  const legalThreats = document.querySelector('input[name="assessmentLegalThreats"]:checked')?.value;
+                  
+                  // Validation
+                  if (!profession) {
+                    alert('Please select your profession');
+                    return;
+                  }
+                  if (!netWorth) {
+                    alert('Please select your net worth range');
+                    return;
+                  }
+                  if (!legalThreats) {
+                    alert('Please indicate your legal threat status');
+                    return;
+                  }
+                  
+                  // Show loading state
+                  const button = event.target;
+                  const originalText = button.innerHTML;
+                  button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                  button.disabled = true;
+                  
+                  // Prepare assessment data
+                  const assessmentData = {
+                    name: 'Anonymous User',
+                    email: 'anonymous@example.com',
+                    profession,
+                    netWorth,
+                    legalThreats
+                  };
+                  
+                  console.log('Submitting assessment data:', assessmentData);
+                  
+                  // Submit to API
+                  if (typeof axios !== 'undefined') {
+                    axios.post('/api/assessment/submit', assessmentData)
+                      .then(response => {
+                        console.log('Assessment submitted successfully:', response.data);
+                        showDirectAssessmentResults(response.data);
+                      })
+                      .catch(error => {
+                        console.error('Assessment submission failed:', error);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        alert('Failed to submit assessment. Please try again.');
+                      });
+                  } else {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    alert('Assessment system unavailable. Please refresh the page and try again.');
+                  }
+                };
+                
+                // Show assessment results - WORKING IMPLEMENTATION
+                function showDirectAssessmentResults(data) {
+                  console.log('Displaying assessment results:', data);
+                  
+                  const container = document.getElementById('assessment-form');
+                  if (container) {
+                    const riskColorClass = data.riskLevel === 'HIGH' ? 'text-red-600' : 
+                                         data.riskLevel === 'MEDIUM' ? 'text-yellow-600' : 'text-green-600';
+                    
+                    container.innerHTML = \`
+                      <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Assessment Complete!</h3>
+                        <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left max-w-2xl mx-auto">
+                          <h4 class="font-semibold text-lg mb-2">
+                            Risk Level: <span class="\${riskColorClass}">\${data.riskLevel}</span>
+                          </h4>
+                          <p class="text-gray-700 mb-4">
+                            Estimated Wealth at Risk: <strong class="text-red-600">$\${data.wealthAtRisk.toLocaleString()}</strong>
+                          </p>
+                          <h5 class="font-semibold mb-2 text-gray-800">Recommended Actions:</h5>
+                          <ul class="list-disc list-inside space-y-1">
+                            \${data.recommendations.map(rec => \`<li class="text-gray-700">\${rec}</li>\`).join('')}
+                          </ul>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                          <button onclick="location.reload()" class="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors">
+                            Take Assessment Again
+                          </button>
+                          <button onclick="scrollToPricing()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                            Get Professional Help
+                          </button>
+                        </div>
+                      </div>
+                    \`;
+                  }
                 }
+                
+                // Scroll to pricing section
+                window.scrollToPricing = function() {
+                  const pricingSection = document.getElementById('pricing');
+                  if (pricingSection) {
+                    pricingSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                };
                 
                 // Enhanced language changing functionality - Always define
                 window.changeLanguage = function(lang) {
