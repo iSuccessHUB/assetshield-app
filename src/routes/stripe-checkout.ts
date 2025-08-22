@@ -83,10 +83,15 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
       }
     }
     
-    // Create actual Stripe checkout session
+    // Get Stripe secret key from environment
     const stripeSecretKey = c.env.STRIPE_SECRET_KEY
-    if (!stripeSecretKey) {
-      return c.json({ error: 'Stripe not configured' }, 500)
+    
+    if (!stripeSecretKey || !stripeSecretKey.startsWith('sk_')) {
+      console.error('Stripe secret key not configured in environment')
+      return c.json({ 
+        error: 'Stripe not configured',
+        details: 'Please configure STRIPE_SECRET_KEY in your deployment environment'
+      }, 500)
     }
     
     // Create Stripe checkout session using fetch API
@@ -98,14 +103,15 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
       },
       body: new URLSearchParams({
         'payment_method_types[]': 'card',
-        mode: 'payment',
+        mode: 'subscription',
         success_url: `${c.req.url.split('/').slice(0, 3).join('/')}/stripe-checkout/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${c.req.url.split('/').slice(0, 3).join('/')}/#pricing`,
         customer_email: lawyerEmail,
         'line_items[0][price_data][currency]': 'usd',
-        'line_items[0][price_data][unit_amount]': (tierPricing.setup * 100).toString(),
+        'line_items[0][price_data][unit_amount]': (tierPricing.monthly * 100).toString(),
+        'line_items[0][price_data][recurring][interval]': 'month',
         'line_items[0][price_data][product_data][name]': `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Platform`,
-        'line_items[0][price_data][product_data][description]': `Setup fee and first month for ${firmName}`,
+        'line_items[0][price_data][product_data][description]': `Monthly subscription for ${firmName} - includes setup and platform access`,
         'line_items[0][quantity]': '1',
         'metadata[tier]': tier,
         'metadata[lawyerName]': lawyerName,
@@ -114,7 +120,8 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
         'metadata[firmName]': firmName,
         'metadata[setupFee]': tierPricing.setup.toString(),
         'metadata[monthlyFee]': tierPricing.monthly.toString(),
-        'metadata[type]': 'platform_purchase'
+        'metadata[type]': 'platform_subscription_with_trial',
+        'subscription_data[trial_period_days]': '14'
       })
     })
     
