@@ -270,6 +270,48 @@ app.get('/test-modal', (c) => {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* CSS styling from renderer.tsx */
+        /* Professional Payment Modal Styles */
+        #payment-modal {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        #payment-modal > div {
+            animation: modalSlideIn 0.3s ease-out;
+            transform-origin: center;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0; 
+                transform: scale(0.9) translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+            }
+        }
+        
+        .form-input-focused {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .payment-button-loading {
+            background: linear-gradient(90deg, #3b82f6, #6366f1, #3b82f6);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         .article-content {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.7;
@@ -1518,10 +1560,11 @@ app.get('/', (c) => {
 
                 <button 
                   onClick="purchasePlatform('starter', 5000, 500)"
-                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  <i className="fas fa-credit-card mr-2"></i>
-                  Buy Now - Instant Access
+                  <i className="fas fa-shopping-cart mr-2"></i>
+                  Get Started Now
+                  <div className="text-xs opacity-90 mt-1">Instant Setup • 24/7 Support</div>
                 </button>
               </div>
 
@@ -1577,10 +1620,11 @@ app.get('/', (c) => {
 
                 <button 
                   onClick="purchasePlatform('professional', 10000, 1200)"
-                  className="w-full py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                  className="w-full py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-white"
                 >
-                  <i className="fas fa-credit-card mr-2"></i>
-                  Buy Now - Instant Access
+                  <i className="fas fa-crown mr-2 text-yellow-500"></i>
+                  Choose Professional
+                  <div className="text-xs opacity-80 mt-1">Most Popular • Best Value</div>
                 </button>
               </div>
 
@@ -1632,10 +1676,11 @@ app.get('/', (c) => {
 
                 <button 
                   onClick="purchasePlatform('enterprise', 25000, 2500)"
-                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  <i className="fas fa-credit-card mr-2"></i>
-                  Buy Now - Instant Access
+                  <i className="fas fa-rocket mr-2"></i>
+                  Go Enterprise
+                  <div className="text-xs opacity-90 mt-1">Ultimate Solution • Premium Support</div>
                 </button>
               </div>
             </div>
@@ -2031,36 +2076,216 @@ app.get('/', (c) => {
             }
           });
           
-          // Handle platform purchases with Stripe checkout
-          window.purchasePlatform = async function(tier, setupFee, monthlyFee) {
-            // Show purchase confirmation modal
-            const confirmPurchase = confirm(
-              \`Purchase AssetShield \${tier.charAt(0).toUpperCase() + tier.slice(1)} Platform?\\n\\n\` +
-              \`💰 Setup Fee: $\${setupFee.toLocaleString()}\\n\` +
-              \`📅 Monthly: $\${monthlyFee.toLocaleString()}/month\\n\\n\` +
-              \`✅ Instant platform activation\\n\` +
-              \`✅ Full white-label branding\\n\` +
-              \`✅ 24/7 automated delivery\\n\` +
-              \`✅ No human interaction required\\n\\n\` +
-              \`Click OK to proceed to secure checkout.\`
-            );
+          // Enhanced payment modal system for lawyers
+          window.purchasePlatform = function(tier, setupFee, monthlyFee) {
+            showProfessionalPaymentModal(tier, setupFee, monthlyFee);
+          };
+          
+          function showProfessionalPaymentModal(tier, setupFee, monthlyFee) {
+            const tierNames = {
+              'starter': 'Starter',
+              'professional': 'Professional', 
+              'enterprise': 'Enterprise'
+            };
             
-            if (!confirmPurchase) return;
+            const tierName = tierNames[tier] || tier.charAt(0).toUpperCase() + tier.slice(1);
             
-            // Get firm information from user
-            const firmName = prompt('Enter your law firm name:');
-            if (!firmName) return;
+            // Create professional payment modal
+            const modalHTML = \`
+              <div id="payment-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  <!-- Modal Header -->
+                  <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-t-2xl">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                          <i class="fas fa-shield-alt text-2xl"></i>
+                        </div>
+                        <div>
+                          <h2 class="text-2xl font-bold">AssetShield \${tierName} Platform</h2>
+                          <p class="text-blue-100">Professional Asset Protection Software</p>
+                        </div>
+                      </div>
+                      <button onclick="closeProfessionalModal()" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Modal Content -->
+                  <div class="p-8">
+                    <!-- Pricing Summary -->
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                      <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calculator text-blue-600 mr-3"></i>
+                        Investment Summary
+                      </h3>
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white rounded-lg p-4 border-l-4 border-blue-600">
+                          <div class="text-sm text-gray-600 mb-1">Setup Fee (One-time)</div>
+                          <div class="text-2xl font-bold text-blue-600">$\${setupFee.toLocaleString()}</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border-l-4 border-green-600">
+                          <div class="text-sm text-gray-600 mb-1">Monthly License</div>
+                          <div class="text-2xl font-bold text-green-600">$\${monthlyFee.toLocaleString()}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Value Proposition -->
+                    <div class="mb-6">
+                      <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-star text-yellow-500 mr-3"></i>
+                        What You Get Instantly
+                      </h3>
+                      <div class="grid md:grid-cols-2 gap-3">
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">Complete white-label branding</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">Advanced risk assessment tool</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">Automated lead capture system</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">Professional client portal</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">24/7 instant deployment</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                          <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                          <span class="text-gray-700">Educational content library</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Contact Form -->
+                    <form id="lawyer-info-form" class="space-y-4 mb-6">
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2"></i>Attorney Name *
+                          </label>
+                          <input type="text" id="lawyer-name" required 
+                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                 placeholder="Your full name">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-building mr-2"></i>Law Firm Name *
+                          </label>
+                          <input type="text" id="firm-name" required 
+                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                 placeholder="Your law firm name">
+                        </div>
+                      </div>
+                      
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-envelope mr-2"></i>Email Address *
+                          </label>
+                          <input type="email" id="lawyer-email" required 
+                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                 placeholder="attorney@lawfirm.com">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-phone mr-2"></i>Phone Number
+                          </label>
+                          <input type="tel" id="lawyer-phone" 
+                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                 placeholder="(555) 123-4567">
+                        </div>
+                      </div>
+                    </form>
+                    
+                    <!-- Security & Guarantee -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div class="flex items-center mb-2">
+                        <i class="fas fa-shield-check text-blue-600 text-xl mr-3"></i>
+                        <h4 class="font-bold text-blue-800">Secure Professional Purchase</h4>
+                      </div>
+                      <p class="text-blue-700 text-sm">
+                        🔒 Bank-level encryption • 💳 Stripe secure checkout • ⚡ Instant activation • 📞 24/7 support
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <!-- Modal Footer -->
+                  <div class="bg-gray-50 px-8 py-6 rounded-b-2xl border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                      <button type="button" onclick="closeProfessionalModal()" 
+                              class="flex-1 py-3 px-6 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Pricing
+                      </button>
+                      <button type="button" onclick="processLawyerPurchase('\${tier}', \${setupFee}, \${monthlyFee})" 
+                              class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105">
+                        <i class="fas fa-credit-card mr-2"></i>Proceed to Secure Checkout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            \`;
             
-            const lawyerName = prompt('Enter your full name:');
-            if (!lawyerName) return;
+            // Add modal to DOM
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
             
-            const lawyerEmail = prompt('Enter your email address:');
-            if (!lawyerEmail || !lawyerEmail.includes('@')) {
-              alert('Please enter a valid email address.');
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Focus first input
+            setTimeout(() => {
+              document.getElementById('lawyer-name')?.focus();
+            }, 100);
+          }
+          
+          window.closeProfessionalModal = function() {
+            const modal = document.getElementById('payment-modal');
+            if (modal) {
+              modal.remove();
+              document.body.style.overflow = '';
+            }
+          };
+          
+          window.processLawyerPurchase = async function(tier, setupFee, monthlyFee) {
+            // Validate form
+            const lawyerName = document.getElementById('lawyer-name')?.value.trim();
+            const firmName = document.getElementById('firm-name')?.value.trim();
+            const lawyerEmail = document.getElementById('lawyer-email')?.value.trim();
+            const lawyerPhone = document.getElementById('lawyer-phone')?.value.trim() || '';
+            
+            if (!lawyerName) {
+              alert('Please enter your full name.');
+              document.getElementById('lawyer-name')?.focus();
               return;
             }
             
-            const lawyerPhone = prompt('Enter your phone number (optional):') || '';
+            if (!firmName) {
+              alert('Please enter your law firm name.');
+              document.getElementById('firm-name')?.focus();
+              return;
+            }
+            
+            if (!lawyerEmail || !lawyerEmail.includes('@')) {
+              alert('Please enter a valid email address.');
+              document.getElementById('lawyer-email')?.focus();
+              return;
+            }
+            
+            // Show loading state
+            const button = event.target;
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Secure Checkout...';
+            button.disabled = true;
             
             try {
               // Create Stripe checkout session
@@ -2082,7 +2307,8 @@ app.get('/', (c) => {
               const result = await response.json();
               
               if (result.success) {
-                // Redirect to Stripe checkout
+                // Close modal and redirect to Stripe checkout
+                closeProfessionalModal();
                 window.location.href = result.checkoutUrl;
               } else {
                 throw new Error(result.error || 'Failed to create checkout session');
@@ -2090,12 +2316,59 @@ app.get('/', (c) => {
               
             } catch (error) {
               console.error('Purchase error:', error);
-              alert(
-                \`Sorry, there was an error processing your purchase.\\n\\n\` +
-                \`Please try again or contact support at support@isuccesshub.com\\n\\n\` +
-                \`Error: \${error.message}\`
+              
+              // Reset button
+              button.innerHTML = originalHTML;
+              button.disabled = false;
+              
+              // Show professional error modal
+              showErrorModal(
+                'Purchase Error',
+                \`We encountered an error processing your purchase request. Please try again or contact our support team.\\n\\nError: \${error.message}\`,
+                'support@isuccesshub.com'
               );
             }
+          };
+          
+          function showErrorModal(title, message, contactEmail) {
+            const errorModalHTML = \`
+              <div id="error-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+                  <div class="bg-red-600 text-white p-6 rounded-t-2xl">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                      </div>
+                      <h3 class="text-xl font-bold">\${title}</h3>
+                    </div>
+                  </div>
+                  <div class="p-6">
+                    <p class="text-gray-700 mb-4">\${message}</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <p class="text-sm text-blue-700">
+                        <i class="fas fa-phone mr-2"></i>Need immediate help? Contact us:
+                      </p>
+                      <p class="font-semibold text-blue-800">\${contactEmail}</p>
+                    </div>
+                    <div class="flex gap-3">
+                      <button onclick="closeErrorModal()" class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                        Close
+                      </button>
+                      <button onclick="closeErrorModal(); showProfessionalPaymentModal()" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            \`;
+            
+            document.body.insertAdjacentHTML('beforeend', errorModalHTML);
+          }
+          
+          window.closeErrorModal = function() {
+            const modal = document.getElementById('error-modal');
+            if (modal) modal.remove();
           };
 
           // Handle demo requests for different platform tiers (legacy)
