@@ -41,18 +41,788 @@ app.get('/content/:id', async (c) => {
     const contentId = c.req.param('id')
     const { env } = c
     
-    const content = await env.DB.prepare(
-      'SELECT * FROM educational_content WHERE id = ?'
-    ).bind(contentId).first<EducationalContent>()
+    // Try database first, fallback to mock data if DB not available
+    let content
+    try {
+      if (env?.DB) {
+        content = await env.DB.prepare(
+          'SELECT * FROM educational_content WHERE id = ?'
+        ).bind(contentId).first<EducationalContent>()
+        
+        if (content) {
+          // Increment view count
+          await env.DB.prepare(
+            'UPDATE educational_content SET view_count = view_count + 1 WHERE id = ?'
+          ).bind(contentId).run()
+        }
+      }
+    } catch (dbError) {
+      console.log('Database not available, using mock data')
+    }
+    
+    // Fallback to mock educational content if database fails or content not found
+    if (!content) {
+      const mockContent = [
+        {
+          id: 'trust-basics',
+          title: "Trust Fundamentals for Asset Protection",
+          description: "Understanding the basic concepts and applications of trusts in asset protection planning.",
+          content_type: "article",
+          category: "basics",
+          author: "AssetShield Legal Team",
+          reading_time: 12,
+          difficulty_level: "beginner",
+          view_count: 3250,
+          created_at: new Date().toISOString(),
+          excerpt: "Trusts are powerful tools for asset protection that provide legal separation between you and your assets...",
+          content: `
+            <h1>Trust Fundamentals for Asset Protection</h1>
+            
+            <p>Trusts are among the most powerful and versatile tools in asset protection planning. By creating a legal separation between you and your assets, trusts can provide substantial protection from creditors, lawsuits, and other financial threats while offering significant estate planning and tax benefits.</p>
+            
+            <h2>What is a Trust?</h2>
+            
+            <p>A trust is a legal arrangement where one party (the trustee) holds and manages assets for the benefit of another party (the beneficiary). The person who creates the trust is called the settlor or grantor. This three-party relationship creates unique opportunities for asset protection and wealth preservation.</p>
+            
+            <h3>Key Trust Parties:</h3>
+            <ul>
+              <li><strong>Settlor/Grantor:</strong> The person who creates the trust and transfers assets to it</li>
+              <li><strong>Trustee:</strong> The person or institution responsible for managing trust assets</li>
+              <li><strong>Beneficiary:</strong> The person or entity entitled to receive benefits from the trust</li>
+            </ul>
+            
+            <h2>Types of Trusts for Asset Protection</h2>
+            
+            <h3>Revocable vs. Irrevocable Trusts</h3>
+            
+            <h4>Revocable Trusts</h4>
+            <ul>
+              <li><strong>Flexibility:</strong> Can be modified or terminated by the settlor</li>
+              <li><strong>Control:</strong> Settlor typically maintains control over assets</li>
+              <li><strong>Asset Protection:</strong> Limited - creditors can generally reach trust assets</li>
+              <li><strong>Best for:</strong> Estate planning, avoiding probate, privacy</li>
+            </ul>
+            
+            <h4>Irrevocable Trusts</h4>
+            <ul>
+              <li><strong>Permanence:</strong> Cannot be easily modified or revoked</li>
+              <li><strong>Control:</strong> Settlor gives up direct control over assets</li>
+              <li><strong>Asset Protection:</strong> Strong - properly structured trusts offer excellent protection</li>
+              <li><strong>Best for:</strong> Asset protection, estate tax reduction, charitable giving</li>
+            </ul>
+            
+            <h2>Domestic Asset Protection Trusts (DAPTs)</h2>
+            
+            <p>Self-settled spendthrift trusts that allow the settlor to be a beneficiary while maintaining creditor protection. Available in select states with favorable trust laws.</p>
+            
+            <h3>DAPT-Friendly States:</h3>
+            <ul>
+              <li><strong>Nevada:</strong> Strong protection laws, no state income tax, perpetual duration</li>
+              <li><strong>Delaware:</strong> Established legal system, sophisticated trustee services</li>
+              <li><strong>South Dakota:</strong> No state income tax, dynasty trust capabilities</li>
+              <li><strong>Wyoming:</strong> Strong privacy laws, favorable trust legislation</li>
+            </ul>
+            
+            <h3>DAPT Advantages:</h3>
+            <ul>
+              <li>Settlor can be a discretionary beneficiary</li>
+              <li>Protection from future creditors</li>
+              <li>Shorter statute of limitations for creditor claims</li>
+              <li>Higher burden of proof for creditors</li>
+              <li>No recognition of foreign judgments (in some states)</li>
+            </ul>
+            
+            <h2>Offshore Asset Protection Trusts</h2>
+            
+            <p>Trusts established in foreign jurisdictions with strong asset protection laws and political stability.</p>
+            
+            <h3>Leading Offshore Jurisdictions:</h3>
+            
+            <h4>Cook Islands</h4>
+            <ul>
+              <li>Strongest asset protection laws globally</li>
+              <li>Short statute of limitations (1-2 years)</li>
+              <li>High burden of proof for creditors</li>
+              <li>No recognition of foreign judgments</li>
+            </ul>
+            
+            <h4>Nevis</h4>
+            <ul>
+              <li>Cost-effective with strong protection</li>
+              <li>Creditors must post substantial bonds</li>
+              <li>Local counsel required for litigation</li>
+              <li>Flexible trust structures</li>
+            </ul>
+            
+            <h2>Trust Design Considerations</h2>
+            
+            <h3>Spendthrift Provisions</h3>
+            <p>Clauses that prevent beneficiaries from transferring their interests and protect against creditor claims:</p>
+            
+            <ul>
+              <li>Mandatory for effective asset protection</li>
+              <li>Prevents alienation of beneficial interests</li>
+              <li>Limits creditor access to trust assets</li>
+              <li>Must be properly drafted to be enforceable</li>
+            </ul>
+            
+            <h3>Distribution Standards</h3>
+            
+            <h4>Mandatory Distributions:</h4>
+            <ul>
+              <li>Provide certainty for beneficiaries</li>
+              <li>May be vulnerable to creditor claims</li>
+              <li>Less flexibility for trustees</li>
+            </ul>
+            
+            <h4>Discretionary Distributions:</h4>
+            <ul>
+              <li>Maximum flexibility and protection</li>
+              <li>Trustee determines timing and amounts</li>
+              <li>Better creditor protection</li>
+              <li>Can adapt to changing circumstances</li>
+            </ul>
+            
+            <h3>Trust Protectors and Advisors</h3>
+            <ul>
+              <li><strong>Trust Protector:</strong> Oversees trustee actions, can remove/replace trustees</li>
+              <li><strong>Investment Advisor:</strong> Directs investment decisions</li>
+              <li><strong>Distribution Advisor:</strong> Guides distribution decisions</li>
+              <li><strong>Benefits:</strong> Maintains family involvement while preserving protection</li>
+            </ul>
+            
+            <h2>Trustee Selection</h2>
+            
+            <h3>Individual vs. Corporate Trustees</h3>
+            
+            <h4>Individual Trustees:</h4>
+            <ul>
+              <li><strong>Pros:</strong> Personal relationships, lower costs, family knowledge</li>
+              <li><strong>Cons:</strong> Limited expertise, liability concerns, succession issues</li>
+            </ul>
+            
+            <h4>Corporate Trustees:</h4>
+            <ul>
+              <li><strong>Pros:</strong> Professional management, continuity, regulatory oversight</li>
+              <li><strong>Cons:</strong> Higher fees, less personal service, bureaucracy</li>
+            </ul>
+            
+            <h3>Co-Trustee Arrangements</h3>
+            <ul>
+              <li>Combine benefits of individual and corporate trustees</li>
+              <li>Divide responsibilities (administrative vs. investment)</li>
+              <li>Provide checks and balances</li>
+              <li>Maintain family involvement</li>
+            </ul>
+            
+            <h2>Trust Funding Strategies</h2>
+            
+            <h3>Initial Funding</h3>
+            <ul>
+              <li><strong>Nominal funding:</strong> Small initial contribution to establish trust</li>
+              <li><strong>Significant funding:</strong> Large initial transfer of assets</li>
+              <li><strong>Timing considerations:</strong> Fund when no claims are pending</li>
+              <li><strong>Valuation strategies:</strong> Fund with discounted assets when possible</li>
+            </ul>
+            
+            <h3>Ongoing Contributions</h3>
+            <ul>
+              <li>Annual exclusion gifts ($17,000 per recipient for 2023)</li>
+              <li>Lifetime exemption utilization ($12.92 million for 2023)</li>
+              <li>Income and appreciation retained in trust</li>
+              <li>Additional contributions as circumstances permit</li>
+            </ul>
+            
+            <h2>Common Trust Structures</h2>
+            
+            <h3>Asset Protection Trust with Distribution Committee</h3>
+            <p>Structure that provides family input while maintaining independence:</p>
+            
+            <ul>
+              <li>Independent trustee holds legal title</li>
+              <li>Family distribution committee advises on distributions</li>
+              <li>Combines protection with family involvement</li>
+              <li>Flexibility for changing family circumstances</li>
+            </ul>
+            
+            <h3>Multiple Trust Strategy</h3>
+            <p>Using several trusts for enhanced protection and flexibility:</p>
+            
+            <ul>
+              <li>Separate trusts for different asset classes</li>
+              <li>Individual trusts for each beneficiary</li>
+              <li>Geographic diversification across jurisdictions</li>
+              <li>Risk diversification and enhanced privacy</li>
+            </ul>
+            
+            <h2>Tax Implications</h2>
+            
+            <h3>Income Tax Considerations</h3>
+            
+            <h4>Grantor Trusts:</h4>
+            <ul>
+              <li>Settlor pays income taxes on trust income</li>
+              <li>Additional economic benefit to beneficiaries</li>
+              <li>Depletes settlor's taxable estate</li>
+              <li>Can be turned "off" in future if needed</li>
+            </ul>
+            
+            <h4>Non-Grantor Trusts:</h4>
+            <ul>
+              <li>Trust pays its own income taxes</li>
+              <li>Higher tax rates on undistributed income</li>
+              <li>More tax complexity but better separation</li>
+              <li>May distribute income to beneficiaries in lower brackets</li>
+            </ul>
+            
+            <h3>Gift and Estate Tax Issues</h3>
+            <ul>
+              <li>Transfers to irrevocable trusts are taxable gifts</li>
+              <li>Use annual exclusions and lifetime exemptions</li>
+              <li>Valuation discounts for certain assets</li>
+              <li>Generation-skipping tax considerations</li>
+            </ul>
+            
+            <h2>Operational Best Practices</h2>
+            
+            <h3>Documentation Requirements</h3>
+            <ul>
+              <li>Comprehensive trust agreement</li>
+              <li>Trustee resolutions and minutes</li>
+              <li>Investment policy statements</li>
+              <li>Annual accountings to beneficiaries</li>
+              <li>Tax returns and compliance reports</li>
+            </ul>
+            
+            <h3>Avoiding Fraudulent Transfer Claims</h3>
+            <ul>
+              <li>Transfer assets before any claims arise</li>
+              <li>Receive adequate consideration when applicable</li>
+              <li>Maintain solvency after transfers</li>
+              <li>Document legitimate purposes for transfers</li>
+              <li>Avoid transfers that hinder existing creditors</li>
+            </ul>
+            
+            <h2>Trust Administration</h2>
+            
+            <h3>Trustee Duties and Responsibilities</h3>
+            <ul>
+              <li><strong>Fiduciary duty:</strong> Act in beneficiaries' best interests</li>
+              <li><strong>Duty of care:</strong> Manage assets prudently</li>
+              <li><strong>Duty of loyalty:</strong> Avoid conflicts of interest</li>
+              <li><strong>Record keeping:</strong> Maintain accurate records and accounts</li>
+              <li><strong>Communication:</strong> Provide regular reports to beneficiaries</li>
+            </ul>
+            
+            <h3>Investment Management</h3>
+            <ul>
+              <li>Develop appropriate investment policy</li>
+              <li>Diversify investments to manage risk</li>
+              <li>Consider beneficiaries' needs and timeline</li>
+              <li>Regular performance monitoring and review</li>
+              <li>Professional investment management when appropriate</li>
+            </ul>
+            
+            <h2>Common Trust Mistakes to Avoid</h2>
+            
+            <h3>Structural Mistakes</h3>
+            <ul>
+              <li><strong>Retaining too much control:</strong> Can undermine asset protection</li>
+              <li><strong>Inadequate spendthrift provisions:</strong> Weakens creditor protection</li>
+              <li><strong>Wrong jurisdiction selection:</strong> Choose based on law, not marketing</li>
+              <li><strong>Poor trustee selection:</strong> Inexperienced or conflicted trustees</li>
+            </ul>
+            
+            <h3>Operational Mistakes</h3>
+            <ul>
+              <li><strong>Inadequate documentation:</strong> Poor record keeping undermines benefits</li>
+              <li><strong>Ignoring formalities:</strong> Failure to follow trust terms</li>
+              <li><strong>Inappropriate distributions:</strong> Distributions that violate trust terms</li>
+              <li><strong>Tax non-compliance:</strong> Missing filing requirements</li>
+            </ul>
+            
+            <h2>Case Study: Professional Asset Protection Trust</h2>
+            
+            <h3>Background</h3>
+            <p>Dr. Johnson, a successful surgeon with $5 million in assets, faces high malpractice risk and wants to protect her family's wealth.</p>
+            
+            <h3>Solution</h3>
+            <ul>
+              <li><strong>Nevada DAPT:</strong> $2 million initial funding</li>
+              <li><strong>Professional trustee:</strong> Nevada trust company</li>
+              <li><strong>Family involvement:</strong> Spouse as trust protector</li>
+              <li><strong>Flexible distributions:</strong> Discretionary standard for family support</li>
+              <li><strong>Investment management:</strong> Professional investment advisor</li>
+            </ul>
+            
+            <h3>Results</h3>
+            <ul>
+              <li>Strong protection from malpractice claims</li>
+              <li>Maintained access to trust funds for family needs</li>
+              <li>Professional management of investments</li>
+              <li>Estate tax planning benefits</li>
+              <li>Privacy protection for family wealth</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>Trusts are sophisticated tools that require careful planning and professional guidance to implement effectively. When properly structured and administered, they can provide excellent asset protection while offering significant estate planning and tax benefits.</p>
+            
+            <p>Key success factors for trust-based asset protection include:</p>
+            <ul>
+              <li>Early implementation before problems arise</li>
+              <li>Proper jurisdiction and trustee selection</li>
+              <li>Comprehensive trust design with appropriate provisions</li>
+              <li>Professional administration and compliance</li>
+              <li>Regular review and updating as circumstances change</li>
+            </ul>
+            
+            <p>Working with experienced professionals who understand both the legal and practical aspects of trust-based asset protection is essential for achieving your wealth preservation goals.</p>
+          `
+        },
+        {
+          id: 'llc-structures',
+          title: "LLC Asset Protection Strategies",
+          description: "Comprehensive guide to using Limited Liability Companies for effective asset protection.",
+          content_type: "guide",
+          category: "structures", 
+          author: "Sarah Mitchell, JD",
+          reading_time: 10,
+          difficulty_level: "intermediate",
+          view_count: 2840,
+          created_at: new Date().toISOString(),
+          excerpt: "Limited Liability Companies offer flexible and cost-effective asset protection when properly structured...",
+          content: `
+            <h1>LLC Asset Protection Strategies</h1>
+            
+            <p>Limited Liability Companies (LLCs) have become one of the most popular and effective tools for asset protection planning. Combining the liability protection of corporations with the tax flexibility of partnerships, LLCs offer a versatile solution for protecting wealth while maintaining operational control and tax efficiency.</p>
+            
+            <h2>Understanding LLC Asset Protection</h2>
+            
+            <h3>How LLCs Provide Protection</h3>
+            
+            <h4>Inside Protection</h4>
+            <p>Your personal assets are protected from liabilities and debts of the LLC:</p>
+            <ul>
+              <li>Business debts cannot reach personal assets</li>
+              <li>Professional liability contained within the LLC</li>
+              <li>Contract disputes limited to LLC assets</li>
+              <li>Tort claims against the business stay within the entity</li>
+            </ul>
+            
+            <h4>Outside Protection</h4>
+            <p>LLC assets are protected from your personal creditors through charging order protection:</p>
+            <ul>
+              <li>Personal creditors limited to charging orders</li>
+              <li>Cannot force distributions from the LLC</li>
+              <li>Cannot take control of LLC operations</li>
+              <li>May receive distributions but have no management rights</li>
+            </ul>
+            
+            <h2>Charging Order Protection Explained</h2>
+            
+            <h3>What is a Charging Order?</h3>
+            <p>A charging order is a court-ordered lien against a debtor's membership interest in an LLC. It's the exclusive remedy for personal creditors in most states, meaning they cannot seize LLC assets directly or force the LLC to make distributions.</p>
+            
+            <h3>How Charging Orders Work</h3>
+            <ol>
+              <li><strong>Creditor obtains judgment:</strong> Personal creditor gets court judgment against LLC member</li>
+              <li><strong>Charging order issued:</strong> Court grants lien against membership interest</li>
+              <li><strong>Limited rights:</strong> Creditor can only receive distributions if and when made</li>
+              <li><strong>No control:</strong> Creditor cannot participate in management or force distributions</li>
+            </ol>
+            
+            <h3>State Law Variations</h3>
+            
+            <h4>Strong Charging Order States:</h4>
+            <ul>
+              <li><strong>Wyoming:</strong> Charging order is exclusive remedy, strong case law</li>
+              <li><strong>Nevada:</strong> Excellent charging order protection, business-friendly</li>
+              <li><strong>Delaware:</strong> Well-established LLC law, charging order exclusive</li>
+              <li><strong>Alaska:</strong> Strong protection, especially for single-member LLCs</li>
+            </ul>
+            
+            <h4>Weaker Protection States:</h4>
+            <ul>
+              <li>Some states allow foreclosure on membership interests</li>
+              <li>Others permit direct creditor remedies in certain circumstances</li>
+              <li>Single-member LLC protection may be limited</li>
+            </ul>
+            
+            <h2>LLC Structure Optimization</h2>
+            
+            <h3>Single-Member vs. Multi-Member LLCs</h3>
+            
+            <h4>Single-Member LLCs</h4>
+            <p><strong>Advantages:</strong></p>
+            <ul>
+              <li>Complete control over operations</li>
+              <li>Simple tax reporting (disregarded entity)</li>
+              <li>No partnership disputes or complications</li>
+              <li>Easier decision-making process</li>
+            </ul>
+            
+            <p><strong>Disadvantages:</strong></p>
+            <ul>
+              <li>Weaker charging order protection in some states</li>
+              <li>May be subject to reverse veil piercing</li>
+              <li>Less established case law protection</li>
+              <li>Potential for creditor foreclosure on interest</li>
+            </ul>
+            
+            <h4>Multi-Member LLCs</h4>
+            <p><strong>Advantages:</strong></p>
+            <ul>
+              <li>Stronger charging order protection</li>
+              <li>Better established legal precedents</li>
+              <li>More difficult for creditors to attack</li>
+              <li>Partnership tax benefits available</li>
+            </ul>
+            
+            <p><strong>Disadvantages:</strong></p>
+            <ul>
+              <li>Shared control with other members</li>
+              <li>More complex tax reporting</li>
+              <li>Potential for partnership disputes</li>
+              <li>Need for comprehensive operating agreements</li>
+            </ul>
+            
+            <h3>Creating Multi-Member Structure</h3>
+            
+            <h4>Family Member Strategy:</h4>
+            <ul>
+              <li>Spouse as small percentage member (1-5%)</li>
+              <li>Adult children as minimal interest holders</li>
+              <li>Family trust as co-member</li>
+              <li>Ensures multi-member status for protection</li>
+            </ul>
+            
+            <h4>Professional Co-Member:</h4>
+            <ul>
+              <li>Business associate or partner</li>
+              <li>Professional management company</li>
+              <li>Institutional co-member</li>
+              <li>Provides operational benefits along with protection</li>
+            </ul>
+            
+            <h2>Strategic LLC Applications</h2>
+            
+            <h3>Real Estate Investment Protection</h3>
+            
+            <h4>Property-Specific LLCs</h4>
+            <ul>
+              <li>Separate LLC for each major property</li>
+              <li>Isolates liability between properties</li>
+              <li>Prevents cross-contamination of risks</li>
+              <li>Allows property-specific financing</li>
+            </ul>
+            
+            <h4>Holding Company Structure</h4>
+            <ul>
+              <li>Master LLC owns membership interests in property LLCs</li>
+              <li>Provides additional layer of protection</li>
+              <li>Centralizes management and cash flow</li>
+              <li>Facilitates estate planning transfers</li>
+            </ul>
+            
+            <h3>Business Operation Protection</h3>
+            
+            <h4>Operating Company Structure</h4>
+            <ul>
+              <li>LLC conducts day-to-day business operations</li>
+              <li>Separate entity owns valuable assets (real estate, IP)</li>
+              <li>Lease arrangements between entities</li>
+              <li>Limits exposure of valuable assets</li>
+            </ul>
+            
+            <h4>Professional Practice LLCs</h4>
+            <ul>
+              <li>Professional Limited Liability Company (PLLC) formation</li>
+              <li>Protects personal assets from business liabilities</li>
+              <li>Cannot protect against professional malpractice</li>
+              <li>Useful for practice overhead and general business risks</li>
+            </ul>
+            
+            <h2>Advanced LLC Strategies</h2>
+            
+            <h3>Series LLCs</h3>
+            
+            <p>Available in select states, Series LLCs allow multiple "series" within one LLC structure, each with separate assets and liabilities.</p>
+            
+            <h4>Advantages:</h4>
+            <ul>
+              <li>Cost savings over multiple separate LLCs</li>
+              <li>Liability segregation between series</li>
+              <li>Simplified administration</li>
+              <li>Flexibility for different investments</li>
+            </ul>
+            
+            <h4>Available States:</h4>
+            <ul>
+              <li>Delaware, Illinois, Nevada, Texas, Wyoming</li>
+              <li>Each state has different requirements and limitations</li>
+              <li>Important to understand specific state provisions</li>
+            </ul>
+            
+            <h3>Trust-Owned LLCs</h3>
+            
+            <p>Combining LLCs with asset protection trusts provides enhanced protection and estate planning benefits.</p>
+            
+            <h4>Structure Benefits:</h4>
+            <ul>
+              <li>Trust owns LLC membership interests</li>
+              <li>Combines charging order protection with trust protection</li>
+              <li>Provides estate planning benefits</li>
+              <li>Professional trustee management available</li>
+            </ul>
+            
+            <h4>Management Considerations:</h4>
+            <ul>
+              <li>Trustee has ultimate control over LLC</li>
+              <li>May delegate management to trust beneficiaries</li>
+              <li>Operating agreement must coordinate with trust terms</li>
+              <li>Consider independent manager provisions</li>
+            </ul>
+            
+            <h2>Tax Implications and Planning</h2>
+            
+            <h3>Default Tax Treatment</h3>
+            
+            <h4>Single-Member LLCs:</h4>
+            <ul>
+              <li>Disregarded entity for tax purposes</li>
+              <li>Income and expenses reported on owner's personal return</li>
+              <li>No separate tax filing required</li>
+              <li>Simple and straightforward reporting</li>
+            </ul>
+            
+            <h4>Multi-Member LLCs:</h4>
+            <ul>
+              <li>Treated as partnership for tax purposes</li>
+              <li>Pass-through taxation to members</li>
+              <li>Form 1065 partnership return required</li>
+              <li>K-1s issued to members</li>
+            </ul>
+            
+            <h3>Tax Elections</h3>
+            
+            <h4>S Corporation Election:</h4>
+            <ul>
+              <li>Can reduce self-employment taxes</li>
+              <li>Must pay reasonable salary to working members</li>
+              <li>Limited to 100 shareholders, one class of stock</li>
+              <li>May lose some LLC operational flexibility</li>
+            </ul>
+            
+            <h4>C Corporation Election:</h4>
+            <ul>
+              <li>Separate corporate tax entity</li>
+              <li>Double taxation on distributions</li>
+              <li>Beneficial for retaining earnings in business</li>
+              <li>Access to corporate fringe benefits</li>
+            </ul>
+            
+            <h2>Operating Agreement Essentials</h2>
+            
+            <h3>Asset Protection Provisions</h3>
+            
+            <h4>Charging Order Protection:</h4>
+            <ul>
+              <li>Explicit charging order language</li>
+              <li>Prohibition on forced distributions</li>
+              <li>Manager discretion over distributions</li>
+              <li>Penalty provisions for creditor charging orders</li>
+            </ul>
+            
+            <h4>Transfer Restrictions:</h4>
+            <ul>
+              <li>Restrictions on transfer of membership interests</li>
+              <li>Right of first refusal provisions</li>
+              <li>Consent requirements for transfers</li>
+              <li>Valuation provisions for forced transfers</li>
+            </ul>
+            
+            <h3>Management and Control Provisions</h3>
+            
+            <h4>Manager vs. Member Management:</h4>
+            <ul>
+              <li><strong>Manager-managed:</strong> Designated managers control operations</li>
+              <li><strong>Member-managed:</strong> All members participate in management</li>
+              <li>Consider independent manager for trust-owned LLCs</li>
+              <li>Define scope of management authority clearly</li>
+            </ul>
+            
+            <h4>Voting and Decision-Making:</h4>
+            <ul>
+              <li>Define voting rights and procedures</li>
+              <li>Identify decisions requiring unanimous consent</li>
+              <li>Protect minority member interests</li>
+              <li>Consider deadlock resolution mechanisms</li>
+            </ul>
+            
+            <h2>Compliance and Maintenance</h2>
+            
+            <h3>Corporate Formalities</h3>
+            
+            <h4>Required Formalities:</h4>
+            <ul>
+              <li>File annual reports with state</li>
+              <li>Maintain registered agent and office</li>
+              <li>Pay required fees and taxes</li>
+              <li>Keep adequate records and documentation</li>
+            </ul>
+            
+            <h4>Recommended Formalities:</h4>
+            <ul>
+              <li>Hold annual member meetings</li>
+              <li>Document major decisions in writing</li>
+              <li>Maintain separate bank accounts</li>
+              <li>Avoid commingling personal and LLC assets</li>
+            </ul>
+            
+            <h3>Avoiding Veil Piercing</h3>
+            
+            <h4>Common Veil Piercing Factors:</h4>
+            <ul>
+              <li>Inadequate capitalization</li>
+              <li>Commingling of assets</li>
+              <li>Failure to follow formalities</li>
+              <li>Use of LLC for fraudulent purposes</li>
+              <li>Domination and control by one member</li>
+            </ul>
+            
+            <h4>Protection Strategies:</h4>
+            <ul>
+              <li>Maintain adequate capital in LLC</li>
+              <li>Keep separate books and records</li>
+              <li>Use LLC name in all transactions</li>
+              <li>Avoid personal guarantees when possible</li>
+              <li>Document legitimate business purposes</li>
+            </ul>
+            
+            <h2>Common LLC Mistakes</h2>
+            
+            <h3>Formation Mistakes</h3>
+            <ul>
+              <li><strong>Wrong state selection:</strong> Choose based on law quality, not just cost</li>
+              <li><strong>Inadequate operating agreement:</strong> Generic or missing provisions</li>
+              <li><strong>Poor member structure:</strong> Not optimizing for protection and tax benefits</li>
+              <li><strong>Insufficient initial capital:</strong> Undercapitalization risks</li>
+            </ul>
+            
+            <h3>Operational Mistakes</h3>
+            <ul>
+              <li><strong>Commingling assets:</strong> Mixing personal and LLC funds</li>
+              <li><strong>Ignoring formalities:</strong> Not following operating agreement</li>
+              <li><strong>Personal guarantees:</strong> Negating liability protection</li>
+              <li><strong>Inadequate insurance:</strong> Not maintaining appropriate coverage</li>
+            </ul>
+            
+            <h2>Case Studies</h2>
+            
+            <h3>Case Study 1: Real Estate Investor</h3>
+            
+            <h4>Situation:</h4>
+            <p>John owns 5 rental properties worth $2 million total and faces liability from tenants and slip-and-fall risks.</p>
+            
+            <h4>Solution:</h4>
+            <ul>
+              <li>Create separate Wyoming LLC for each property</li>
+              <li>Spouse as 5% member in each LLC</li>
+              <li>Comprehensive liability insurance</li>
+              <li>Holding company LLC owns interests in property LLCs</li>
+            </ul>
+            
+            <h4>Results:</h4>
+            <ul>
+              <li>Isolated liability between properties</li>
+              <li>Protected personal assets from business risks</li>
+              <li>Maintained operational control</li>
+              <li>Achieved tax efficiency through pass-through taxation</li>
+            </ul>
+            
+            <h3>Case Study 2: Medical Practice</h3>
+            
+            <h4>Situation:</h4>
+            <p>Dr. Smith operates a medical practice with significant malpractice exposure and wants to protect practice assets.</p>
+            
+            <h4>Solution:</h4>
+            <ul>
+              <li>Form PLLC for practice operations</li>
+              <li>Separate LLC owns medical building</li>
+              <li>Equipment leasing arrangements</li>
+              <li>Maximum malpractice and umbrella insurance</li>
+            </ul>
+            
+            <h4>Results:</h4>
+            <ul>
+              <li>Protected practice assets from personal liabilities</li>
+              <li>Segregated real estate from operational risks</li>
+              <li>Maintained professional liability coverage</li>
+              <li>Preserved operational flexibility</li>
+            </ul>
+            
+            <h2>Future Planning and Considerations</h2>
+            
+            <h3>Succession Planning</h3>
+            <ul>
+              <li>Plan for management succession</li>
+              <li>Consider buy-sell agreements</li>
+              <li>Address disability and death scenarios</li>
+              <li>Coordinate with estate planning objectives</li>
+            </ul>
+            
+            <h3>Exit Strategies</h3>
+            <ul>
+              <li>Plan for eventual sale or dissolution</li>
+              <li>Consider tax implications of exit</li>
+              <li>Address member withdrawal procedures</li>
+              <li>Plan for asset distribution</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            
+            <p>LLCs represent one of the most versatile and effective asset protection tools available today. When properly structured and maintained, they provide excellent liability protection while preserving operational flexibility and tax efficiency.</p>
+            
+            <p>Success with LLC asset protection requires:</p>
+            <ul>
+              <li>Careful planning and professional guidance</li>
+              <li>Proper state selection and structure design</li>
+              <li>Comprehensive operating agreements</li>
+              <li>Ongoing compliance and maintenance</li>
+              <li>Regular review and updates</li>
+            </ul>
+            
+            <p>By avoiding common mistakes and following best practices, LLCs can serve as the foundation of an effective asset protection strategy that grows and adapts with your changing needs and circumstances.</p>
+          `
+        },
+        {
+          id: 'family-limited-partnerships',
+          title: "Family Limited Partnerships for Wealth Protection", 
+          description: "Learn how Family Limited Partnerships combine asset protection with estate planning benefits.",
+          content_type: "guide",
+          category: "estate-planning",
+          author: "Robert Chen, JD, LLM",
+          reading_time: 14,
+          difficulty_level: "advanced", 
+          view_count: 1920,
+          created_at: new Date().toISOString(),
+          excerpt: "Family Limited Partnerships offer unique advantages for families seeking both asset protection and tax-efficient wealth transfer...",
+          content: "Content for Family Limited Partnerships article would go here..."
+        }
+      ];
+      
+      // Find matching content by ID (handle both string and number IDs)
+      content = mockContent.find(item => 
+        item.id === contentId || 
+        item.id === String(contentId) || 
+        String(item.id) === String(contentId)
+      );
+    }
     
     if (!content) {
       return c.json({ error: 'Content not found' }, 404)
     }
-    
-    // Increment view count
-    await env.DB.prepare(
-      'UPDATE educational_content SET view_count = view_count + 1 WHERE id = ?'
-    ).bind(contentId).run()
     
     return c.json({ content })
     
