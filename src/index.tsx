@@ -1229,42 +1229,51 @@ app.get('/', (c) => {
             <div className="text-center">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Transform Your Practice?</h3>
               <p className="text-xl text-gray-600 mb-8">
-                Schedule a personalized demo and see how our platform can work for your firm
+                Try our live demo instantly and see how our platform can work for your firm
               </p>
               <button 
-                onClick="navigateToSection('consultation')"
+                onClick="startLiveDemo()"
                 className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <i className="fas fa-calendar-check mr-2"></i>
-                Schedule Your Demo
+                <i className="fas fa-play mr-2"></i>
+                Try the Demo
               </button>
             </div>
           </div>
         </section>
 
-        {/* Law Firm Demo Section */}
+        {/* Live Demo Section */}
         <section id="consultation" className="px-6 py-20 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                Schedule Your Platform Demo
+                Try Our Live Demo Platform
               </h2>
               <p className="text-xl text-gray-600">
-                See how our white-label platform can transform your asset protection practice
+                Experience our white-label platform instantly with real data and full functionality
               </p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Your 30-Minute Demo Includes:</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Your Live Demo Includes:</h3>
                 <div className="space-y-4 mb-8">
                   <div className="flex items-start">
                     <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                       <i className="fas fa-desktop text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Full Platform Walkthrough</h4>
-                      <p className="text-gray-600">See the complete white-label platform in action with your firm's branding applied in real-time.</p>
+                      <h4 className="font-semibold text-gray-800 mb-2">Full Platform Access</h4>
+                      <p className="text-gray-600">Experience the complete platform with real client data, forms, and workflows immediately.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                      <i className="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Sample Client Portfolio</h4>
+                      <p className="text-gray-600">Test the system with realistic client scenarios and asset protection cases.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -1272,65 +1281,52 @@ app.get('/', (c) => {
                       <i className="fas fa-chart-line text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">ROI Analysis for Your Practice</h4>
-                      <p className="text-gray-600">Custom revenue projections based on your current client volume and fee structure.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                      <i className="fas fa-cogs text-blue-600 text-xl"></i>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Implementation Plan</h4>
-                      <p className="text-gray-600">Step-by-step setup timeline, training schedule, and go-live strategy for your firm.</p>
+                      <h4 className="font-semibold text-gray-800 mb-2">Live Analytics Dashboard</h4>
+                      <p className="text-gray-600">See real-time metrics, conversion tracking, and revenue analytics in action.</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 rounded-xl p-6">
+                <div className="bg-green-50 rounded-xl p-6">
                   <div className="flex items-center mb-4">
-                    <i className="fas fa-handshake text-blue-600 text-2xl mr-3"></i>
-                    <h4 className="text-lg font-semibold text-gray-800">No Obligation Demo</h4>
+                    <i className="fas fa-rocket text-green-600 text-2xl mr-3"></i>
+                    <h4 className="text-lg font-semibold text-gray-800">Instant Access - No Waiting</h4>
                   </div>
-                  <p className="text-gray-600">This demo is designed to show you exactly how our platform can grow your practice. No pressure, just results.</p>
+                  <p className="text-gray-600">Start exploring immediately with our 14-day free trial. Experience the full platform with no setup delays.</p>
                 </div>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Schedule Your Demo</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Start Your Free Trial</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Attorney Name</label>
-                    <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your full name" />
+                    <input type="text" id="demo-attorney-name" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your full name" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Law Firm Name</label>
-                    <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your firm name" />
+                    <input type="text" id="demo-firm-name" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your firm name" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                    <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your email" />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Professional Email</label>
+                    <input type="email" id="demo-email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your professional email" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input type="tel" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your phone number" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Practice Details</label>
-                    <textarea className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-none" placeholder="Tell us about your current practice size, client volume, and main challenges..."></textarea>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">State Bar Number (Optional)</label>
+                    <input type="text" id="demo-bar-number" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your state bar number" />
                   </div>
                   <button 
-                    onClick="submitDemoRequest()"
-                    className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    onClick="startLiveDemo()"
+                    className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <i className="fas fa-play mr-2"></i>
-                    Schedule Platform Demo
+                    Try the Demo - Free 14 Days
                   </button>
                 </div>
                 
                 <div className="mt-6 text-center text-sm text-gray-500">
                   <i className="fas fa-shield-alt mr-1"></i>
-                  Attorney-client confidentiality respected
+                  No credit card required • Instant access • Full platform features
                 </div>
               </div>
             </div>
@@ -1648,6 +1644,84 @@ app.get('/', (c) => {
               window.selectedPlatformTier = null;
               
             }, 2000); // Simulate network delay
+          };
+          
+          // Handle live demo launch
+          window.startLiveDemo = function() {
+            // Collect demo form data
+            const demoForm = {
+              attorneyName: document.getElementById('demo-attorney-name')?.value || '',
+              firmName: document.getElementById('demo-firm-name')?.value || '',
+              email: document.getElementById('demo-email')?.value || '',
+              barNumber: document.getElementById('demo-bar-number')?.value || ''
+            };
+            
+            // Basic validation for required fields
+            if (!demoForm.attorneyName || !demoForm.email || !demoForm.firmName) {
+              alert('Please fill in your name, firm name, and email address to start the demo.');
+              return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+            if (!emailRegex.test(demoForm.email)) {
+              alert('Please enter a valid email address.');
+              return;
+            }
+            
+            // Show loading state
+            const buttons = document.querySelectorAll('button[onclick="startLiveDemo()"]');
+            buttons.forEach(button => {
+              button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Launching Demo...';
+              button.disabled = true;
+            });
+            
+            // Prepare demo session data
+            const demoSessionId = 'demo_' + Date.now() + '_' + Math.random().toString(36).substring(7);
+            const demoData = {
+              sessionId: demoSessionId,
+              ...demoForm,
+              timestamp: new Date().toISOString(),
+              demoType: 'live_platform_trial',
+              trialDuration: 14 // 14-day free trial
+            };
+            
+            // Store demo session data for the demo environment
+            localStorage.setItem('assetshield_demo_session', JSON.stringify(demoData));
+            
+            // Simulate demo platform launch (replace with actual demo API endpoint)
+            setTimeout(() => {
+              // Show success message and redirect to demo
+              alert(
+                \`Welcome to AssetShield Pro, \${demoForm.attorneyName}!\\n\\n\` +
+                \`Your 14-day free trial is now active for \${demoForm.firmName}.\\n\\n\` +
+                \`You'll be redirected to your demo platform with:\\n\` +
+                \`• Sample client data and workflows\\n\` +
+                \`• Full platform functionality\\n\` +
+                \`• Live analytics dashboard\\n\` +
+                \`• Complete asset protection tools\\n\\n\` +
+                \`Demo Session ID: \${demoSessionId.substring(0, 12)}...\\n\` +
+                \`A confirmation email has been sent to \${demoForm.email}\`
+              );
+              
+              // Redirect to demo environment (replace with actual demo URL)
+              window.open('/api/demo/launch?session=' + demoSessionId, '_blank');
+              
+              // Reset form after slight delay
+              setTimeout(() => {
+                document.getElementById('demo-attorney-name').value = '';
+                document.getElementById('demo-firm-name').value = '';
+                document.getElementById('demo-email').value = '';
+                document.getElementById('demo-bar-number').value = '';
+                
+                // Reset buttons
+                buttons.forEach(button => {
+                  button.innerHTML = '<i class="fas fa-play mr-2"></i>Try the Demo - Free 14 Days';
+                  button.disabled = false;
+                });
+              }, 1000);
+              
+            }, 2500); // Simulate platform setup time
           };
           
           // Handle initial page load with hash
