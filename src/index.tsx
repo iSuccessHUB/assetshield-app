@@ -549,109 +549,671 @@ app.get('/', (c) => {
           </div>
         </section>
 
-        {/* Risk Assessment Section */}
-        <section id="assessment" className="px-6 py-20 bg-white">
-          <div className="max-w-4xl mx-auto">
+        {/* Risk Assessment Section - Professional Multi-Step Form */}
+        <section id="assessment" className="px-6 py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="assessment.title">
                 Asset Protection Risk Assessment
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600" data-translate="assessment.subtitle">
                 Evaluate your current protection level in just 5 minutes
               </p>
+              <div className="mt-6 flex justify-center space-x-8 text-sm text-gray-500">
+                <div className="flex items-center">
+                  <i className="fas fa-shield-alt text-blue-600 mr-2"></i>
+                  <span>100% Confidential</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-clock text-blue-600 mr-2"></i>
+                  <span>5 Minutes</span>
+                </div>
+                <div className="flex items-center">
+                  <i className="fas fa-chart-line text-blue-600 mr-2"></i>
+                  <span>Instant Results</span>
+                </div>
+              </div>
             </div>
 
-            <div id="assessment-container" className="bg-white rounded-2xl shadow-2xl p-8">
-              <div id="step-indicator" className="flex justify-between mb-8">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">1</div>
-                  <span className="ml-2 text-sm font-medium text-gray-700">Basic Info</span>
+            <div id="assessment-container" className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+              {/* Professional Progress Bar */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+                <div className="flex items-center justify-between">
+                  <div className="text-white">
+                    <h3 className="text-lg font-semibold">Risk Assessment Progress</h3>
+                    <p className="text-blue-100 text-sm">Complete all steps for your personalized report</p>
+                  </div>
+                  <div className="text-right text-white">
+                    <div className="text-2xl font-bold">
+                      <span id="current-step">1</span><span className="text-blue-200">/4</span>
+                    </div>
+                    <div className="text-xs text-blue-200">Steps Complete</div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-semibold">2</div>
-                  <span className="ml-2 text-sm font-medium text-gray-500">Assets</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-semibold">3</div>
-                  <span className="ml-2 text-sm font-medium text-gray-500">Risk Factors</span>
+                
+                {/* Progress Bar */}
+                <div className="mt-4 bg-blue-500/30 rounded-full h-2">
+                  <div id="progress-bar" className="bg-white rounded-full h-2 transition-all duration-500 ease-out" style="width: 25%"></div>
                 </div>
               </div>
 
-              <div id="assessment-form">
-                {/* Working Assessment Form - Direct Implementation */}
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Basic Information</h3>
+              {/* Dynamic Step Indicator */}
+              <div className="px-8 py-6 bg-gray-50 border-b">
+                <div id="step-indicator" className="flex justify-between">
+                  <div className="flex items-center step-item active" data-step="1">
+                    <div className="step-circle w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-3">
+                      <i className="fas fa-user"></i>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-800">Basic Information</div>
+                      <div className="text-xs text-gray-500">Your profession & background</div>
+                    </div>
+                  </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">What is your profession?</label>
-                    <select id="assessment-profession" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required>
-                      <option value="">Select your profession</option>
-                      <option value="doctor">Doctor/Medical Professional</option>
-                      <option value="lawyer">Lawyer/Attorney</option>
-                      <option value="business_owner">Business Owner</option>
-                      <option value="real_estate">Real Estate Professional</option>
-                      <option value="executive">Corporate Executive</option>
-                      <option value="consultant">Consultant</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">What is your approximate net worth?</label>
-                    <div className="space-y-2">
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentNetWorth" value="under_500k" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>Under $500,000</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentNetWorth" value="500k_1m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>$500,000 - $1,000,000</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentNetWorth" value="1m_5m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>$1,000,000 - $5,000,000</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentNetWorth" value="5m_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>$5,000,000 - $10,000,000</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentNetWorth" value="over_10m" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>Over $10,000,000</span>
-                      </label>
+                  <div className="flex items-center step-item" data-step="2">
+                    <div className="step-circle w-10 h-10 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-semibold mr-3">
+                      <i className="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-500">Assets & Wealth</div>
+                      <div className="text-xs text-gray-400">Net worth & holdings</div>
                     </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Are you currently facing any legal threats or lawsuits?</label>
-                    <div className="space-y-2">
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentLegalThreats" value="none" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>No current threats</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentLegalThreats" value="potential" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>Potential threats on the horizon</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="radio" name="assessmentLegalThreats" value="active" className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3" />
-                        <span>Active litigation or threats</span>
-                      </label>
+                  
+                  <div className="flex items-center step-item" data-step="3">
+                    <div className="step-circle w-10 h-10 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-semibold mr-3">
+                      <i className="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-500">Risk Factors</div>
+                      <div className="text-xs text-gray-400">Current threats & exposure</div>
                     </div>
                   </div>
-
-                  <div className="flex justify-end">
-                    <button id="submit-assessment-btn" className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                      Get My Risk Assessment <i className="fas fa-arrow-right ml-2"></i>
-                    </button>
+                  
+                  <div className="flex items-center step-item" data-step="4">
+                    <div className="step-circle w-10 h-10 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-semibold mr-3">
+                      <i className="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-500">Results</div>
+                      <div className="text-xs text-gray-400">Your risk analysis</div>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Dynamic Form Content */}
+              <div id="assessment-form" className="p-8">
+                {/* Content will be loaded dynamically */}
               </div>
             </div>
             
-            {/* Assessment JavaScript - Static form with event handlers */}
+            {/* Professional Multi-Step Assessment System */}
             <script dangerouslySetInnerHTML={{__html: `
-
+                // Professional Risk Assessment System - Multi-Step Dynamic Form
+                class RiskAssessment {
+                  constructor() {
+                    this.currentStep = 1;
+                    this.totalSteps = 4;
+                    this.assessmentData = {};
+                    this.init();
+                  }
+                  
+                  init() {
+                    console.log('🎯 Initializing Professional Risk Assessment System');
+                    this.showStep(1);
+                    this.updateProgress();
+                  }
+                  
+                  updateProgress() {
+                    const progress = (this.currentStep / this.totalSteps) * 100;
+                    const progressBar = document.getElementById('progress-bar');
+                    const currentStepEl = document.getElementById('current-step');
+                    
+                    if (progressBar) {
+                      progressBar.style.width = progress + '%';
+                    }
+                    
+                    if (currentStepEl) {
+                      currentStepEl.textContent = this.currentStep;
+                    }
+                    
+                    // Update step indicators
+                    document.querySelectorAll('.step-item').forEach((item, index) => {
+                      const stepNum = index + 1;
+                      const circle = item.querySelector('.step-circle');
+                      const texts = item.querySelectorAll('div');
+                      
+                      if (stepNum <= this.currentStep) {
+                        item.classList.add('active');
+                        circle.classList.remove('bg-gray-300', 'text-gray-500');
+                        circle.classList.add('bg-blue-600', 'text-white');
+                        texts.forEach(text => {
+                          text.classList.remove('text-gray-500', 'text-gray-400');
+                          text.classList.add('text-gray-800');
+                        });
+                      } else {
+                        item.classList.remove('active');
+                        circle.classList.remove('bg-blue-600', 'text-white');
+                        circle.classList.add('bg-gray-300', 'text-gray-500');
+                      }
+                    });
+                  }
+                  
+                  showStep(step) {
+                    this.currentStep = step;
+                    const container = document.getElementById('assessment-form');
+                    
+                    if (!container) return;
+                    
+                    let content = '';
+                    
+                    switch(step) {
+                      case 1:
+                        content = this.getStep1Content();
+                        break;
+                      case 2:
+                        content = this.getStep2Content();
+                        break;
+                      case 3:
+                        content = this.getStep3Content();
+                        break;
+                      case 4:
+                        content = this.getStep4Content();
+                        break;
+                    }
+                    
+                    // Animate content change
+                    container.style.opacity = '0';
+                    container.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                      container.innerHTML = content;
+                      container.style.opacity = '1';
+                      container.style.transform = 'translateY(0)';
+                      this.updateProgress();
+                      
+                      // Add event listeners for new content
+                      this.attachEventListeners();
+                    }, 200);
+                  }
+                  
+                  getStep1Content() {
+                    return \`
+                      <div class="assessment-step">
+                        <div class="text-center mb-8">
+                          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-blue-600 text-2xl"></i>
+                          </div>
+                          <h3 class="text-2xl font-bold text-gray-800 mb-2">Tell Us About Yourself</h3>
+                          <p class="text-gray-600">Help us understand your professional background</p>
+                        </div>
+                        
+                        <div class="max-w-2xl mx-auto space-y-6">
+                          <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                              <i class="fas fa-briefcase mr-2 text-blue-600"></i>What is your profession?
+                            </label>
+                            <div class="grid md:grid-cols-2 gap-3">
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="doctor" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Doctor/Medical</div>
+                                  <div class="text-sm text-gray-500">Healthcare professional</div>
+                                </div>
+                              </label>
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="lawyer" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Lawyer/Attorney</div>
+                                  <div class="text-sm text-gray-500">Legal professional</div>
+                                </div>
+                              </label>
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="business_owner" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Business Owner</div>
+                                  <div class="text-sm text-gray-500">Entrepreneur/Executive</div>
+                                </div>
+                              </label>
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="real_estate" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Real Estate</div>
+                                  <div class="text-sm text-gray-500">Property professional</div>
+                                </div>
+                              </label>
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="executive" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Corporate Executive</div>
+                                  <div class="text-sm text-gray-500">C-level/Management</div>
+                                </div>
+                              </label>
+                              <label class="profession-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all">
+                                <input type="radio" name="profession" value="other" class="w-5 h-5 text-blue-600 mr-3">
+                                <div>
+                                  <div class="font-semibold text-gray-800">Other</div>
+                                  <div class="text-sm text-gray-500">Different profession</div>
+                                </div>
+                              </label>
+                            </div>
+                          </div>
+                          
+                          <div class="flex justify-center pt-6">
+                            <button id="step1-next" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                              <span>Continue to Assets</span>
+                              <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    \`;
+                  }
+                  
+                  getStep2Content() {
+                    return \`
+                      <div class="assessment-step">
+                        <div class="text-center mb-8">
+                          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-dollar-sign text-green-600 text-2xl"></i>
+                          </div>
+                          <h3 class="text-2xl font-bold text-gray-800 mb-2">Your Assets & Wealth</h3>
+                          <p class="text-gray-600">Help us understand your financial position</p>
+                        </div>
+                        
+                        <div class="max-w-2xl mx-auto space-y-6">
+                          <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                              <i class="fas fa-chart-line mr-2 text-green-600"></i>What is your approximate net worth?
+                            </label>
+                            <div class="space-y-3">
+                              <label class="networth-option flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 cursor-pointer transition-all">
+                                <div class="flex items-center">
+                                  <input type="radio" name="netWorth" value="under_500k" class="w-5 h-5 text-green-600 mr-4">
+                                  <div>
+                                    <div class="font-semibold text-gray-800">Under $500,000</div>
+                                    <div class="text-sm text-gray-500">Getting started with wealth building</div>
+                                  </div>
+                                </div>
+                                <div class="text-green-600 font-bold">$0 - $500K</div>
+                              </label>
+                              
+                              <label class="networth-option flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 cursor-pointer transition-all">
+                                <div class="flex items-center">
+                                  <input type="radio" name="netWorth" value="500k_1m" class="w-5 h-5 text-green-600 mr-4">
+                                  <div>
+                                    <div class="font-semibold text-gray-800">$500,000 - $1,000,000</div>
+                                    <div class="text-sm text-gray-500">Building substantial wealth</div>
+                                  </div>
+                                </div>
+                                <div class="text-green-600 font-bold">$500K - $1M</div>
+                              </label>
+                              
+                              <label class="networth-option flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 cursor-pointer transition-all">
+                                <div class="flex items-center">
+                                  <input type="radio" name="netWorth" value="1m_5m" class="w-5 h-5 text-green-600 mr-4">
+                                  <div>
+                                    <div class="font-semibold text-gray-800">$1,000,000 - $5,000,000</div>
+                                    <div class="text-sm text-gray-500">High net worth individual</div>
+                                  </div>
+                                </div>
+                                <div class="text-green-600 font-bold">$1M - $5M</div>
+                              </label>
+                              
+                              <label class="networth-option flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 cursor-pointer transition-all">
+                                <div class="flex items-center">
+                                  <input type="radio" name="netWorth" value="5m_10m" class="w-5 h-5 text-green-600 mr-4">
+                                  <div>
+                                    <div class="font-semibold text-gray-800">$5,000,000 - $10,000,000</div>
+                                    <div class="text-sm text-gray-500">Very high net worth individual</div>
+                                  </div>
+                                </div>
+                                <div class="text-green-600 font-bold">$5M - $10M</div>
+                              </label>
+                              
+                              <label class="networth-option flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 cursor-pointer transition-all">
+                                <div class="flex items-center">
+                                  <input type="radio" name="netWorth" value="over_10m" class="w-5 h-5 text-green-600 mr-4">
+                                  <div>
+                                    <div class="font-semibold text-gray-800">Over $10,000,000</div>
+                                    <div class="text-sm text-gray-500">Ultra high net worth individual</div>
+                                  </div>
+                                </div>
+                                <div class="text-green-600 font-bold">$10M+</div>
+                              </label>
+                            </div>
+                          </div>
+                          
+                          <div class="flex justify-between pt-6">
+                            <button id="step2-back" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                              <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <button id="step2-next" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                              <span>Continue to Risk Factors</span>
+                              <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    \`;
+                  }
+                  
+                  getStep3Content() {
+                    return \`
+                      <div class="assessment-step">
+                        <div class="text-center mb-8">
+                          <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl"></i>
+                          </div>
+                          <h3 class="text-2xl font-bold text-gray-800 mb-2">Risk Factors Assessment</h3>
+                          <p class="text-gray-600">Help us identify your current exposure levels</p>
+                        </div>
+                        
+                        <div class="max-w-2xl mx-auto space-y-6">
+                          <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                              <i class="fas fa-balance-scale mr-2 text-yellow-600"></i>Are you currently facing any legal threats or lawsuits?
+                            </label>
+                            <div class="space-y-3">
+                              <label class="legal-threat-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 cursor-pointer transition-all">
+                                <input type="radio" name="legalThreats" value="none" class="w-5 h-5 text-yellow-600 mr-4">
+                                <div class="flex-1">
+                                  <div class="flex items-center justify-between">
+                                    <div class="font-semibold text-gray-800">No Current Threats</div>
+                                    <div class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full">Low Risk</div>
+                                  </div>
+                                  <div class="text-sm text-gray-500 mt-1">No known legal issues or potential litigation</div>
+                                </div>
+                              </label>
+                              
+                              <label class="legal-threat-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 cursor-pointer transition-all">
+                                <input type="radio" name="legalThreats" value="potential" class="w-5 h-5 text-yellow-600 mr-4">
+                                <div class="flex-1">
+                                  <div class="flex items-center justify-between">
+                                    <div class="font-semibold text-gray-800">Potential Threats</div>
+                                    <div class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Medium Risk</div>
+                                  </div>
+                                  <div class="text-sm text-gray-500 mt-1">Possible future legal challenges or industry risks</div>
+                                </div>
+                              </label>
+                              
+                              <label class="legal-threat-option flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 cursor-pointer transition-all">
+                                <input type="radio" name="legalThreats" value="active" class="w-5 h-5 text-yellow-600 mr-4">
+                                <div class="flex-1">
+                                  <div class="flex items-center justify-between">
+                                    <div class="font-semibold text-gray-800">Active Litigation</div>
+                                    <div class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full">High Risk</div>
+                                  </div>
+                                  <div class="text-sm text-gray-500 mt-1">Currently facing lawsuits or legal proceedings</div>
+                                </div>
+                              </label>
+                            </div>
+                          </div>
+                          
+                          <div class="flex justify-between pt-6">
+                            <button id="step3-back" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                              <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <button id="step3-next" class="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                              <span>Get My Results</span>
+                              <i class="fas fa-chart-line ml-2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    \`;
+                  }
+                  
+                  getStep4Content() {
+                    // This will be filled with results after API call
+                    return \`
+                      <div class="assessment-step text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i class="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Analyzing Your Risk Profile</h3>
+                        <p class="text-gray-600">Please wait while we calculate your personalized assessment...</p>
+                      </div>
+                    \`;
+                  }
+                  
+                  attachEventListeners() {
+                    // Step 1 listeners
+                    const step1Next = document.getElementById('step1-next');
+                    const professionInputs = document.querySelectorAll('input[name="profession"]');
+                    
+                    if (professionInputs.length > 0) {
+                      professionInputs.forEach(input => {
+                        input.addEventListener('change', () => {
+                          if (step1Next) {
+                            step1Next.disabled = false;
+                            // Add visual feedback
+                            document.querySelectorAll('.profession-option').forEach(option => {
+                              option.classList.remove('border-blue-500', 'bg-blue-50');
+                            });
+                            input.closest('.profession-option').classList.add('border-blue-500', 'bg-blue-50');
+                          }
+                        });
+                      });
+                    }
+                    
+                    if (step1Next) {
+                      step1Next.addEventListener('click', () => {
+                        const selectedProfession = document.querySelector('input[name="profession"]:checked');
+                        if (selectedProfession) {
+                          this.assessmentData.profession = selectedProfession.value;
+                          this.showStep(2);
+                        }
+                      });
+                    }
+                    
+                    // Step 2 listeners
+                    const step2Next = document.getElementById('step2-next');
+                    const step2Back = document.getElementById('step2-back');
+                    const networthInputs = document.querySelectorAll('input[name="netWorth"]');
+                    
+                    if (networthInputs.length > 0) {
+                      networthInputs.forEach(input => {
+                        input.addEventListener('change', () => {
+                          if (step2Next) {
+                            step2Next.disabled = false;
+                            // Add visual feedback
+                            document.querySelectorAll('.networth-option').forEach(option => {
+                              option.classList.remove('border-green-500', 'bg-green-50');
+                            });
+                            input.closest('.networth-option').classList.add('border-green-500', 'bg-green-50');
+                          }
+                        });
+                      });
+                    }
+                    
+                    if (step2Next) {
+                      step2Next.addEventListener('click', () => {
+                        const selectedNetWorth = document.querySelector('input[name="netWorth"]:checked');
+                        if (selectedNetWorth) {
+                          this.assessmentData.netWorth = selectedNetWorth.value;
+                          this.showStep(3);
+                        }
+                      });
+                    }
+                    
+                    if (step2Back) {
+                      step2Back.addEventListener('click', () => this.showStep(1));
+                    }
+                    
+                    // Step 3 listeners
+                    const step3Next = document.getElementById('step3-next');
+                    const step3Back = document.getElementById('step3-back');
+                    const legalThreatInputs = document.querySelectorAll('input[name="legalThreats"]');
+                    
+                    if (legalThreatInputs.length > 0) {
+                      legalThreatInputs.forEach(input => {
+                        input.addEventListener('change', () => {
+                          if (step3Next) {
+                            step3Next.disabled = false;
+                            // Add visual feedback
+                            document.querySelectorAll('.legal-threat-option').forEach(option => {
+                              option.classList.remove('border-yellow-500', 'bg-yellow-50');
+                            });
+                            input.closest('.legal-threat-option').classList.add('border-yellow-500', 'bg-yellow-50');
+                          }
+                        });
+                      });
+                    }
+                    
+                    if (step3Next) {
+                      step3Next.addEventListener('click', () => {
+                        const selectedLegalThreats = document.querySelector('input[name="legalThreats"]:checked');
+                        if (selectedLegalThreats) {
+                          this.assessmentData.legalThreats = selectedLegalThreats.value;
+                          this.showStep(4);
+                          this.submitAssessment();
+                        }
+                      });
+                    }
+                    
+                    if (step3Back) {
+                      step3Back.addEventListener('click', () => this.showStep(2));
+                    }
+                  }
+                  
+                  async submitAssessment() {
+                    try {
+                      console.log('🚀 Submitting professional assessment:', this.assessmentData);
+                      
+                      const assessmentData = {
+                        name: 'Anonymous User',
+                        email: 'anonymous@example.com',
+                        ...this.assessmentData
+                      };
+                      
+                      const response = await fetch('/api/assessment/submit', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(assessmentData)
+                      });
+                      
+                      const result = await response.json();
+                      
+                      if (result.success) {
+                        this.showResults(result);
+                      } else {
+                        throw new Error(result.error || 'Assessment failed');
+                      }
+                      
+                    } catch (error) {
+                      console.error('Assessment submission failed:', error);
+                      this.showError(error.message);
+                    }
+                  }
+                  
+                  showResults(data) {
+                    const container = document.getElementById('assessment-form');
+                    const riskColorClass = data.riskLevel === 'HIGH' ? 'text-red-600' : 
+                                         data.riskLevel === 'MEDIUM' ? 'text-yellow-600' : 'text-green-600';
+                    const riskBgClass = data.riskLevel === 'HIGH' ? 'bg-red-50 border-red-200' : 
+                                       data.riskLevel === 'MEDIUM' ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200';
+                    
+                    container.innerHTML = \`
+                      <div class="assessment-step text-center">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <i class="fas fa-check-circle text-green-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h3>
+                        <p class="text-gray-600 mb-8">Here's your personalized risk analysis and recommendations</p>
+                        
+                        <div class="max-w-3xl mx-auto">
+                          <!-- Risk Level Card -->
+                          <div class="mb-8 p-6 \${riskBgClass} border-2 rounded-xl">
+                            <div class="flex items-center justify-center mb-4">
+                              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg mr-4">
+                                <i class="fas fa-shield-alt \${riskColorClass} text-2xl"></i>
+                              </div>
+                              <div class="text-left">
+                                <div class="text-sm text-gray-600">Your Risk Level</div>
+                                <div class="text-3xl font-bold \${riskColorClass}">\${data.riskLevel}</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Wealth at Risk -->
+                          <div class="mb-8 p-6 bg-red-50 border-2 border-red-200 rounded-xl">
+                            <div class="flex items-center justify-center mb-2">
+                              <i class="fas fa-exclamation-triangle text-red-600 text-xl mr-3"></i>
+                              <h4 class="text-lg font-semibold text-gray-800">Estimated Wealth at Risk</h4>
+                            </div>
+                            <div class="text-4xl font-bold text-red-600 mb-2">$\${data.wealthAtRisk.toLocaleString()}</div>
+                            <p class="text-sm text-red-700">Amount potentially vulnerable to creditors or litigation</p>
+                          </div>
+                          
+                          <!-- Recommendations -->
+                          <div class="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-xl text-left">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                              <i class="fas fa-lightbulb text-blue-600 mr-3"></i>
+                              Recommended Action Items
+                            </h4>
+                            <ul class="space-y-3">
+                              \${data.recommendations.map(rec => \`
+                                <li class="flex items-start">
+                                  <i class="fas fa-check-circle text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                                  <span class="text-gray-700">\${rec}</span>
+                                </li>
+                              \`).join('')}
+                            </ul>
+                          </div>
+                          
+                          <!-- Action Buttons -->
+                          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="location.reload()" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                              <i class="fas fa-redo mr-2"></i>Take Assessment Again
+                            </button>
+                            <button onclick="window.scrollToPricing()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg">
+                              <i class="fas fa-shield-alt mr-2"></i>Get Professional Protection
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    \`;
+                  }
+                  
+                  showError(message) {
+                    const container = document.getElementById('assessment-form');
+                    container.innerHTML = \`
+                      <div class="assessment-step text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Assessment Error</h3>
+                        <p class="text-gray-600 mb-6">\${message}</p>
+                        <button onclick="location.reload()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                          <i class="fas fa-redo mr-2"></i>Try Again
+                        </button>
+                      </div>
+                    \`;
+                  }
+                }
+                
+                // Initialize the assessment system
+                let riskAssessment;
+                document.addEventListener('DOMContentLoaded', function() {
+                  console.log('🎯 Starting Professional Risk Assessment System');
+                  riskAssessment = new RiskAssessment();
+                });
+                
+                // Global function for scrolling to pricing
+                window.scrollToPricing = function() {
+                  const pricingSection = document.getElementById('pricing');
+                  if (pricingSection) {
+                    pricingSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                };
+              `}}></script>
+            
+            {/* Continuing JavaScript for navigation and other functions */}
+            <script dangerouslySetInnerHTML={{__html: `
                 // Mobile menu toggle function
                 window.toggleMobileMenu = function() {
                   const menu = document.getElementById('mobile-menu');
