@@ -5,9 +5,11 @@
 AssetShield Pro is the world's first **fully automated white-label asset protection platform** for law firms. Zero human interaction required - from demo to purchase to platform delivery.
 
 ## 🌐 **Live Application**
-- **Platform URL**: https://3000-i6u2nicruozd1b06ynn4y-6532622b.e2b.dev
-- **Demo System**: Live 14-day trials with real data
+- **Production URL**: https://assetshieldapp.com
+- **GitHub Repository**: https://github.com/iSuccessHUB/assetshield-app
+- **Demo System**: Live 14-day trials with real data  
 - **Purchase System**: Automated Stripe checkout and instant delivery
+- **Sandbox URL**: https://3000-i6u2nicruozd1b06ynn4y-6532622b.e2b.dev
 
 ## 🎯 **100% Feature Complete Platform**
 
@@ -23,9 +25,10 @@ AssetShield Pro is the world's first **fully automated white-label asset protect
 #### **Core Platform**
 - ✅ **Risk Assessment Engine**: Sophisticated scoring with personalized recommendations
 - ✅ **Lead Management CRM**: Full pipeline from assessment to conversion
-- ✅ **Educational Content**: 6 comprehensive articles with modal display
+- ✅ **Educational Content**: 6 comprehensive articles with fixed modal display system
 - ✅ **Document Automation**: Template system with variable replacement
 - ✅ **Payment Processing**: Stripe integration for setup fees and subscriptions
+- ✅ **Google AdSense Integration**: Domain verification for monetization
 
 #### **Analytics & Reporting**
 - ✅ **Conversion Funnel Tracking**: Complete pipeline analytics
@@ -143,6 +146,9 @@ Payment confirmed → Database created → Subdomain setup → Branding applied 
 - ✅ Progressive Web App features
 - ✅ Database schema with all relationships
 - ✅ Payment processing integration
+- ✅ Modal content loading system (all 6 educational articles)
+- ✅ Google AdSense domain verification
+- ✅ Transformed from appointment-based to instant access system
 
 ### 🚀 **Platform Capabilities**
 - **Immediate Deployment**: Platform ready for production
@@ -197,6 +203,12 @@ AssetShield Pro now offers lawyers:
 **Result**: A completely self-service B2B platform that sells and delivers itself around the clock, requiring zero human intervention until post-purchase support (Enterprise tier only).
 
 **Last Updated**: August 22, 2024  
-**Version**: 2.0.0 - Complete Automation  
-**Status**: ✅ 100% Feature Complete  
-**Automation**: ✅ 24/7/365 Self-Service
+**Version**: 2.1.0 - Complete B2B White-Label Platform  
+**Status**: ✅ 100% Feature Complete + Modal Content System Fixed  
+**Automation**: ✅ 24/7/365 Self-Service  
+**Latest Changes**: 
+- ✅ Removed "Learn More" button from hero section
+- ✅ Fixed modal content loading for all 6 educational articles
+- ✅ Added Google AdSense verification code
+- ✅ Transformed all "Schedule Demo" to "Try the Demo" for instant access
+- ✅ Successfully deployed to live domain: assetshieldapp.com
