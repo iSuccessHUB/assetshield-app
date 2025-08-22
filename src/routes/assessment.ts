@@ -81,7 +81,7 @@ function calculateRiskLevel(data: AssessmentFormData): RiskResult {
   }
 }
 
-// Submit assessment
+// Submit assessment (Database-free version)
 app.post('/submit', async (c) => {
   try {
     const data: AssessmentFormData = await c.req.json()
@@ -91,61 +91,31 @@ app.post('/submit', async (c) => {
       return c.json({ error: 'Email and name are required' }, 400)
     }
     
-    const { env } = c
-    
-    // Check if user exists, create if not
-    let user = await env.DB.prepare(
-      'SELECT * FROM users WHERE email = ?'
-    ).bind(data.email).first<User>()
-    
-    if (!user) {
-      const userResult = await env.DB.prepare(
-        'INSERT INTO users (email, name, phone, user_type) VALUES (?, ?, ?, ?)'
-      ).bind(data.email, data.name, data.phone || null, 'individual').run()
-      
-      user = {
-        id: userResult.meta.last_row_id as number,
-        email: data.email,
-        name: data.name,
-        phone: data.phone || '',
-        user_type: 'individual',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    }
-    
-    // Calculate risk
+    // Calculate risk without database dependency
     const riskResult = calculateRiskLevel(data)
     
-    // Save assessment
-    const assessmentResult = await env.DB.prepare(
-      `INSERT INTO risk_assessments 
-       (user_id, profession, net_worth_range, has_real_estate, liquid_asset_percentage, 
-        legal_history, current_protection, risk_level, wealth_at_risk, recommendations) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(
-      user.id,
-      data.profession,
-      data.netWorth,
-      data.hasRealEstate,
-      data.liquidAssetPercentage,
-      JSON.stringify(data.legalHistory),
-      JSON.stringify(data.currentProtection),
-      riskResult.riskLevel,
-      riskResult.wealthAtRisk,
-      JSON.stringify(riskResult.recommendations)
-    ).run()
+    // Generate assessment ID (timestamp-based)
+    const assessmentId = Date.now()
+    
+    // Log assessment for demo purposes (in production, this would be saved to database)
+    console.log('Assessment submitted:', {
+      assessmentId,
+      user: { email: data.email, name: data.name },
+      data,
+      result: riskResult
+    })
     
     return c.json({
-      assessmentId: assessmentResult.meta.last_row_id,
+      assessmentId,
       riskLevel: riskResult.riskLevel,
       wealthAtRisk: riskResult.wealthAtRisk,
       recommendations: riskResult.recommendations,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
-      }
+        id: assessmentId, // Use timestamp as user ID for demo
+        email: data.email,
+        name: data.name
+      },
+      success: true
     })
     
   } catch (error) {
@@ -154,33 +124,27 @@ app.post('/submit', async (c) => {
   }
 })
 
-// Get assessment results
+// Get assessment results (Database-free demo version)
 app.get('/results/:id', async (c) => {
   try {
     const assessmentId = c.req.param('id')
-    const { env } = c
     
-    const assessment = await env.DB.prepare(
-      `SELECT ra.*, u.name, u.email 
-       FROM risk_assessments ra 
-       JOIN users u ON ra.user_id = u.id 
-       WHERE ra.id = ?`
-    ).bind(assessmentId).first<RiskAssessment & { name: string, email: string }>()
-    
-    if (!assessment) {
-      return c.json({ error: 'Assessment not found' }, 404)
-    }
-    
+    // For demo purposes, return mock results
+    // In production, this would fetch from database
     return c.json({
-      id: assessment.id,
-      riskLevel: assessment.risk_level,
-      wealthAtRisk: assessment.wealth_at_risk,
-      recommendations: JSON.parse(assessment.recommendations || '[]'),
+      id: assessmentId,
+      riskLevel: 'MEDIUM',
+      wealthAtRisk: 750000,
+      recommendations: [
+        'Form an LLC for business assets',
+        'Establish a basic asset protection trust', 
+        'Review and increase liability insurance'
+      ],
       user: {
-        name: assessment.name,
-        email: assessment.email
+        name: 'Demo User',
+        email: 'demo@example.com'
       },
-      createdAt: assessment.created_at
+      createdAt: new Date().toISOString()
     })
     
   } catch (error) {

@@ -445,22 +445,10 @@ app.get('/', (c) => {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors" data-translate="nav.riskAssessment">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors" data-translate="nav.strategies">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors" data-translate="nav.education">Education</a>
-              <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')" data-translate="nav.forLawFirms">For Law Firms</a>
-              <div className="relative">
-                <button id="language-btn" onclick="toggleLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
-                  <i className="fas fa-globe mr-2"></i>EN
-                  <i className="fas fa-chevron-down ml-1 text-sm"></i>
-                </button>
-                <div id="language-menu" className="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <button onclick="changeLanguage('en')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">English</button>
-                  <button onclick="changeLanguage('es')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Español</button>
-                  <button onclick="changeLanguage('fr')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Français</button>
-                  <button onclick="changeLanguage('de')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Deutsch</button>
-                </div>
-              </div>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors">Education</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')">For Law Firms</a>
               <button onclick="showLoginModal()" className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
                 <i className="fas fa-user mr-2"></i>Login
               </button>
@@ -470,22 +458,10 @@ app.get('/', (c) => {
           {/* Mobile Navigation */}
           <div id="mobile-menu" className="hidden md:hidden mt-4 pb-4 border-t border-white/20">
             <div className="flex flex-col space-y-3 mt-4">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.riskAssessment">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.strategies">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2" data-translate="nav.education">Education</a>
-              <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')" data-translate="nav.forLawFirms">For Law Firms</a>
-              <div className="flex items-center justify-between py-2">
-                <button id="mobile-language-btn" onclick="toggleMobileLanguageMenu()" className="text-white/90 hover:text-white transition-colors flex items-center">
-                  <i className="fas fa-globe mr-2"></i>English
-                  <i className="fas fa-chevron-down ml-1 text-sm"></i>
-                </button>
-                <div id="mobile-language-menu" className="hidden absolute right-4 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <button onclick="changeLanguage('en')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm">English</button>
-                  <button onclick="changeLanguage('es')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm">Español</button>
-                  <button onclick="changeLanguage('fr')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm">Français</button>
-                  <button onclick="changeLanguage('de')" className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm">Deutsch</button>
-                </div>
-              </div>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2">Education</a>
+              <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')">For Law Firms</a>
               <button onclick="showLoginModal()" className="w-full py-3 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
                 <i className="fas fa-user mr-2"></i>Login
               </button>
@@ -496,10 +472,10 @@ app.get('/', (c) => {
         {/* Hero Section */}
         <section className="px-4 sm:px-6 py-12 sm:py-20">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight" data-translate="hero.title">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Complete Asset Protection Platform
             </h1>
-            <p className="text-lg sm:text-xl text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto" data-translate="hero.subtitle">
+            <p className="text-lg sm:text-xl text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto">
               Discover your asset protection risk level, explore tailored strategies, and access comprehensive educational resources to safeguard your wealth.
             </p>
             
@@ -535,10 +511,10 @@ app.get('/', (c) => {
         <section id="assessment" className="px-6 py-20 bg-white">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="assessment.title">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
                 Asset Protection Risk Assessment
               </h2>
-              <p className="text-xl text-gray-600" data-translate="assessment.subtitle">
+              <p className="text-xl text-gray-600">
                 Evaluate your current protection level in just 5 minutes
               </p>
             </div>
@@ -665,69 +641,7 @@ app.get('/', (c) => {
                   loadAssessmentForm();
                 }, 500);
 
-                // CRITICAL: Define language functions here to ensure they're available
-                console.log('Defining language functions...');
-                
-                window.changeLanguage = function(lang) {
-                  console.log('Changing language to:', lang);
-                  localStorage.setItem('assetshield-language', lang);
-                  
-                  const languageBtn = document.getElementById('language-btn');
-                  const mobileLanguageBtn = document.getElementById('mobile-language-btn');
-                  
-                  const languageNames = { 'en': 'EN', 'es': 'ES', 'fr': 'FR', 'de': 'DE' };
-                  const fullLanguageNames = { 'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch' };
-                  
-                  if (languageBtn) {
-                    languageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + languageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
-                  }
-                  if (mobileLanguageBtn) {
-                    mobileLanguageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + fullLanguageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
-                  }
-                  
-                  // Close menus
-                  const menu = document.getElementById('language-menu');
-                  const mobileMenu = document.getElementById('mobile-language-menu');
-                  if (menu) menu.classList.add('hidden');
-                  if (mobileMenu) mobileMenu.classList.add('hidden');
-                  
-                  // Basic translations
-                  const translations = {
-                    'en': { 'hero.title': 'Complete Asset Protection Platform', 'assessment.title': 'Asset Protection Risk Assessment', 'nav.riskAssessment': 'Risk Assessment', 'nav.strategies': 'Strategies', 'nav.education': 'Education', 'nav.forLawFirms': 'For Law Firms' },
-                    'es': { 'hero.title': 'Plataforma Completa de Protección de Activos', 'assessment.title': 'Evaluación de Riesgo de Protección de Activos', 'nav.riskAssessment': 'Evaluación de Riesgo', 'nav.strategies': 'Estrategias', 'nav.education': 'Educación', 'nav.forLawFirms': 'Para Bufetes' },
-                    'fr': { 'hero.title': 'Plateforme Complète de Protection d\\'Actifs', 'assessment.title': 'Évaluation des Risques de Protection d\\'Actifs', 'nav.riskAssessment': 'Évaluation des Risques', 'nav.strategies': 'Stratégies', 'nav.education': 'Éducation', 'nav.forLawFirms': 'Pour Cabinets' },
-                    'de': { 'hero.title': 'Vollständige Vermögensschutz-Plattform', 'assessment.title': 'Risikobewertung für Vermögensschutz', 'nav.riskAssessment': 'Risikobewertung', 'nav.strategies': 'Strategien', 'nav.education': 'Bildung', 'nav.forLawFirms': 'Für Kanzleien' }
-                  };
-                  
-                  // Apply translations
-                  console.log('Applying translations for language:', lang);
-                  const elementsToTranslate = document.querySelectorAll('[data-translate]');
-                  console.log('Found elements to translate:', elementsToTranslate.length);
-                  
-                  elementsToTranslate.forEach(function(element) {
-                    const key = element.getAttribute('data-translate');
-                    if (translations[lang] && translations[lang][key]) {
-                      const oldText = element.textContent;
-                      element.textContent = translations[lang][key];
-                      console.log('Translated:', key, 'from', oldText, 'to', translations[lang][key]);
-                    }
-                  });
-                  
-                  // Show notification
-                  const messages = { 'en': 'Language changed to English', 'es': 'Idioma cambiado a Español', 'fr': 'Langue changée en Français', 'de': 'Sprache geändert auf Deutsch' };
-                  alert(messages[lang] || messages['en']);
-                };
-                
-                window.toggleLanguageMenu = function() {
-                  const menu = document.getElementById('language-menu');
-                  if (menu) menu.classList.toggle('hidden');
-                };
-                
-                window.toggleMobileLanguageMenu = function() {
-                  const menu = document.getElementById('mobile-language-menu');
-                  if (menu) menu.classList.toggle('hidden');
-                };
-                
+                // Mobile menu toggle function
                 window.toggleMobileMenu = function() {
                   const menu = document.getElementById('mobile-menu');
                   const icon = document.querySelector('#mobile-menu-btn i');
@@ -742,7 +656,7 @@ app.get('/', (c) => {
                   }
                 };
                 
-                console.log('Language functions defined successfully');
+                console.log('Mobile navigation functions defined successfully');
                 
                 // Simple next step function as fallback
                 if (!window.nextAssessmentStep) {
@@ -943,26 +857,8 @@ app.get('/', (c) => {
                   };
                 }
                 
-                // Initialize language from localStorage on page load
-                if (!window.initializeLanguage) {
-                  window.initializeLanguage = function() {
-                    const savedLanguage = localStorage.getItem('assetshield-language');
-                    if (savedLanguage && savedLanguage !== 'en') {
-                      // Apply the saved language
-                      setTimeout(() => {
-                        window.changeLanguage(savedLanguage);
-                      }, 100);
-                    }
-                  };
-                }
-                
-                // Initialize language when DOM is loaded
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', window.initializeLanguage);
-                } else {
-                  // DOM is already loaded
-                  window.initializeLanguage();
-                }
+                // Assessment form ready
+                console.log('Assessment system initialized successfully');
                 
 
               `}}></script>
@@ -978,10 +874,10 @@ app.get('/', (c) => {
         <section id="education" className="px-6 py-20 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="education.title">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
                 Asset Protection Education Center
               </h2>
-              <p className="text-xl text-gray-600" data-translate="education.subtitle">
+              <p className="text-xl text-gray-600">
                 Comprehensive resources to help you make informed decisions
               </p>
             </div>
@@ -1171,10 +1067,10 @@ app.get('/', (c) => {
         <section id="strategies" className="px-6 py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4" data-translate="strategies.title">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
                 Asset Protection Strategies
               </h2>
-              <p className="text-xl text-gray-600" data-translate="strategies.subtitle">
+              <p className="text-xl text-gray-600">
                 Comprehensive strategies to protect your wealth from creditors, lawsuits, and financial threats
               </p>
             </div>
