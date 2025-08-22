@@ -1,14 +1,7 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  "$schema": "node_modules/wrangler/config-schema.json", 
   "name": "assetshield-app",
   "compatibility_date": "2025-08-22",
   "pages_build_output_dir": "./dist",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "assetshield-app-production",
-      "database_id": "placeholder-will-create-later"
-    }
-  ]
+  "compatibility_flags": ["nodejs_compat"]
 }
