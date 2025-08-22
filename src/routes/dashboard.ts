@@ -700,9 +700,27 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
         }
     </script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Prevent infinite scrolling issues */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            background-color: #f9fafb;
+        }
+        /* Fixed chart container sizes to prevent resizing loops */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        canvas {
+            max-height: 300px !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 min-h-screen">
     <!-- Demo Banner -->
     <div class="bg-orange-500 text-white px-4 py-2">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -836,13 +854,81 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
                 <!-- Conversion Funnel -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Conversion Funnel (Demo Data)</h3>
-                    <canvas id="funnelChart" width="400" height="300"></canvas>
+                    <div class="chart-container">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8 h-full flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-chart-bar text-4xl text-blue-600 mb-4"></i>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                                        <span class="text-sm">Visitors</span>
+                                        <span class="font-bold text-blue-600">450</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                                        <span class="text-sm">Started Assessment</span>
+                                        <span class="font-bold text-blue-600">320</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                                        <span class="text-sm">Completed Assessment</span>
+                                        <span class="font-bold text-blue-600">180</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                                        <span class="text-sm">Generated Lead</span>
+                                        <span class="font-bold text-blue-600">95</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                                        <span class="text-sm">Consultation Booked</span>
+                                        <span class="font-bold text-blue-600">42</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Lead Sources -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Lead Sources (Demo Data)</h3>
-                    <canvas id="sourceChart" width="400" height="300"></canvas>
+                    <div class="chart-container">
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-8 h-full">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-blue-600 rounded mr-3"></div>
+                                        <span class="text-sm">Website Assessment</span>
+                                    </div>
+                                    <span class="font-bold">45%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-blue-400 rounded mr-3"></div>
+                                        <span class="text-sm">Referrals</span>
+                                    </div>
+                                    <span class="font-bold">25%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-green-500 rounded mr-3"></div>
+                                        <span class="text-sm">Social Media</span>
+                                    </div>
+                                    <span class="font-bold">15%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+                                        <span class="text-sm">Search Ads</span>
+                                    </div>
+                                    <span class="font-bold">10%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-red-500 rounded mr-3"></div>
+                                        <span class="text-sm">Direct Contact</span>
+                                    </div>
+                                    <span class="font-bold">5%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -925,59 +1011,107 @@ function getDemoDashboardHTML(lawFirm: any, dashboardData: any): string {
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-6 h-6 bg-primary rounded flex items-center justify-center mr-2">
+                        <i class="fas fa-shield-alt text-white text-sm"></i>
+                    </div>
+                    <span class="font-semibold text-gray-900">AssetShield Pro Demo</span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">
+                    This is a live demo with sample data. Experience the complete platform with real workflows and features.
+                </p>
+                <div class="flex items-center justify-center space-x-6 text-sm text-gray-500">
+                    <span><i class="fas fa-clock mr-1"></i> 14-day trial remaining</span>
+                    <span><i class="fas fa-database mr-1"></i> Sample data provided</span>
+                    <span><i class="fas fa-shield-check mr-1"></i> Full feature access</span>
+                </div>
+                <div class="mt-6">
+                    <button 
+                        onclick="if(confirm('Ready to purchase AssetShield Pro? This will redirect you to our pricing page.')) { window.open('/#pricing', '_blank'); }"
+                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors mr-3"
+                    >
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        Purchase Full Platform
+                    </button>
+                    <button 
+                        onclick="if(confirm('Exit demo and return to main site?')) { window.close(); }"
+                        class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Exit Demo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            initializeDemoCharts();
-        });
-        
-        function initializeDemoCharts() {
-            // Funnel Chart
-            const funnelCtx = document.getElementById('funnelChart').getContext('2d');
-            new Chart(funnelCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Visitors', 'Started Assessment', 'Completed Assessment', 'Generated Lead', 'Consultation'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [450, 320, 180, 95, 42],
-                        backgroundColor: '${branding.primary_color}',
-                        borderColor: '${branding.secondary_color}',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+            console.log('Demo dashboard loaded successfully');
+            
+            // Add hover effects to action cards
+            const actionButtons = document.querySelectorAll('button');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (this.textContent.includes('Try Assessment')) {
+                        alert('Demo Feature: This would take you to the risk assessment tool where clients evaluate their asset protection needs.');
+                    } else if (this.textContent.includes('View Leads')) {
+                        alert('Demo Feature: This would show your complete lead management pipeline with client details and follow-up tasks.');
+                    } else if (this.textContent.includes('Customize')) {
+                        alert('Demo Feature: This would open the white-label customization panel where you can brand the platform with your firm\\'s colors, logo, and content.');
+                    } else if (this.textContent.includes('Exit Demo')) {
+                        if (confirm('Are you sure you want to exit the demo? This will close the demo window.')) {
+                            window.close();
                         }
                     }
-                }
+                });
             });
             
-            // Source Chart
-            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
-            new Chart(sourceCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Website Assessment', 'Referrals', 'Social Media', 'Search Ads', 'Direct Contact'],
-                    datasets: [{
-                        data: [45, 25, 15, 10, 5],
-                        backgroundColor: [
-                            '${branding.primary_color}',
-                            '${branding.secondary_color}',
-                            '#10b981',
-                            '#f59e0b',
-                            '#ef4444'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+            // Add demo success message
+            setTimeout(() => {
+                if (!sessionStorage.getItem('demo_welcome_shown')) {
+                    sessionStorage.setItem('demo_welcome_shown', 'true');
+                    showWelcomeMessage();
                 }
-            });
+            }, 1000);
+        });
+        
+        function showWelcomeMessage() {
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-0 left-0 right-0 bg-green-600 text-white p-4 z-50 transform -translate-y-full transition-transform duration-500';
+            banner.innerHTML = \`
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span class="font-medium">Demo Access Confirmed! You\\'re now exploring AssetShield Pro with live sample data.</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.style.display='none'" class="text-white hover:text-green-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            \`;
+            document.body.appendChild(banner);
+            
+            // Slide down
+            setTimeout(() => {
+                banner.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                banner.style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    if (banner.parentNode) {
+                        banner.parentNode.removeChild(banner);
+                    }
+                }, 500);
+            }, 5000);
         }
     </script>
 </body>
