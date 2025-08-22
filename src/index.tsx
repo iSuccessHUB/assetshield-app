@@ -2775,10 +2775,20 @@ app.get('/', (c) => {
           }
           
           window.closeProfessionalModal = function() {
+            console.log('🔄 Closing payment modal...');
             const modal = document.getElementById('payment-modal');
             if (modal) {
-              modal.remove();
-              document.body.style.overflow = '';
+              // Add fade-out animation
+              modal.style.opacity = '0';
+              modal.style.transition = 'opacity 0.2s ease-out';
+              
+              setTimeout(() => {
+                modal.remove();
+                document.body.style.overflow = '';
+                console.log('✅ Payment modal closed');
+              }, 200);
+            } else {
+              console.log('⚠️ Payment modal not found');
             }
           };
           
@@ -2833,12 +2843,25 @@ app.get('/', (c) => {
               const result = await response.json();
               
               if (result.success) {
-                // Close modal and open Stripe checkout in new tab
-                closeProfessionalModal();
-                window.open(result.checkoutUrl, '_blank');
+                console.log('✅ Checkout session created:', result.sessionId);
+                console.log('🔗 Opening checkout URL:', result.checkoutUrl);
                 
-                // Show success feedback
-                showCheckoutSuccessMessage();
+                // Close modal first
+                closeProfessionalModal();
+                
+                // Small delay to ensure modal is closed, then open checkout
+                setTimeout(() => {
+                  const opened = window.open(result.checkoutUrl, '_blank');
+                  console.log('🆕 New tab opened:', opened ? 'Success' : 'Blocked by popup blocker');
+                  
+                  if (opened) {
+                    // Show success feedback if tab opened successfully
+                    showCheckoutSuccessMessage();
+                  } else {
+                    // Show fallback message if popup was blocked
+                    showPopupBlockedMessage(result.checkoutUrl);
+                  }
+                }, 100);
               } else {
                 throw new Error(result.error || 'Failed to create checkout session');
               }
@@ -2860,30 +2883,88 @@ app.get('/', (c) => {
           };
           
           function showCheckoutSuccessMessage() {
-            // Create a subtle success message
+            console.log('📢 Showing checkout success message...');
+            
+            // Remove any existing success messages first
+            const existingMessages = document.querySelectorAll('.checkout-success-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create a prominent success message
             const successDiv = document.createElement('div');
-            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 flex items-center';
+            successDiv.className = 'checkout-success-message fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl z-[9999] flex items-center transform translate-x-full';
+            successDiv.style.cssText = 'position: fixed !important; top: 1rem !important; right: 1rem !important; z-index: 9999 !important; transform: translateX(100%);';
             successDiv.innerHTML = \`
-              <i class="fas fa-check-circle mr-3 text-xl"></i>
+              <i class="fas fa-external-link-alt mr-3 text-xl"></i>
               <div>
-                <div class="font-semibold">Checkout Opened</div>
-                <div class="text-sm text-green-100">Complete your purchase in the new tab</div>
+                <div class="font-semibold">Payment Tab Opened!</div>
+                <div class="text-sm text-green-100">Complete your secure checkout in the new tab</div>
               </div>
             \`;
             
             document.body.appendChild(successDiv);
             
-            // Auto-remove after 5 seconds
+            // Animate in
+            setTimeout(() => {
+              successDiv.style.transform = 'translateX(0)';
+              successDiv.style.transition = 'transform 0.3s ease-out';
+              console.log('✅ Success message displayed');
+            }, 50);
+            
+            // Auto-remove after 6 seconds
             setTimeout(() => {
               if (successDiv.parentNode) {
-                successDiv.style.opacity = '0';
                 successDiv.style.transform = 'translateX(100%)';
-                successDiv.style.transition = 'all 0.3s ease-out';
+                successDiv.style.transition = 'transform 0.3s ease-out';
                 setTimeout(() => {
                   successDiv.remove();
+                  console.log('🗑️ Success message removed');
                 }, 300);
               }
-            }, 5000);
+            }, 6000);
+          }
+          
+          function showPopupBlockedMessage(checkoutUrl) {
+            console.log('🚫 Popup blocked, showing manual link...');
+            
+            // Remove any existing messages first
+            const existingMessages = document.querySelectorAll('.popup-blocked-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create popup blocked message with manual link
+            const blockedDiv = document.createElement('div');
+            blockedDiv.className = 'popup-blocked-message fixed top-4 right-4 bg-yellow-500 text-white px-6 py-4 rounded-lg shadow-2xl z-[9999] max-w-sm';
+            blockedDiv.style.cssText = 'position: fixed !important; top: 1rem !important; right: 1rem !important; z-index: 9999 !important;';
+            blockedDiv.innerHTML = \`
+              <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle mr-3 text-xl mt-1"></i>
+                <div class="flex-1">
+                  <div class="font-semibold mb-2">Popup Blocked</div>
+                  <div class="text-sm text-yellow-100 mb-3">Your browser blocked the payment window. Click below to complete your purchase:</div>
+                  <a href="\${checkoutUrl}" target="_blank" 
+                     class="inline-block bg-white text-yellow-600 px-4 py-2 rounded font-semibold text-sm hover:bg-yellow-50 transition-colors">
+                    <i class="fas fa-external-link-alt mr-2"></i>Open Payment Page
+                  </a>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-yellow-200 hover:text-white">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            \`;
+            
+            document.body.appendChild(blockedDiv);
+            console.log('⚠️ Popup blocked message displayed');
+            
+            // Auto-remove after 15 seconds (longer than success message)
+            setTimeout(() => {
+              if (blockedDiv.parentNode) {
+                blockedDiv.style.opacity = '0';
+                blockedDiv.style.transition = 'opacity 0.3s ease-out';
+                setTimeout(() => {
+                  blockedDiv.remove();
+                  console.log('🗑️ Popup blocked message removed');
+                }, 300);
+              }
+            }, 15000);
           }
           
           function showErrorModal(title, message, contactEmail) {
