@@ -568,12 +568,12 @@ app.get('/', (c) => {
               </div>
               
               <script dangerouslySetInnerHTML={{__html: `
-                // Immediate assessment form initialization - fallback if main app.js fails
-                setTimeout(function() {
+                // Assessment form loading function - DEFINE FIRST
+                function loadAssessmentForm() {
                   const container = document.getElementById('assessment-form');
                   const loading = document.getElementById('assessment-loading');
                   if (container && loading && loading.parentNode === container) {
-                    console.log('Fallback: Direct assessment form initialization...');
+                    console.log('Loading assessment form...');
                     container.innerHTML = \`
                       <div class="space-y-6">
                         <h3 class="text-2xl font-bold text-gray-800 mb-6">Basic Information</h3>
@@ -618,6 +618,24 @@ app.get('/', (c) => {
                           </div>
                         </div>
 
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Are you currently facing any legal threats or lawsuits?</label>
+                          <div class="space-y-2">
+                            <label class="flex items-center">
+                              <input type="radio" name="legalThreats" value="none" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
+                              <span>No current threats</span>
+                            </label>
+                            <label class="flex items-center">
+                              <input type="radio" name="legalThreats" value="potential" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
+                              <span>Potential threats on the horizon</span>
+                            </label>
+                            <label class="flex items-center">
+                              <input type="radio" name="legalThreats" value="active" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mr-3">
+                              <span>Active litigation or threats</span>
+                            </label>
+                          </div>
+                        </div>
+
                         <div class="flex justify-end">
                           <button onclick="nextAssessmentStep()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                             Next Step <i class="fas fa-arrow-right ml-2"></i>
@@ -626,7 +644,103 @@ app.get('/', (c) => {
                       </div>
                     \`;
                   }
-                }, 2000);
+                }
+                
+                // Immediate assessment form initialization - no delay
+                (function() {
+                  console.log('Assessment initialization starting...');
+                  const container = document.getElementById('assessment-form');
+                  const loading = document.getElementById('assessment-loading');
+                  if (container && loading) {
+                    console.log('Assessment container found, loading form immediately...');
+                    loadAssessmentForm();
+                  }
+                })();
+                
+                // Also try with a short delay as backup
+                setTimeout(function() {
+                  console.log('Fallback: Trying to load assessment form after delay...');
+                  loadAssessmentForm();
+                }, 500);
+
+                // CRITICAL: Define language functions here to ensure they're available
+                console.log('Defining language functions...');
+                
+                window.changeLanguage = function(lang) {
+                  console.log('Changing language to:', lang);
+                  localStorage.setItem('assetshield-language', lang);
+                  
+                  const languageBtn = document.getElementById('language-btn');
+                  const mobileLanguageBtn = document.getElementById('mobile-language-btn');
+                  
+                  const languageNames = { 'en': 'EN', 'es': 'ES', 'fr': 'FR', 'de': 'DE' };
+                  const fullLanguageNames = { 'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch' };
+                  
+                  if (languageBtn) {
+                    languageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + languageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
+                  }
+                  if (mobileLanguageBtn) {
+                    mobileLanguageBtn.innerHTML = '<i class="fas fa-globe mr-2"></i>' + fullLanguageNames[lang] + '<i class="fas fa-chevron-down ml-1 text-sm"></i>';
+                  }
+                  
+                  // Close menus
+                  const menu = document.getElementById('language-menu');
+                  const mobileMenu = document.getElementById('mobile-language-menu');
+                  if (menu) menu.classList.add('hidden');
+                  if (mobileMenu) mobileMenu.classList.add('hidden');
+                  
+                  // Basic translations
+                  const translations = {
+                    'en': { 'hero.title': 'Complete Asset Protection Platform', 'assessment.title': 'Asset Protection Risk Assessment', 'nav.riskAssessment': 'Risk Assessment', 'nav.strategies': 'Strategies', 'nav.education': 'Education', 'nav.forLawFirms': 'For Law Firms' },
+                    'es': { 'hero.title': 'Plataforma Completa de Protección de Activos', 'assessment.title': 'Evaluación de Riesgo de Protección de Activos', 'nav.riskAssessment': 'Evaluación de Riesgo', 'nav.strategies': 'Estrategias', 'nav.education': 'Educación', 'nav.forLawFirms': 'Para Bufetes' },
+                    'fr': { 'hero.title': 'Plateforme Complète de Protection d\\'Actifs', 'assessment.title': 'Évaluation des Risques de Protection d\\'Actifs', 'nav.riskAssessment': 'Évaluation des Risques', 'nav.strategies': 'Stratégies', 'nav.education': 'Éducation', 'nav.forLawFirms': 'Pour Cabinets' },
+                    'de': { 'hero.title': 'Vollständige Vermögensschutz-Plattform', 'assessment.title': 'Risikobewertung für Vermögensschutz', 'nav.riskAssessment': 'Risikobewertung', 'nav.strategies': 'Strategien', 'nav.education': 'Bildung', 'nav.forLawFirms': 'Für Kanzleien' }
+                  };
+                  
+                  // Apply translations
+                  console.log('Applying translations for language:', lang);
+                  const elementsToTranslate = document.querySelectorAll('[data-translate]');
+                  console.log('Found elements to translate:', elementsToTranslate.length);
+                  
+                  elementsToTranslate.forEach(function(element) {
+                    const key = element.getAttribute('data-translate');
+                    if (translations[lang] && translations[lang][key]) {
+                      const oldText = element.textContent;
+                      element.textContent = translations[lang][key];
+                      console.log('Translated:', key, 'from', oldText, 'to', translations[lang][key]);
+                    }
+                  });
+                  
+                  // Show notification
+                  const messages = { 'en': 'Language changed to English', 'es': 'Idioma cambiado a Español', 'fr': 'Langue changée en Français', 'de': 'Sprache geändert auf Deutsch' };
+                  alert(messages[lang] || messages['en']);
+                };
+                
+                window.toggleLanguageMenu = function() {
+                  const menu = document.getElementById('language-menu');
+                  if (menu) menu.classList.toggle('hidden');
+                };
+                
+                window.toggleMobileLanguageMenu = function() {
+                  const menu = document.getElementById('mobile-language-menu');
+                  if (menu) menu.classList.toggle('hidden');
+                };
+                
+                window.toggleMobileMenu = function() {
+                  const menu = document.getElementById('mobile-menu');
+                  const icon = document.querySelector('#mobile-menu-btn i');
+                  if (menu && icon) {
+                    if (menu.classList.contains('hidden')) {
+                      menu.classList.remove('hidden');
+                      icon.className = 'fas fa-times text-xl';
+                    } else {
+                      menu.classList.add('hidden');
+                      icon.className = 'fas fa-bars text-xl';
+                    }
+                  }
+                };
+                
+                console.log('Language functions defined successfully');
                 
                 // Simple next step function as fallback
                 if (!window.nextAssessmentStep) {
@@ -635,9 +749,8 @@ app.get('/', (c) => {
                   };
                 }
                 
-                // Enhanced language changing functionality
-                if (!window.changeLanguage) {
-                  window.changeLanguage = function(lang) {
+                // Enhanced language changing functionality - Always define
+                window.changeLanguage = function(lang) {
                     console.log('Changing language to:', lang);
                     
                     // Store language preference in localStorage
@@ -735,13 +848,28 @@ app.get('/', (c) => {
                     };
                     
                     // Apply translations to elements with data-translate attribute
+                    console.log('Applying translations for language:', lang);
                     const elementsToTranslate = document.querySelectorAll('[data-translate]');
-                    elementsToTranslate.forEach(element => {
+                    console.log('Found elements to translate:', elementsToTranslate.length);
+                    
+                    elementsToTranslate.forEach((element, index) => {
                       const key = element.getAttribute('data-translate');
+                      console.log('Element ' + index + ': key="' + key + '", current text="' + element.textContent + '"');
+                      
                       if (translations[lang] && translations[lang][key]) {
-                        element.textContent = translations[lang][key];
+                        const newText = translations[lang][key];
+                        element.textContent = newText;
+                        console.log('Updated to: "' + newText + '"');
+                      } else {
+                        console.log('No translation found for key: ' + key + ' in language: ' + lang);
                       }
                     });
+                    
+                    // Force a visual update
+                    document.body.style.opacity = '0.99';
+                    setTimeout(() => {
+                      document.body.style.opacity = '1';
+                    }, 50);
                     
                     // Show confirmation message
                     const message = {
@@ -766,22 +894,18 @@ app.get('/', (c) => {
                         }
                       }, 300);
                     }, 3000);
-                  };
-                }
+                };
                 
-                if (!window.toggleLanguageMenu) {
-                  window.toggleLanguageMenu = function() {
-                    const menu = document.getElementById('language-menu');
-                    if (menu) menu.classList.toggle('hidden');
-                  };
-                }
+                // Always define toggle functions
+                window.toggleLanguageMenu = function() {
+                  const menu = document.getElementById('language-menu');
+                  if (menu) menu.classList.toggle('hidden');
+                };
                 
-                if (!window.toggleMobileLanguageMenu) {
-                  window.toggleMobileLanguageMenu = function() {
-                    const menu = document.getElementById('mobile-language-menu');
-                    if (menu) menu.classList.toggle('hidden');
-                  };
-                }
+                window.toggleMobileLanguageMenu = function() {
+                  const menu = document.getElementById('mobile-language-menu');
+                  if (menu) menu.classList.toggle('hidden');
+                };
                 
                 if (!window.toggleMobileMenu) {
                   window.toggleMobileMenu = function() {
