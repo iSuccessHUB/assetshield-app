@@ -367,7 +367,7 @@ async function sendWelcomeEmail(email: string, name: string, firmName: string, s
     3. Set up your team members (Professional/Enterprise)
     4. Configure your domain and integrations
     
-    Need help? Contact our support team at support@assetshield.com
+    Need help? Contact our support team at support@isuccesshub.com
     
     Welcome to AssetShield!
     The AssetShield Team

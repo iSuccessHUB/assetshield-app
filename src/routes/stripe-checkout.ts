@@ -478,7 +478,7 @@ stripeCheckoutRoutes.get('/purchase-success', async (c) => {
                             <i class="fas fa-external-link-alt mr-2"></i>
                             View Your Platform
                         </a>
-                        <a href="mailto:support@assetshield.com" 
+                        <a href="mailto:support@isuccesshub.com" 
                            class="block py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
                             <i class="fas fa-envelope mr-2"></i>
                             Contact Support

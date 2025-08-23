@@ -71,7 +71,7 @@ dashboardRoutes.get('/login', async (c) => {
                 
                 <div class="text-center">
                     <p class="text-xs text-blue-200">
-                        Need help? Contact <a href="mailto:support@assetshield.com" class="underline">support@assetshield.com</a>
+                        Need help? Contact <a href="mailto:support@isuccesshub.com" class="underline">support@isuccesshub.com</a>
                     </p>
                 </div>
             </div>

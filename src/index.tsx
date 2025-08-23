@@ -2623,7 +2623,7 @@ app.get('/', (c) => {
               console.error('Demo creation error:', error);
               alert(
                 \`Sorry, there was an error setting up your demo.\\n\\n\` +
-                \`Please try again or contact support at demo@assetshield.app\\n\\n\` +
+                \`Please try again or contact support at support@isuccesshub.com\\n\\n\` +
                 \`Error: \${error.message}\`
               );
               

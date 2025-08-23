@@ -25,8 +25,8 @@ interface WelcomeEmailData {
 
 export class EmailService {
   private db: D1Database;
-  private fromEmail: string = 'welcome@assetshield.com';
-  private supportEmail: string = 'support@assetshield.com';
+  private fromEmail: string = 'welcome@isuccesshub.com';
+  private supportEmail: string = 'support@isuccesshub.com';
   
   constructor(db: D1Database) {
     this.db = db;

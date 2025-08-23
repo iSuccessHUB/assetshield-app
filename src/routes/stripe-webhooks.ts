@@ -333,7 +333,7 @@ async function sendWelcomeEmail(emailData: any): Promise<void> {
               </div>
               
               <div class="footer">
-                  <p>Contact us at <a href="mailto:support@assetshield.com">support@assetshield.com</a></p>
+                  <p>Contact us at <a href="mailto:support@isuccesshub.com">support@isuccesshub.com</a></p>
                   <p>AssetShield - Centralized White-Label Platform</p>
               </div>
           </div>
@@ -362,7 +362,7 @@ Getting Started:
 Trial: 14 days until ${emailData.trialEndsDate}
 Monthly: $${emailData.monthlyFee} (after trial)
 
-Questions? Contact support@assetshield.com
+Questions? Contact support@isuccesshub.com
 
 Best regards,
 AssetShield Team`
