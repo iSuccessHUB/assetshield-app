@@ -12,7 +12,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "assetshieldapp-production",
+      "database_name": "assetshield-clean-production",
       "database_id": "your-database-id-here"
     }
   ]

@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
-import { PlatformProvisioningService } from '../services/platform-provisioning'
-import { EmailService } from '../services/email-service'
+import { SaaSPlatformService } from '../services/saas-platform'
 
 interface CloudflareBindings {
   DB: D1Database;
@@ -201,69 +200,65 @@ async function createSubscriptionAfterSetup(c: any, session: any, metadata: any)
   }
 }
 
-// Complete platform provisioning with database and email integration
+// Create customer account in centralized SaaS platform
 async function provisionPlatformComplete(c: any, session: any, metadata: any, subscription: any) {
   try {
-    console.log('🚀 Starting complete platform provisioning for:', metadata.firmName)
+    console.log('🚀 Creating customer account for:', metadata.firmName)
     
-    // Initialize services
-    const provisioningService = new PlatformProvisioningService(c.env.DB)
-    const emailService = new EmailService(c.env.DB)
+    // Initialize SaaS service
+    const saasService = new SaaSPlatformService(c.env.DB)
     
-    // Prepare platform data
-    const platformData = {
+    // Prepare customer data
+    const customerData = {
       firmName: metadata.firmName,
-      lawyerName: metadata.lawyerName,
-      lawyerEmail: metadata.lawyerEmail,
-      lawyerPhone: metadata.lawyerPhone || '',
+      ownerName: metadata.lawyerName,
+      ownerEmail: metadata.lawyerEmail,
+      ownerPhone: metadata.lawyerPhone || '',
       tier: metadata.tier,
       setupFee: parseInt(metadata.setupFee),
       monthlyFee: parseInt(metadata.monthlyFee),
       stripeCustomerId: session.customer,
-      stripePaymentIntent: session.payment_intent,
       subscriptionId: subscription?.id
     }
     
-    // Provision the platform
-    const platformInstance = await provisioningService.provisionPlatform(platformData)
+    // Create customer account
+    const customerAccount = await saasService.createCustomer(customerData)
     
-    // Send welcome email with credentials
-    const welcomeEmailData = {
-      lawyerName: platformData.lawyerName,
-      firmName: platformData.firmName,
-      tier: platformData.tier.charAt(0).toUpperCase() + platformData.tier.slice(1),
-      platformUrl: platformInstance.platformUrl,
-      adminEmail: platformInstance.adminEmail,
-      adminPassword: platformInstance.adminPassword,
-      apiKey: platformInstance.apiKey,
-      trialEndsDate: new Date(platformInstance.trialEndsAt).toLocaleDateString(),
-      monthlyFee: platformData.monthlyFee,
-      features: platformInstance.features
-    }
+    // Send welcome email with dashboard credentials
+    await sendWelcomeEmail({
+      lawyerName: customerData.ownerName,
+      lawyerEmail: customerData.ownerEmail,
+      firmName: customerData.firmName,
+      tier: customerData.tier,
+      dashboardUrl: 'https://dashboard.assetshield.com',
+      loginEmail: customerData.ownerEmail,
+      loginPassword: customerAccount.password,
+      apiKey: customerAccount.apiKey,
+      trialEndsDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      monthlyFee: customerData.monthlyFee
+    })
     
-    await emailService.sendWelcomeEmail(welcomeEmailData)
-    
-    // Log the successful provisioning
-    await provisioningService.logActivity(
-      platformInstance.id,
-      platformData.lawyerEmail,
-      'platform_provisioned',
+    // Log the successful account creation
+    await saasService.logActivity(
+      customerAccount.customerId,
+      customerData.ownerEmail,
+      'account_created',
       {
         stripeSessionId: session.id,
         subscriptionId: subscription?.id,
-        setupFeePaid: platformData.setupFee,
-        tier: platformData.tier
+        setupFeePaid: customerData.setupFee,
+        tier: customerData.tier
       }
     )
     
-    console.log('✅ Complete platform provisioning successful:', {
-      platformId: platformInstance.id,
-      subdomain: platformInstance.subdomain,
-      platformUrl: platformInstance.platformUrl
+    console.log('✅ Customer account created successfully:', {
+      customerId: customerAccount.customerId,
+      email: customerData.ownerEmail,
+      tier: customerData.tier
     })
     
   } catch (error) {
-    console.error('❌ Complete platform provisioning failed:', error)
+    console.error('❌ Customer account creation failed:', error)
     
     // Send error notification to support
     try {
@@ -273,6 +268,113 @@ async function provisionPlatformComplete(c: any, session: any, metadata: any, su
       console.error('❌ Failed to send error notification:', notificationError)
     }
   }
+}
+
+// Send welcome email with dashboard access
+async function sendWelcomeEmail(emailData: any): Promise<void> {
+  console.log('📧 Sending welcome email to:', emailData.lawyerEmail)
+  
+  // In a real implementation, integrate with email service
+  const emailContent = {
+    to: emailData.lawyerEmail,
+    subject: `🎉 Welcome to AssetShield ${emailData.tier.charAt(0).toUpperCase() + emailData.tier.slice(1)}!`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <meta charset="UTF-8">
+          <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
+              .footer { background: #f8fafc; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; font-size: 14px; color: #6b7280; }
+              .button { display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 10px 0; }
+              .credentials { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <div class="header">
+                  <h1>🛡️ Welcome to AssetShield</h1>
+                  <p>Your centralized SaaS dashboard is ready!</p>
+              </div>
+              
+              <div class="content">
+                  <h2>Hello ${emailData.lawyerName},</h2>
+                  
+                  <p>Congratulations! Your AssetShield ${emailData.tier} account for <strong>${emailData.firmName}</strong> has been successfully created.</p>
+                  
+                  <div class="credentials">
+                      <h3>🔑 Dashboard Access</h3>
+                      <p><strong>Dashboard URL:</strong> <a href="${emailData.dashboardUrl}">${emailData.dashboardUrl}</a></p>
+                      <p><strong>Email:</strong> ${emailData.loginEmail}</p>
+                      <p><strong>Password:</strong> ${emailData.loginPassword}</p>
+                      <p><strong>API Key:</strong> ${emailData.apiKey}</p>
+                  </div>
+                  
+                  <a href="${emailData.dashboardUrl}" class="button">🚀 Access Your Dashboard</a>
+                  
+                  <h3>🚀 Getting Started:</h3>
+                  <ol>
+                      <li><strong>Login</strong> to your dashboard using the credentials above</li>
+                      <li><strong>Customize</strong> your white-label branding (logo, colors, content)</li>
+                      <li><strong>Connect</strong> your custom domain (optional)</li>
+                      <li><strong>Share</strong> your branded assessment tool with clients</li>
+                      <li><strong>Track leads</strong> and manage consultations from your dashboard</li>
+                  </ol>
+                  
+                  <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                      <h4>⏰ Trial Period</h4>
+                      <p>Your 14-day trial is active until <strong>${emailData.trialEndsDate}</strong>. After the trial, your monthly subscription of $${emailData.monthlyFee} will begin automatically.</p>
+                  </div>
+                  
+                  <p>Questions? We're here to help you succeed!</p>
+              </div>
+              
+              <div class="footer">
+                  <p>Contact us at <a href="mailto:support@assetshield.com">support@assetshield.com</a></p>
+                  <p>AssetShield - Centralized White-Label Platform</p>
+              </div>
+          </div>
+      </body>
+      </html>
+    `,
+    text: `Welcome to AssetShield!
+
+Hello ${emailData.lawyerName},
+
+Your AssetShield ${emailData.tier} account for ${emailData.firmName} is ready!
+
+Dashboard Access:
+- URL: ${emailData.dashboardUrl}
+- Email: ${emailData.loginEmail}
+- Password: ${emailData.loginPassword}
+- API Key: ${emailData.apiKey}
+
+Getting Started:
+1. Login to your dashboard
+2. Customize your branding
+3. Connect your domain (optional)
+4. Share with clients
+5. Track leads and consultations
+
+Trial: 14 days until ${emailData.trialEndsDate}
+Monthly: $${emailData.monthlyFee} (after trial)
+
+Questions? Contact support@assetshield.com
+
+Best regards,
+AssetShield Team`
+  };
+  
+  console.log('📨 Welcome email prepared:', {
+    to: emailContent.to,
+    subject: emailContent.subject
+  });
+  
+  // Simulate email sending (replace with real email service)
+  console.log('✅ Welcome email sent successfully (simulated)');
 }
 
 

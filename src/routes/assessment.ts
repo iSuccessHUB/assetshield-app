@@ -110,27 +110,73 @@ function calculateRiskLevel(data: AssessmentFormData): RiskResult {
   }
 }
 
-// Submit assessment (Database-free version)
+// Submit assessment with white-label lead capture support
 app.post('/submit', async (c) => {
   try {
     const data: AssessmentFormData = await c.req.json()
+    const whiteLabelConfig = c.get('whiteLabelConfig')
     
     // Validate required fields
     if (!data.email || !data.name) {
       return c.json({ error: 'Email and name are required' }, 400)
     }
     
-    // Calculate risk without database dependency
+    // Calculate risk assessment
     const riskResult = calculateRiskLevel(data)
     
     // Generate assessment ID (timestamp-based)
     const assessmentId = Date.now()
     
-    // Log assessment for demo purposes (in production, this would be saved to database)
-    console.log('Assessment submitted:', {
+    // If this is a white-label domain, capture the lead for the customer
+    if (whiteLabelConfig && c.env.DB) {
+      try {
+        console.log('💡 Capturing lead for white-label customer:', whiteLabelConfig.firmName)
+        
+        // Import SaaS service for lead capture
+        const { SaaSPlatformService } = await import('../services/saas-platform')
+        const saasService = new SaaSPlatformService(c.env.DB)
+        
+        // Get request info for tracking
+        const host = c.req.header('host') || 'unknown'
+        const userAgent = c.req.header('user-agent') || ''
+        const referrer = c.req.header('referer') || ''
+        
+        // Prepare lead data
+        const leadData = {
+          clientName: data.name,
+          clientEmail: data.email,
+          sourceDomain: host,
+          assessmentData: {
+            profession: data.profession,
+            netWorth: data.netWorth,
+            legalThreats: data.legalThreats,
+            hasRealEstate: data.hasRealEstate,
+            legalHistory: data.legalHistory,
+            currentProtection: data.currentProtection
+          },
+          riskScore: riskResult.riskLevel === 'HIGH' ? 85 : riskResult.riskLevel === 'MEDIUM' ? 55 : 25,
+          riskLevel: riskResult.riskLevel.toLowerCase(),
+          ipAddress: c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || '',
+          userAgent,
+          referrer
+        }
+        
+        // Save lead to customer's account
+        const leadId = await saasService.addClientLead(whiteLabelConfig.customerId, leadData)
+        console.log('✅ Lead captured successfully:', leadId)
+        
+      } catch (leadError) {
+        console.error('❌ Failed to capture lead for white-label customer:', leadError)
+        // Continue with assessment even if lead capture fails
+      }
+    }
+    
+    // Log assessment for monitoring
+    console.log('📋 Assessment submitted:', {
       assessmentId,
+      isWhiteLabel: !!whiteLabelConfig,
+      firmName: whiteLabelConfig?.firmName || 'AssetShield',
       user: { email: data.email, name: data.name },
-      data,
       result: riskResult
     })
     
@@ -140,7 +186,7 @@ app.post('/submit', async (c) => {
       wealthAtRisk: riskResult.wealthAtRisk,
       recommendations: riskResult.recommendations,
       user: {
-        id: assessmentId, // Use timestamp as user ID for demo
+        id: assessmentId,
         email: data.email,
         name: data.name
       },

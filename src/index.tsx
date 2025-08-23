@@ -18,6 +18,7 @@ import { documentsRoutes } from './routes/documents'
 import { i18nRoutes } from './routes/i18n'
 import { stripeWebhookRoutes } from './routes/stripe-webhooks'
 import { platformApiRoutes } from './routes/platform-api'
+import { domainMapping, generateWhiteLabelCSS, generateWhiteLabelManifest } from './middleware/domain-mapping'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -25,6 +26,9 @@ const app = new Hono<{ Bindings: CloudflareBindings }>()
 app.use('*', securityHeaders())
 app.use('*', auditLogger())
 app.use('*', requestSizeLimit())
+
+// Apply domain mapping middleware for white-label support
+app.use('*', domainMapping())
 
 // Enable CORS for API routes with security configurations
 app.use('/api/*', cors({
@@ -42,49 +46,26 @@ app.use('/api/*', sanitizeInput())
 // Serve static files
 app.use('/static/*', serveStatic({ root: './public' }))
 
-// Serve PWA files from root
+// Serve PWA files from root with white-label support
 app.get('/manifest.json', async (c) => {
-  const manifest = {
-    "name": "AssetShield App - Asset Protection Platform",
-    "short_name": "AssetShield",
-    "description": "Complete asset protection platform for individuals and law firms",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#1e40af",
-    "theme_color": "#1e40af",
-    "orientation": "portrait",
-    "categories": ["business", "finance", "productivity"],
-    "lang": "en",
-    "dir": "ltr",
-    "icons": [
-      {
-        "src": "/static/icons/icon-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "maskable any"
-      },
-      {
-        "src": "/static/icons/icon-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png",
-        "purpose": "maskable any"
-      }
-    ],
-    "shortcuts": [
-      {
-        "name": "Risk Assessment",
-        "short_name": "Assessment",
-        "description": "Start a new risk assessment",
-        "url": "/#assessment",
-        "icons": [
-          {
-            "src": "/static/icons/assessment-shortcut.png",
-            "sizes": "96x96"
-          }
-        ]
-      }
-    ]
-  }
+  const whiteLabelConfig = c.get('whiteLabelConfig');
+  const manifest = generateWhiteLabelManifest(whiteLabelConfig);
+  
+  // Add shortcuts for risk assessment
+  manifest.shortcuts = [
+    {
+      "name": "Risk Assessment",
+      "short_name": "Assessment",
+      "description": "Start a new risk assessment",
+      "url": "/#assessment",
+      "icons": [
+        {
+          "src": "/static/icons/assessment-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ];
   
   c.header('Content-Type', 'application/json')
   return c.json(manifest)
@@ -469,19 +450,36 @@ app.get('/test-modal', (c) => {
 </html>`)
 })
 
-// Main landing page
+// Main landing page with white-label support
 app.get('/', (c) => {
+  const whiteLabelConfig = c.get('whiteLabelConfig');
+  const isWhiteLabel = whiteLabelConfig !== null;
+  
+  // Generate white-label CSS if needed
+  const customCSS = isWhiteLabel ? generateWhiteLabelCSS(whiteLabelConfig) : '';
+  
   return c.render(
     <div>
+      {/* White-label CSS injection */}
+      {isWhiteLabel && (
+        <style dangerouslySetInnerHTML={{__html: customCSS}} />
+      )}
+      
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
         {/* Header */}
         <nav className="px-4 sm:px-6 py-4 bg-white/10 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                <i className="fas fa-shield-alt text-white text-lg sm:text-xl"></i>
-              </div>
-              <h1 className="text-lg sm:text-2xl font-bold text-white">AssetShield App</h1>
+              {isWhiteLabel && whiteLabelConfig?.logoUrl ? (
+                <img src={whiteLabelConfig.logoUrl} alt={whiteLabelConfig.firmName} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-contain" />
+              ) : (
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                  <i className="fas fa-shield-alt text-white text-lg sm:text-xl"></i>
+                </div>
+              )}
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {isWhiteLabel ? whiteLabelConfig?.firmName : 'AssetShield App'}
+              </h1>
             </div>
             
             {/* Mobile Menu Button */}
@@ -519,25 +517,31 @@ app.get('/', (c) => {
         <section className="px-4 sm:px-6 py-12 sm:py-20">
           <div className="max-w-7xl mx-auto text-center">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Complete Asset Protection Platform
+              {isWhiteLabel ? whiteLabelConfig?.heroTitle : 'Complete Asset Protection Platform'}
             </h1>
             <p className="text-lg sm:text-xl text-blue-100 mb-8 sm:mb-12 max-w-3xl mx-auto">
-              Discover your asset protection risk level, explore tailored strategies, and access comprehensive educational resources to safeguard your wealth.
+              {isWhiteLabel ? whiteLabelConfig?.heroSubtitle : 'Discover your asset protection risk level, explore tailored strategies, and access comprehensive educational resources to safeguard your wealth.'}
             </p>
             
             {/* Trust Indicators */}
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mb-8 sm:mb-12 text-blue-200">
               <div className="flex items-center">
                 <i className="fas fa-shield-alt mr-2"></i>
-                <span className="text-sm sm:text-base">Bank-Level Security</span>
+                <span className="text-sm sm:text-base">
+                  {isWhiteLabel ? 'Professional Protection' : 'Bank-Level Security'}
+                </span>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-users mr-2"></i>
-                <span className="text-sm sm:text-base">10,000+ Clients Protected</span>
+                <span className="text-sm sm:text-base">
+                  {isWhiteLabel ? 'Experienced Legal Team' : '10,000+ Clients Protected'}
+                </span>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-globe mr-2"></i>
-                <span className="text-sm sm:text-base">Global Coverage</span>
+                <span className="text-sm sm:text-base">
+                  {isWhiteLabel ? 'Comprehensive Coverage' : 'Global Coverage'}
+                </span>
               </div>
             </div>
             
