@@ -17,6 +17,7 @@ import { analyticsRoutes } from './routes/analytics'
 import { documentsRoutes } from './routes/documents'
 import { i18nRoutes } from './routes/i18n'
 import { stripeWebhookRoutes } from './routes/stripe-webhooks'
+import { platformApiRoutes } from './routes/platform-api'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -256,6 +257,7 @@ app.route('/integrations', integrationsRoutes)
 app.route('/provisioning', provisioningRoutes)
 app.route('/stripe-checkout', stripeCheckoutRoutes)
 app.route('/stripe-webhooks', stripeWebhookRoutes)
+app.route('/api/platform', platformApiRoutes)
 
 // Automated purchase success routes
 app.get('/purchase-success', (c) => c.redirect('/stripe-checkout/purchase-success?' + c.req.url.split('?')[1]))

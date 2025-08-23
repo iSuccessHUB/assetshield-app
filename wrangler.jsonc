@@ -8,5 +8,12 @@
     "NODE_ENV": "production",
     "STRIPE_MODE": "live",
     "CURRENCY": "USD"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "assetshieldapp-production",
+      "database_id": "your-database-id-here"
+    }
+  ]
 }

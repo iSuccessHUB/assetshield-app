@@ -1,6 +1,9 @@
 import { Hono } from 'hono'
+import { PlatformProvisioningService } from '../services/platform-provisioning'
+import { EmailService } from '../services/email-service'
 
 interface CloudflareBindings {
+  DB: D1Database;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
 }
@@ -84,10 +87,10 @@ async function handleCheckoutCompleted(c: any, event: any) {
     console.log('🚀 Processing platform setup payment for:', metadata.firmName)
     
     // Create subscription for the customer after successful setup payment
-    await createSubscriptionAfterSetup(c, session, metadata)
+    const subscription = await createSubscriptionAfterSetup(c, session, metadata)
     
-    // You could also trigger platform provisioning here
-    await provisionPlatform(c, session, metadata)
+    // Provision the platform automatically
+    await provisionPlatformComplete(c, session, metadata, subscription)
   }
 }
 
@@ -198,124 +201,81 @@ async function createSubscriptionAfterSetup(c: any, session: any, metadata: any)
   }
 }
 
-// Provision platform after successful payment
-async function provisionPlatform(c: any, session: any, metadata: any) {
+// Complete platform provisioning with database and email integration
+async function provisionPlatformComplete(c: any, session: any, metadata: any, subscription: any) {
   try {
-    console.log('🚀 Provisioning platform for:', metadata.firmName)
+    console.log('🚀 Starting complete platform provisioning for:', metadata.firmName)
     
-    // Here you would:
-    // 1. Create platform instance
-    // 2. Set up white-label branding
-    // 3. Configure subdomain
-    // 4. Send welcome email with login credentials
-    // 5. Activate features based on tier
-    // 6. Create admin user account
+    // Initialize services
+    const provisioningService = new PlatformProvisioningService(c.env.DB)
+    const emailService = new EmailService(c.env.DB)
     
-    const platformConfig = {
+    // Prepare platform data
+    const platformData = {
       firmName: metadata.firmName,
       lawyerName: metadata.lawyerName,
       lawyerEmail: metadata.lawyerEmail,
+      lawyerPhone: metadata.lawyerPhone || '',
       tier: metadata.tier,
-      setupPaymentId: session.payment_intent,
-      subscriptionStartDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
-      features: getFeaturesByTier(metadata.tier),
-      subdomain: generateSubdomain(metadata.firmName),
-      status: 'trial_active'
+      setupFee: parseInt(metadata.setupFee),
+      monthlyFee: parseInt(metadata.monthlyFee),
+      stripeCustomerId: session.customer,
+      stripePaymentIntent: session.payment_intent,
+      subscriptionId: subscription?.id
     }
     
-    console.log('📋 Platform configuration:', platformConfig)
+    // Provision the platform
+    const platformInstance = await provisioningService.provisionPlatform(platformData)
     
-    // You would store this in your database
-    // await c.env.DB.prepare(`
-    //   INSERT INTO law_firms (firm_name, owner_name, owner_email, subscription_tier, features, subdomain, status, trial_ends_at)
-    //   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    // `).bind(
-    //   platformConfig.firmName,
-    //   platformConfig.lawyerName,
-    //   platformConfig.lawyerEmail,
-    //   platformConfig.tier,
-    //   JSON.stringify(platformConfig.features),
-    //   platformConfig.subdomain,
-    //   platformConfig.status,
-    //   platformConfig.subscriptionStartDate
-    // ).run()
+    // Send welcome email with credentials
+    const welcomeEmailData = {
+      lawyerName: platformData.lawyerName,
+      firmName: platformData.firmName,
+      tier: platformData.tier.charAt(0).toUpperCase() + platformData.tier.slice(1),
+      platformUrl: platformInstance.platformUrl,
+      adminEmail: platformInstance.adminEmail,
+      adminPassword: platformInstance.adminPassword,
+      apiKey: platformInstance.apiKey,
+      trialEndsDate: new Date(platformInstance.trialEndsAt).toLocaleDateString(),
+      monthlyFee: platformData.monthlyFee,
+      features: platformInstance.features
+    }
     
-    // Send welcome email
-    await sendWelcomeEmail(platformConfig)
+    await emailService.sendWelcomeEmail(welcomeEmailData)
     
-    console.log('✅ Platform provisioned successfully')
+    // Log the successful provisioning
+    await provisioningService.logActivity(
+      platformInstance.id,
+      platformData.lawyerEmail,
+      'platform_provisioned',
+      {
+        stripeSessionId: session.id,
+        subscriptionId: subscription?.id,
+        setupFeePaid: platformData.setupFee,
+        tier: platformData.tier
+      }
+    )
+    
+    console.log('✅ Complete platform provisioning successful:', {
+      platformId: platformInstance.id,
+      subdomain: platformInstance.subdomain,
+      platformUrl: platformInstance.platformUrl
+    })
     
   } catch (error) {
-    console.error('❌ Error provisioning platform:', error)
-  }
-}
-
-// Get features by tier
-function getFeaturesByTier(tier: string): string[] {
-  const features = {
-    starter: [
-      'White-label branding',
-      'Risk assessment tool',
-      'Lead capture & management',
-      'Educational content library',
-      'Basic analytics dashboard',
-      'Up to 100 clients/month'
-    ],
-    professional: [
-      'Everything in Starter',
-      'Advanced customization',
-      'Multiple attorney accounts',
-      'Document automation',
-      'Advanced analytics & reporting',
-      'Up to 500 clients/month'
-    ],
-    enterprise: [
-      'Everything in Professional',
-      'Multi-office deployment',
-      'Custom integrations',
-      'White-label mobile app',
-      'Unlimited clients',
-      'Dedicated account manager',
-      '24/7 priority support'
-    ]
-  }
-  
-  return features[tier as keyof typeof features] || features.starter
-}
-
-// Generate subdomain from firm name
-function generateSubdomain(firmName: string): string {
-  return firmName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
-    .substring(0, 20)
-    + Math.random().toString(36).substring(2, 6)
-}
-
-// Send welcome email (mock implementation)
-async function sendWelcomeEmail(config: any) {
-  console.log('📧 Sending welcome email to:', config.lawyerEmail)
-  
-  // In a real implementation, you would integrate with an email service
-  // like SendGrid, Mailchimp, or AWS SES
-  
-  const emailContent = {
-    to: config.lawyerEmail,
-    subject: `Welcome to AssetShield ${config.tier.charAt(0).toUpperCase() + config.tier.slice(1)}!`,
-    template: 'platform_welcome',
-    data: {
-      lawyerName: config.lawyerName,
-      firmName: config.firmName,
-      platformUrl: `https://${config.subdomain}.assetshield.app`,
-      tier: config.tier,
-      trialEndsAt: config.subscriptionStartDate,
-      features: config.features
+    console.error('❌ Complete platform provisioning failed:', error)
+    
+    // Send error notification to support
+    try {
+      console.log('📧 Sending error notification to support')
+      // In production, implement error notification system
+    } catch (notificationError) {
+      console.error('❌ Failed to send error notification:', notificationError)
     }
   }
-  
-  console.log('📨 Welcome email prepared:', emailContent)
-  // await sendEmail(emailContent)
 }
+
+
 
 // Webhook configuration endpoint
 stripeWebhookRoutes.get('/config', async (c) => {
