@@ -8,6 +8,31 @@ interface CloudflareBindings {
 
 export const stripeCheckoutRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
+// Debug endpoint to check Stripe configuration
+stripeCheckoutRoutes.get('/debug', async (c) => {
+  const stripeSecretKey = c.env.STRIPE_SECRET_KEY
+  const stripePublishableKey = c.env.STRIPE_PUBLISHABLE_KEY
+  
+  return c.json({
+    environment: {
+      hasEnvObject: !!c.env,
+      allEnvKeys: c.env ? Object.keys(c.env) : [],
+      stripeSecretExists: !!stripeSecretKey,
+      stripePublishableExists: !!stripePublishableKey,
+      stripeSecretFormat: stripeSecretKey ? stripeSecretKey.startsWith('sk_') : false,
+      stripePublishableFormat: stripePublishableKey ? stripePublishableKey.startsWith('pk_') : false,
+      stripeSecretPrefix: stripeSecretKey ? stripeSecretKey.substring(0, 12) + '...' : 'not found',
+      timestamp: new Date().toISOString()
+    },
+    instructions: {
+      problem: 'STRIPE_SECRET_KEY environment variable not configured',
+      solution: 'Configure in Cloudflare Pages → Settings → Environment Variables',
+      requiredVars: ['STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KEY'],
+      note: 'Environment variables must be set in your deployment platform, not in code'
+    }
+  })
+})
+
 // Create Stripe checkout session for platform purchase
 stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
   try {
@@ -83,18 +108,40 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
       }
     }
     
-    // Get Stripe secret key from environment
+    // Get Stripe secret key from environment with detailed logging
     const stripeSecretKey = c.env.STRIPE_SECRET_KEY
     
-    if (!stripeSecretKey || !stripeSecretKey.startsWith('sk_')) {
-      console.error('Stripe secret key not configured in environment')
+    // Enhanced debugging for Stripe configuration
+    console.log('🔍 Stripe Environment Check:')
+    console.log('  - Available env keys:', Object.keys(c.env || {}))
+    console.log('  - STRIPE_SECRET_KEY exists:', !!stripeSecretKey)
+    console.log('  - Key format valid:', stripeSecretKey ? stripeSecretKey.startsWith('sk_') : false)
+    
+    if (!stripeSecretKey) {
+      console.error('❌ STRIPE_SECRET_KEY not found in environment')
+      console.log('💡 Available environment variables:', Object.keys(c.env || {}))
       return c.json({ 
         error: 'Stripe not configured',
-        details: 'Please configure STRIPE_SECRET_KEY in your deployment environment'
+        details: 'STRIPE_SECRET_KEY environment variable not found. Please configure in Cloudflare Pages → Settings → Environment Variables',
+        debug: {
+          availableEnvKeys: Object.keys(c.env || {}),
+          stripeKeyExists: !!stripeSecretKey
+        }
       }, 500)
     }
     
-    // Create Stripe checkout session using fetch API
+    if (!stripeSecretKey.startsWith('sk_')) {
+      console.error('❌ Invalid Stripe key format:', stripeSecretKey.substring(0, 10) + '...')
+      return c.json({ 
+        error: 'Stripe not configured',
+        details: 'Invalid STRIPE_SECRET_KEY format. Must start with sk_live_ or sk_test_'
+      }, 500)
+    }
+    
+    console.log('✅ Stripe configuration valid')
+    
+    // Create Stripe checkout session using payment mode for setup fee + subscription
+    // Note: Using payment mode for setup fee, then subscription will be created via webhook
     const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
@@ -103,16 +150,17 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
       },
       body: new URLSearchParams({
         'payment_method_types[]': 'card',
-        mode: 'subscription',
+        mode: 'payment',
         success_url: `${c.req.url.split('/').slice(0, 3).join('/')}/stripe-checkout/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${c.req.url.split('/').slice(0, 3).join('/')}/#pricing`,
         customer_email: lawyerEmail,
+        // Setup fee as one-time payment
         'line_items[0][price_data][currency]': 'usd',
-        'line_items[0][price_data][unit_amount]': (tierPricing.monthly * 100).toString(),
-        'line_items[0][price_data][recurring][interval]': 'month',
-        'line_items[0][price_data][product_data][name]': `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Platform`,
-        'line_items[0][price_data][product_data][description]': `Monthly subscription for ${firmName} - includes setup and platform access`,
+        'line_items[0][price_data][unit_amount]': (tierPricing.setup * 100).toString(),
+        'line_items[0][price_data][product_data][name]': `AssetShield ${tier.charAt(0).toUpperCase() + tier.slice(1)} Setup Fee`,
+        'line_items[0][price_data][product_data][description]': `One-time setup fee for ${firmName} - includes 14-day trial then $${tierPricing.monthly}/month`,
         'line_items[0][quantity]': '1',
+        // Metadata to track subscription info
         'metadata[tier]': tier,
         'metadata[lawyerName]': lawyerName,
         'metadata[lawyerEmail]': lawyerEmail,
@@ -120,8 +168,8 @@ stripeCheckoutRoutes.post('/create-checkout/:tier', async (c) => {
         'metadata[firmName]': firmName,
         'metadata[setupFee]': tierPricing.setup.toString(),
         'metadata[monthlyFee]': tierPricing.monthly.toString(),
-        'metadata[type]': 'platform_subscription_with_trial',
-        'subscription_data[trial_period_days]': '14'
+        'metadata[type]': 'platform_setup_payment',
+        'metadata[subscription_will_start]': 'after_14_days'
       })
     })
     
@@ -300,6 +348,26 @@ stripeCheckoutRoutes.get('/demo-checkout', async (c) => {
     </body>
     </html>
   `)
+})
+
+// Debug endpoint to check environment configuration
+stripeCheckoutRoutes.get('/debug-env', async (c) => {
+  const { env } = c
+  
+  return c.json({
+    timestamp: new Date().toISOString(),
+    environment: {
+      hasStripeSecretKey: !!env.STRIPE_SECRET_KEY,
+      hasStripePublishableKey: !!env.STRIPE_PUBLISHABLE_KEY,
+      stripeKeyPrefix: env.STRIPE_SECRET_KEY ? env.STRIPE_SECRET_KEY.substring(0, 10) + '...' : 'NOT_FOUND',
+      availableKeys: Object.keys(env || {}),
+      totalEnvKeys: Object.keys(env || {}).length
+    },
+    cloudflareWorker: {
+      region: c.req.cf?.colo || 'unknown',
+      requestId: c.req.header('cf-ray') || 'unknown'
+    }
+  })
 })
 
 // Success page after purchase

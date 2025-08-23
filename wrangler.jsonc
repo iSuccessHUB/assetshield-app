@@ -3,5 +3,10 @@
   "name": "assetshieldapp",
   "compatibility_date": "2025-01-27",
   "pages_build_output_dir": "./dist",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "NODE_ENV": "production",
+    "STRIPE_MODE": "live",
+    "CURRENCY": "USD"
+  }
 }

@@ -37,8 +37,8 @@ export const renderer = jsxRenderer(({ children }) => {
         <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
         
         {/* Cache busting for critical fixes */}
-        <meta name="app-version" content="modal-zindex-fix-v4.1" />
-        <meta name="deployment-timestamp" content="2025-01-27-modal-fix" />
+        <meta name="app-version" content="stripe-debug-tools-v4.2" />
+        <meta name="deployment-timestamp" content="2025-01-27-stripe-debug" />
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />

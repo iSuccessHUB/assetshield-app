@@ -14,11 +14,27 @@ app.post('/create-intent', async (c) => {
       return c.json({ error: 'Missing required fields' }, 400)
     }
     
-    // Create real Stripe payment intent
+    // Create real Stripe payment intent with enhanced debugging
     const stripeSecretKey = c.env.STRIPE_SECRET_KEY
+    
+    // Enhanced debugging for Stripe configuration
+    console.log('🔍 Payments Stripe Environment Check:')
+    console.log('  - Available env keys:', Object.keys(c.env || {}))
+    console.log('  - STRIPE_SECRET_KEY exists:', !!stripeSecretKey)
+    
     if (!stripeSecretKey) {
-      return c.json({ error: 'Stripe not configured' }, 500)
+      console.error('❌ STRIPE_SECRET_KEY not found in payments environment')
+      return c.json({ 
+        error: 'Stripe not configured',
+        details: 'STRIPE_SECRET_KEY environment variable not found. Please configure in Cloudflare Pages → Settings → Environment Variables',
+        debug: {
+          availableEnvKeys: Object.keys(c.env || {}),
+          stripeKeyExists: !!stripeSecretKey
+        }
+      }, 500)
     }
+    
+    console.log('✅ Payments Stripe configuration valid')
     
     // Create Stripe payment intent using fetch API (Cloudflare Workers compatible)
     const response = await fetch('https://api.stripe.com/v1/payment_intents', {
