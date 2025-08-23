@@ -502,9 +502,9 @@ app.get('/', (c) => {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors">Education</a>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('assessment')">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('strategies')">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('education')">Education</a>
               <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')">For Law Firms</a>
               <button onclick="showLoginModal()" className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
                 <i className="fas fa-user mr-2"></i>Login
@@ -515,9 +515,9 @@ app.get('/', (c) => {
           {/* Mobile Navigation */}
           <div id="mobile-menu" className="hidden md:hidden mt-4 pb-4 border-t border-white/20">
             <div className="flex flex-col space-y-3 mt-4">
-              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2">Risk Assessment</a>
-              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2">Strategies</a>
-              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2">Education</a>
+              <a href="#assessment" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('assessment')">Risk Assessment</a>
+              <a href="#strategies" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('strategies')">Strategies</a>
+              <a href="#education" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('education')">Education</a>
               <a href="#pricing" className="text-white/90 hover:text-white transition-colors py-2" onClick="navigateToSection('pricing')">For Law Firms</a>
               <button onclick="showLoginModal()" className="w-full py-3 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
                 <i className="fas fa-user mr-2"></i>Login
@@ -2541,7 +2541,7 @@ app.get('/', (c) => {
               <div>
                 <h4 className="text-white font-semibold mb-4">Law Firms</h4>
                 <ul className="space-y-2">
-                  <li><a href="/portal" className="hover:text-white transition-colors cursor-pointer">Platform Overview</a></li>
+                  <li><a href="/dashboard" className="hover:text-white transition-colors cursor-pointer">Platform Overview</a></li>
                   <li><a href="#pricing" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('pricing')">Pricing</a></li>
                   <li><a href="#consultation" className="hover:text-white transition-colors cursor-pointer" onClick="navigateToSection('consultation')">Schedule Demo</a></li>
                   <li><a href="mailto:support@isuccesshub.com" className="hover:text-white transition-colors cursor-pointer">Support</a></li>
