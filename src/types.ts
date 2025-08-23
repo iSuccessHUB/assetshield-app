@@ -12,7 +12,6 @@ export interface CloudflareBindings {
   // Environment variables
   STRIPE_SECRET_KEY: string;
   STRIPE_PUBLISHABLE_KEY: string;
-  GOOGLE_ADSENSE_CLIENT: string;
   STRIPE_MODE: string;
   CURRENCY: string;
   NODE_ENV: string;
