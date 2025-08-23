@@ -210,6 +210,9 @@ app.use(renderer)
 // API Routes
 // Import new routes
 import { demoRoutes } from './routes/demo'
+import { enhancedDemoRoutes } from './routes/enhanced-demo'
+import { serviceBundleRoutes } from './routes/service-bundles'
+import { salesAnalyticsRoutes } from './routes/sales-analytics'
 import { dashboardRoutes } from './routes/dashboard'
 import { officesRoutes } from './routes/offices'
 import { integrationsRoutes } from './routes/integrations'
@@ -232,6 +235,9 @@ app.route('/api/i18n', i18nRoutes)
 
 // New feature routes
 app.route('/demo', demoRoutes)
+app.route('/api/enhanced-demo', enhancedDemoRoutes)
+app.route('/api/service-bundles', serviceBundleRoutes)
+app.route('/api/sales-analytics', salesAnalyticsRoutes)
 app.route('/dashboard', dashboardRoutes) 
 app.route('/offices', officesRoutes)
 app.route('/integrations', integrationsRoutes)
