@@ -16,6 +16,7 @@ import { complianceRoutes } from './routes/compliance'
 import { analyticsRoutes } from './routes/analytics'
 import { documentsRoutes } from './routes/documents'
 import { i18nRoutes } from './routes/i18n'
+import { stripeWebhookRoutes } from './routes/stripe-webhooks'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -254,6 +255,7 @@ app.route('/offices', officesRoutes)
 app.route('/integrations', integrationsRoutes)
 app.route('/provisioning', provisioningRoutes)
 app.route('/stripe-checkout', stripeCheckoutRoutes)
+app.route('/stripe-webhooks', stripeWebhookRoutes)
 
 // Automated purchase success routes
 app.get('/purchase-success', (c) => c.redirect('/stripe-checkout/purchase-success?' + c.req.url.split('?')[1]))
@@ -2060,7 +2062,7 @@ app.get('/', (c) => {
                 White-Label Platform Pricing
               </h2>
               <p className="text-xl text-gray-600">
-                Transform your practice with our complete asset protection platform - fully branded for your law firm
+                Start your 14-day risk-free trial today - pay the setup fee now, monthly billing begins after trial
               </p>
             </div>
 
@@ -2076,8 +2078,8 @@ app.get('/', (c) => {
                 
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold text-blue-600 mb-2">$5,000</div>
-                  <p className="text-gray-500 mb-1">One-time setup fee</p>
-                  <div className="text-2xl font-bold text-gray-800">$500<span className="text-lg text-gray-500">/month</span></div>
+                  <p className="text-gray-500 mb-1">Setup fee (includes 14-day trial)</p>
+                  <div className="text-lg text-gray-600">Then $500<span className="text-sm text-gray-500">/month</span></div>
                 </div>
 
                 <ul className="space-y-3 mb-8">
@@ -2111,9 +2113,9 @@ app.get('/', (c) => {
                   onClick="purchasePlatform('starter', 5000, 500)"
                   className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
-                  <i className="fas fa-shopping-cart mr-2"></i>
-                  Get Started Now
-                  <div className="text-xs opacity-90 mt-1">Instant Setup • 24/7 Support</div>
+                  <i className="fas fa-rocket mr-2"></i>
+                  Start 14-Day Trial
+                  <div className="text-xs opacity-90 mt-1">Pay $5,000 • Cancel Anytime During Trial</div>
                 </button>
               </div>
 
@@ -2132,8 +2134,8 @@ app.get('/', (c) => {
                 
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold mb-2">$10,000</div>
-                  <p className="text-blue-100 mb-1">One-time setup fee</p>
-                  <div className="text-2xl font-bold">$1,200<span className="text-lg text-blue-100">/month</span></div>
+                  <p className="text-blue-100 mb-1">Setup fee (includes 14-day trial)</p>
+                  <div className="text-xl text-blue-100">Then $1,200<span className="text-lg text-blue-200">/month</span></div>
                 </div>
 
                 <ul className="space-y-3 mb-8">
@@ -2172,8 +2174,8 @@ app.get('/', (c) => {
                   className="w-full py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-white"
                 >
                   <i className="fas fa-crown mr-2 text-yellow-500"></i>
-                  Choose Professional
-                  <div className="text-xs opacity-80 mt-1">Most Popular • Best Value</div>
+                  Start 14-Day Trial
+                  <div className="text-xs opacity-80 mt-1">Pay $10,000 • Cancel Anytime During Trial</div>
                 </button>
               </div>
 
@@ -2188,8 +2190,8 @@ app.get('/', (c) => {
                 
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold text-blue-600 mb-2">$25,000</div>
-                  <p className="text-gray-500 mb-1">One-time setup fee</p>
-                  <div className="text-2xl font-bold text-gray-800">$2,500<span className="text-lg text-gray-500">/month</span></div>
+                  <p className="text-gray-500 mb-1">Setup fee (includes 14-day trial)</p>
+                  <div className="text-lg text-gray-600">Then $2,500<span className="text-sm text-gray-500">/month</span></div>
                 </div>
 
                 <ul className="space-y-3 mb-8">
@@ -2228,8 +2230,8 @@ app.get('/', (c) => {
                   className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   <i className="fas fa-rocket mr-2"></i>
-                  Go Enterprise
-                  <div className="text-xs opacity-90 mt-1">Ultimate Solution • Premium Support</div>
+                  Start 14-Day Trial
+                  <div className="text-xs opacity-90 mt-1">Pay $25,000 • Cancel Anytime During Trial</div>
                 </button>
               </div>
             </div>
@@ -2666,17 +2668,25 @@ app.get('/', (c) => {
                     <!-- Pricing Summary -->
                     <div class="bg-gray-50 rounded-xl p-6 mb-6">
                       <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-calculator text-blue-600 mr-3"></i>
-                        Investment Summary
+                        <i class="fas fa-credit-card text-blue-600 mr-3"></i>
+                        Payment Details
                       </h3>
-                      <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white rounded-lg p-4 border-l-4 border-blue-600">
-                          <div class="text-sm text-gray-600 mb-1">Setup Fee (One-time)</div>
-                          <div class="text-2xl font-bold text-blue-600">$\${setupFee.toLocaleString()}</div>
+                      <div class="bg-white rounded-lg p-6 border border-blue-200">
+                        <div class="flex items-center justify-between mb-4">
+                          <div>
+                            <div class="text-lg font-bold text-gray-800">Setup Fee (Pay Today)</div>
+                            <div class="text-sm text-gray-600">Includes platform setup & 14-day trial</div>
+                          </div>
+                          <div class="text-3xl font-bold text-blue-600">$\${setupFee.toLocaleString()}</div>
                         </div>
-                        <div class="bg-white rounded-lg p-4 border-l-4 border-green-600">
-                          <div class="text-sm text-gray-600 mb-1">Monthly License</div>
-                          <div class="text-2xl font-bold text-green-600">$\${monthlyFee.toLocaleString()}</div>
+                        <div class="bg-blue-50 rounded-lg p-4">
+                          <div class="flex items-center text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <div class="text-sm">
+                              <div class="font-semibold">Then $\${monthlyFee.toLocaleString()}/month after your 14-day trial</div>
+                              <div class="text-blue-600">Cancel anytime during trial at no charge</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2757,13 +2767,13 @@ app.get('/', (c) => {
                     </form>
                     
                     <!-- Security & Guarantee -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                       <div class="flex items-center mb-2">
-                        <i class="fas fa-shield-check text-blue-600 text-xl mr-3"></i>
-                        <h4 class="font-bold text-blue-800">Secure Professional Purchase</h4>
+                        <i class="fas fa-shield-check text-green-600 text-xl mr-3"></i>
+                        <h4 class="font-bold text-green-800">14-Day Risk-Free Trial</h4>
                       </div>
-                      <p class="text-blue-700 text-sm">
-                        🔒 Bank-level encryption • 💳 Stripe secure checkout • ⚡ Instant activation • 📞 24/7 support
+                      <p class="text-green-700 text-sm">
+                        🔒 Secure Stripe payment • ⚡ Instant platform activation • 📞 Cancel anytime during trial • 💯 Full setup included
                       </p>
                     </div>
                   </div>
@@ -2776,8 +2786,8 @@ app.get('/', (c) => {
                         <i class="fas fa-arrow-left mr-2"></i>Back to Pricing
                       </button>
                       <button type="button" onclick="processLawyerPurchase('\${tier}', \${setupFee}, \${monthlyFee})" 
-                              class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105">
-                        <i class="fas fa-credit-card mr-2"></i>Proceed to Secure Checkout
+                              class="flex-1 py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-blue-700 transition-all transform hover:scale-105">
+                        <i class="fas fa-credit-card mr-2"></i>Start 14-Day Trial - Pay $\${setupFee.toLocaleString()}
                       </button>
                     </div>
                   </div>
