@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json", 
-  "name": "assetshieldapp",
+  "name": "assetshield-saas",
   "compatibility_date": "2025-01-27",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": ["nodejs_compat"],
@@ -12,8 +12,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "assetshield-clean-production",
-      "database_id": "your-database-id-here"
+      "database_name": "assetshield-saas-production",
+      "database_id": "443e1183-063d-4293-be4a-312f37276ead"
     }
   ]
 }
