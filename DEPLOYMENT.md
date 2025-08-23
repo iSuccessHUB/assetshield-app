@@ -69,4 +69,4 @@ curl -X POST https://your-domain.com/stripe-checkout/create-checkout/starter \
 - All API calls use HTTPS
 - Client-side never sees secret keys
 - Checkout sessions are server-side generated
-- GitHub push protection prevents accidental key exposure
+- GitHub push protection prevents accidental key exposure# Admin Login Fix Deployed Sat Aug 23 22:53:24 UTC 2025
