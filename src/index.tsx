@@ -22,6 +22,7 @@ import { enhancedDemoRoutes } from './routes/enhanced-demo'
 import { serviceBundleRoutes } from './routes/service-bundles'
 import { salesAnalyticsRoutes } from './routes/sales-analytics'
 import { securityRoutes } from './routes/security'
+import { adminRoutes } from './routes/admin'
 import { domainMapping, generateWhiteLabelCSS, generateWhiteLabelManifest } from './middleware/domain-mapping'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
@@ -245,6 +246,10 @@ app.route('/api/sales-analytics', salesAnalyticsRoutes)
 
 // Security monitoring routes
 app.route('/api/security', securityRoutes)
+
+// Admin dashboard routes (secure)
+app.route('/admin', adminRoutes)
+
 app.route('/dashboard', dashboardRoutes) 
 app.route('/offices', officesRoutes)
 app.route('/integrations', integrationsRoutes)
