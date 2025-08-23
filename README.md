@@ -17,7 +17,7 @@ AssetShield Pro is the world's first **fully automated white-label asset protect
 
 ### **🔐 Enterprise Admin Dashboard (PRODUCTION READY)**
 - **URL**: https://assetshieldapp.com/admin/login (🔒 **COMPLETELY HIDDEN** from main app)
-- **Username**: `admin@isuccesshub.com`  
+- **Username**: `peter@isuccesshub.com`  
 - **Password**: `AdminPass2024!Change` (⚠️ **CHANGE IMMEDIATELY**)
 - **2FA**: ✅ **Two-Factor Authentication Available** (Setup after first login)
 - **Security**: ✅ **Enterprise-grade** with rate limiting, audit logging, JWT authentication

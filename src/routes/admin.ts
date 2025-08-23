@@ -102,7 +102,7 @@ function getAdminJWTSecret(): string {
 
 // Admin credentials (In production, store in environment variables)
 const ADMIN_CREDENTIALS = {
-  username: process.env.ADMIN_USERNAME || 'admin@isuccesshub.com',
+  username: process.env.ADMIN_USERNAME || 'peter@isuccesshub.com',
   password: process.env.ADMIN_PASSWORD || 'AdminPass2024!Change',  // Change this immediately
   totpSecret: process.env.ADMIN_TOTP_SECRET || '' // Will be generated if empty
 }
@@ -130,7 +130,7 @@ function checkRateLimit(ip: string): boolean {
 // 2FA Setup route (only accessible to authenticated admin)
 adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
   const secret = await TOTP.generateSecret()
-  const qrUrl = TOTP.generateQRCodeUrl(secret, 'AssetShield Admin', ADMIN_CREDENTIALS.username)
+  const qrUrl = TOTP.generateQRCodeUrl(secret, 'AssetShield Admin', 'peter@isuccesshub.com')
   
   return c.html(`
     <!DOCTYPE html>
@@ -319,7 +319,7 @@ adminRoutes.get('/login', async (c) => {
                             </label>
                             <input id="username" name="username" type="text" required 
                                    class="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                                   placeholder="admin@isuccesshub.com">
+                                   placeholder="peter@isuccesshub.com">
                         </div>
                         
                         <div>

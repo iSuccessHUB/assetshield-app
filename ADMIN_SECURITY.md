@@ -7,7 +7,7 @@
 #### 1. Change Default Credentials
 ```bash
 # Set these environment variables in your Cloudflare Pages deployment:
-ADMIN_USERNAME=your-secure-username@yourdomain.com
+ADMIN_USERNAME=peter@isuccesshub.com
 ADMIN_PASSWORD=YourSuperSecurePassword123!@#
 ADMIN_JWT_SECRET=generate-with-openssl-rand-base64-32
 ```
