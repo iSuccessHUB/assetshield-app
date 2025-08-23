@@ -37,10 +37,12 @@ export const renderer = jsxRenderer(({ children }) => {
         <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
         
         {/* Cache busting for critical fixes */}
-        <meta name="app-version" content="enhanced-systems-v3.0" />
+        <meta name="app-version" content="stripe-live-final-v4.0" />
+        <meta name="deployment-timestamp" content="2025-01-27-stripe-final" />
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
+        <meta name="last-modified" content="Mon, 27 Jan 2025 12:00:00 GMT" />
         
         {/* External Libraries */}
         <script src="https://cdn.tailwindcss.com"></script>
