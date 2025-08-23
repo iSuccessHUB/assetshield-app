@@ -63,19 +63,18 @@ export function securityHeaders() {
       c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
     }
     
-    // Functional CSP - Prioritize user experience while maintaining security
+    // Balanced CSP - Maintains security while ensuring full functionality
     const cspPolicy = [
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com data:",
-      "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com",
-      "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net data:",
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com",
+      "script-src-elem 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com",
+      "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net",
       "img-src 'self' data: https: blob:",
       "font-src 'self' cdn.jsdelivr.net data:",
-      "connect-src 'self' api.stripe.com nominatim.openstreetmap.org wss: https: data:",
+      "connect-src 'self' api.stripe.com nominatim.openstreetmap.org https:",
       "frame-src 'self' js.stripe.com",
-      "frame-ancestors 'self'",
-      "media-src 'self' data:",
-      "object-src 'self'",
+      "media-src 'self'",
+      "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'"
     ];
@@ -85,9 +84,8 @@ export function securityHeaders() {
       cspPolicy.push("report-uri /api/security/csp-report");
     }
     
-    // Temporarily disable CSP to test functionality
-    // TODO: Re-enable with proper configuration once interactivity is restored
-    // c.header('Content-Security-Policy', cspPolicy.join('; '))
+    // Balanced CSP: Secure but functional - allows necessary interactions
+    c.header('Content-Security-Policy', cspPolicy.join('; '))
   }
 }
 
