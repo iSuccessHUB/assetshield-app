@@ -2641,7 +2641,7 @@ app.get('/', (c) => {
             
             // Create professional payment modal
             const modalHTML = \`
-              <div id="payment-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div id="payment-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" style="z-index: 10000 !important;">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                   <!-- Modal Header -->
                   <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-t-2xl">
@@ -3002,8 +3002,23 @@ app.get('/', (c) => {
           }
           
           function showErrorModal(title, message, contactEmail) {
+            // Close any underlying modals first and restore body scroll
+            const paymentModal = document.getElementById('payment-modal');
+            const demoModal = document.getElementById('demo-modal');
+            if (paymentModal) {
+              paymentModal.remove();
+              console.log('🔄 Closed payment modal before showing error');
+            }
+            if (demoModal) {
+              demoModal.remove();
+              console.log('🔄 Closed demo modal before showing error');
+            }
+            
+            // Keep body overflow hidden for error modal
+            document.body.style.overflow = 'hidden';
+            
             const errorModalHTML = \`
-              <div id="error-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+              <div id="error-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style="z-index: 20000 !important;">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
                   <div class="bg-red-600 text-white p-6 rounded-t-2xl">
                     <div class="flex items-center">
@@ -3039,12 +3054,31 @@ app.get('/', (c) => {
           
           window.closeErrorModal = function() {
             const modal = document.getElementById('error-modal');
-            if (modal) modal.remove();
+            if (modal) {
+              modal.remove();
+              document.body.style.overflow = '';
+              console.log('✅ Error modal closed, body scroll restored');
+            }
           };
           
           function showSuccessModal(title, message, onConfirm) {
+            // Close any underlying modals first and restore body scroll
+            const paymentModal = document.getElementById('payment-modal');
+            const demoModal = document.getElementById('demo-modal');
+            if (paymentModal) {
+              paymentModal.remove();
+              console.log('🔄 Closed payment modal before showing success');
+            }
+            if (demoModal) {
+              demoModal.remove();
+              console.log('🔄 Closed demo modal before showing success');
+            }
+            
+            // Keep body overflow hidden for success modal
+            document.body.style.overflow = 'hidden';
+            
             const successModalHTML = \`
-              <div id="success-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+              <div id="success-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style="z-index: 20000 !important;">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
                   <div class="bg-green-600 text-white p-6 rounded-t-2xl">
                     <div class="flex items-center">
@@ -3074,7 +3108,11 @@ app.get('/', (c) => {
           
           window.closeSuccessModal = function() {
             const modal = document.getElementById('success-modal');
-            if (modal) modal.remove();
+            if (modal) {
+              modal.remove();
+              document.body.style.overflow = '';
+              console.log('✅ Success modal closed, body scroll restored');
+            }
           };
 
           // Handle demo requests for different platform tiers (legacy)
@@ -3191,7 +3229,7 @@ app.get('/', (c) => {
             }
             
             const modalHTML = \`
-              <div id="demo-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+              <div id="demo-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="z-index: 10000 !important;">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all">
                   <!-- Modal Header -->
                   <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-t-2xl p-6">
