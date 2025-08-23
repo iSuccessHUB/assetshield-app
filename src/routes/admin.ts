@@ -394,7 +394,11 @@ adminRoutes.get('/login', async (c) => {
                         body: JSON.stringify({ username, password, totp })
                     });
                     
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
                     const result = await response.json();
+                    console.log('Login result:', result);
                     
                     if (result.success) {
                         window.location.href = '/admin/dashboard';
@@ -417,7 +421,8 @@ adminRoutes.get('/login', async (c) => {
                         }
                     }
                 } catch (error) {
-                    errorDiv.textContent = 'Network error. Please try again.';
+                    console.error('Login error:', error);
+                    errorDiv.textContent = 'Network error. Please check console for details.';
                     errorDiv.classList.remove('hidden');
                 } finally {
                     if (!requires2FA) {
@@ -514,10 +519,14 @@ adminRoutes.post('/api/login', async (c) => {
       exp: Math.floor(Date.now() / 1000) + (8 * 60 * 60) // 8 hours
     }, getAdminJWTSecret())
     
-    // Set secure HTTP-only cookie
+    // Set secure HTTP-only cookie (secure only in production HTTPS)
+    const isProduction = c.req.header('host')?.includes('assetshieldapp.com') || 
+                        c.req.header('host')?.includes('.pages.dev') || 
+                        c.req.header('CF-Visitor')
+    
     setCookie(c, 'admin_token', token, {
       httpOnly: true,
-      secure: true,
+      secure: isProduction, // Only secure in production HTTPS
       sameSite: 'Strict',
       maxAge: 8 * 60 * 60, // 8 hours
       path: '/admin'
@@ -546,7 +555,22 @@ adminRoutes.post('/api/login', async (c) => {
     
   } catch (error) {
     console.error('Admin login error:', error)
-    return c.json({ error: 'Login failed' }, 500)
+    // Log the error for debugging
+    await c.env.DB.prepare(`
+      INSERT INTO security_events (
+        event_type, ip_address, user_agent, event_data, 
+        risk_level, action_taken, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+    `).bind(
+      'admin_login_error',
+      c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown',
+      c.req.header('User-Agent') || 'unknown',
+      JSON.stringify({ error: error.message, timestamp: new Date().toISOString() }),
+      'high',
+      'error_logged'
+    ).run().catch(() => {}) // Ignore DB errors during error logging
+    
+    return c.json({ error: 'Login failed', debug: error.message }, 500)
   }
 })
 
