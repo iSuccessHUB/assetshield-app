@@ -287,6 +287,125 @@ adminRoutes.post('/api/setup-2fa', requireAdminAuth, async (c) => {
   }
 })
 
+// Debug login page for troubleshooting
+adminRoutes.get('/debug-login', async (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AssetShield Admin Debug Login</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-900 text-white p-8">
+        <div class="max-w-md mx-auto">
+            <h1 class="text-2xl font-bold mb-6">AssetShield Admin Debug Login</h1>
+            
+            <form id="debugLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Username</label>
+                    <input id="username" type="text" value="peter@isuccesshub.com" 
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input id="password" type="password" value="AdminPass2024!Change"
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white">
+                </div>
+                
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded">
+                    Debug Login
+                </button>
+            </form>
+            
+            <div id="debugOutput" class="mt-6 p-4 bg-gray-800 rounded">
+                <h3 class="font-bold mb-2">Debug Output:</h3>
+                <div id="debugLog" class="text-sm font-mono"></div>
+            </div>
+        </div>
+
+        <script>
+            function log(message) {
+                const debugLog = document.getElementById('debugLog');
+                const timestamp = new Date().toLocaleTimeString();
+                debugLog.innerHTML += '[' + timestamp + '] ' + message + '<br>';
+                console.log(message);
+            }
+
+            document.getElementById('debugLoginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                log('Starting login attempt...');
+                log('Username: ' + username);
+                log('Password length: ' + password.length);
+                
+                try {
+                    log('Making fetch request to /admin/api/login');
+                    
+                    const response = await fetch('/admin/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    log('Response status: ' + response.status);
+                    log('Response ok: ' + response.ok);
+                    
+                    const responseText = await response.text();
+                    log('Raw response: ' + responseText);
+                    
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                        log('Parsed result: ' + JSON.stringify(result));
+                    } catch (parseError) {
+                        log('JSON parse error: ' + parseError.message);
+                        return;
+                    }
+                    
+                    if (result.success) {
+                        log('✅ Login successful!');
+                        log('Attempting to redirect to dashboard...');
+                        
+                        // Test if we can access the dashboard
+                        const dashboardResponse = await fetch('/admin/dashboard');
+                        log('Dashboard response status: ' + dashboardResponse.status);
+                        
+                        if (dashboardResponse.ok) {
+                            log('✅ Dashboard accessible, redirecting...');
+                            window.location.href = '/admin/dashboard';
+                        } else {
+                            log('❌ Dashboard not accessible');
+                        }
+                    } else {
+                        log('❌ Login failed: ' + (result.error || 'Unknown error'));
+                        if (result.debug) {
+                            log('Debug info: ' + result.debug);
+                        }
+                    }
+                    
+                } catch (error) {
+                    log('❌ Network error: ' + error.message);
+                    log('Error stack: ' + error.stack);
+                }
+            });
+            
+            log('Debug login page loaded');
+            log('Current URL: ' + window.location.href);
+            log('User agent: ' + navigator.userAgent);
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 // Admin login page
 adminRoutes.get('/login', async (c) => {
   return c.html(`
@@ -445,7 +564,22 @@ adminRoutes.get('/login', async (c) => {
 // Admin login API
 adminRoutes.post('/api/login', async (c) => {
   try {
-    const { username, password, totp } = await c.req.json()
+    // Log the request for debugging
+    console.log('Admin login attempt received')
+    
+    const requestBody = await c.req.text()
+    console.log('Request body:', requestBody)
+    
+    let parsedBody
+    try {
+      parsedBody = JSON.parse(requestBody)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return c.json({ error: 'Invalid JSON in request body', debug: parseError.message }, 400)
+    }
+    
+    const { username, password, totp } = parsedBody
+    console.log('Parsed credentials:', { username, passwordLength: password?.length, hasTotp: !!totp })
     
     // Rate limiting for admin login attempts
     const ip = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown'
