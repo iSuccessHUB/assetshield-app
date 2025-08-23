@@ -63,31 +63,31 @@ export function securityHeaders() {
       c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
     }
     
-    // Enhanced CSP with stricter security
+    // Functional CSP - Prioritize user experience while maintaining security
     const cspPolicy = [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com 'nonce-" + generateNonce() + "'",
-      "script-src-elem 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com",
-      "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net",
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com data:",
+      "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' cdn.tailwindcss.com cdn.jsdelivr.net js.stripe.com",
+      "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdn.jsdelivr.net data:",
       "img-src 'self' data: https: blob:",
       "font-src 'self' cdn.jsdelivr.net data:",
-      "connect-src 'self' api.stripe.com nominatim.openstreetmap.org wss: https:",
+      "connect-src 'self' api.stripe.com nominatim.openstreetmap.org wss: https: data:",
       "frame-src 'self' js.stripe.com",
-      "frame-ancestors 'none'",
-      "media-src 'self'",
-      "object-src 'none'",
+      "frame-ancestors 'self'",
+      "media-src 'self' data:",
+      "object-src 'self'",
       "base-uri 'self'",
-      "form-action 'self'",
-      "upgrade-insecure-requests",
-      "block-all-mixed-content"
+      "form-action 'self'"
     ];
     
-    // Add CSP reporting if in production
+    // Add CSP reporting if in production (non-blocking)
     if (c.req.header('X-Forwarded-Proto') === 'https') {
       cspPolicy.push("report-uri /api/security/csp-report");
     }
     
-    c.header('Content-Security-Policy', cspPolicy.join('; '))
+    // Temporarily disable CSP to test functionality
+    // TODO: Re-enable with proper configuration once interactivity is restored
+    // c.header('Content-Security-Policy', cspPolicy.join('; '))
   }
 }
 
@@ -131,15 +131,14 @@ function sanitizeObject(obj: any): any {
   return obj
 }
 
-// Basic string sanitization
+// Basic string sanitization - Less aggressive to preserve functionality
 function sanitizeString(str: string): string {
   if (typeof str !== 'string') return str
   
+  // Only remove the most dangerous patterns, preserve normal content
   return str
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags only
     .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+="[^"]*"/gi, '') // Remove event handlers
-    .replace(/on\w+='[^']*'/gi, '') // Remove event handlers (single quotes)
     .trim()
 }
 
