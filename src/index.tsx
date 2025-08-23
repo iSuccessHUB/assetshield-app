@@ -18,6 +18,10 @@ import { documentsRoutes } from './routes/documents'
 import { i18nRoutes } from './routes/i18n'
 import { stripeWebhookRoutes } from './routes/stripe-webhooks'
 import { platformApiRoutes } from './routes/platform-api'
+import { enhancedDemoRoutes } from './routes/enhanced-demo'
+import { serviceBundleRoutes } from './routes/service-bundles'
+import { salesAnalyticsRoutes } from './routes/sales-analytics'
+import { securityRoutes } from './routes/security'
 import { domainMapping, generateWhiteLabelCSS, generateWhiteLabelManifest } from './middleware/domain-mapping'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
@@ -238,6 +242,9 @@ app.route('/demo', demoRoutes)
 app.route('/api/enhanced-demo', enhancedDemoRoutes)
 app.route('/api/service-bundles', serviceBundleRoutes)
 app.route('/api/sales-analytics', salesAnalyticsRoutes)
+
+// Security monitoring routes
+app.route('/api/security', securityRoutes)
 app.route('/dashboard', dashboardRoutes) 
 app.route('/offices', officesRoutes)
 app.route('/integrations', integrationsRoutes)

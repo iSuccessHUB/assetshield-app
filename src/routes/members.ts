@@ -5,7 +5,13 @@ import type { CloudflareBindings } from '../types'
 
 export const membersRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
-const JWT_SECRET = 'your-super-secret-jwt-key-change-in-production'
+// JWT Secret - Use same secure implementation as auth.ts
+function getJWTSecret(): string {
+  if (typeof process !== 'undefined' && process.env?.JWT_SECRET) {
+    return process.env.JWT_SECRET;
+  }
+  return 'fallback-jwt-secret-set-environment-variable-in-production-for-security';
+}
 
 // Middleware to check authentication
 async function requireAuth(c: any, next: any) {
@@ -16,7 +22,7 @@ async function requireAuth(c: any, next: any) {
       return c.redirect('/login?redirect=' + encodeURIComponent(c.req.url))
     }
     
-    const payload = await verify(token, JWT_SECRET)
+    const payload = await verify(token, getJWTSecret())
     
     // Add user info to context
     c.set('user', {

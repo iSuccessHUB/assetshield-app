@@ -1,11 +1,23 @@
 import { Hono } from 'hono'
-// Generate UUID-like string using crypto
+import { InputValidator, SecureDatabase } from '../utils/database-security'
+
+// Generate cryptographically secure UUID
 function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  
+  // Set version (4) and variant bits
+  array[6] = (array[6] & 0x0f) | 0x40;
+  array[8] = (array[8] & 0x3f) | 0x80;
+  
+  const hex = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return [
+    hex.slice(0, 8),
+    hex.slice(8, 12),
+    hex.slice(12, 16),
+    hex.slice(16, 20),
+    hex.slice(20, 32)
+  ].join('-');
 }
 
 interface CloudflareBindings {
@@ -14,17 +26,42 @@ interface CloudflareBindings {
 
 export const enhancedDemoRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
-// Enhanced demo registration with comprehensive lead capture
+// Enhanced demo registration with comprehensive lead capture and security validation
 enhancedDemoRoutes.post('/register', async (c) => {
   try {
     const registrationData = await c.req.json()
     
-    // Validate required fields
-    const requiredFields = ['companyName', 'contactName', 'email']
-    for (const field of requiredFields) {
-      if (!registrationData[field]) {
-        return c.json({ error: `Missing required field: ${field}` }, 400)
+    // Validate and sanitize email
+    const emailValidation = InputValidator.validateEmail(registrationData.email);
+    if (!emailValidation.valid) {
+      return c.json({ 
+        error: 'Invalid email address', 
+        details: emailValidation.error 
+      }, 400);
+    }
+    
+    // Validate required fields with sanitization
+    const requiredFields = {
+      companyName: InputValidator.sanitizeString(registrationData.companyName, 100),
+      contactName: InputValidator.sanitizeString(registrationData.contactName, 100),
+      email: emailValidation.sanitized!
+    };
+    
+    // Check for missing required fields
+    for (const [field, value] of Object.entries(requiredFields)) {
+      if (!value || value.trim().length === 0) {
+        return c.json({ error: `Missing or invalid required field: ${field}` }, 400);
       }
+    }
+    
+    // Rate limiting for demo registrations per email
+    const emailKey = `demo_register:${requiredFields.email}`;
+    const rateCheck = InputValidator.checkRateLimit(emailKey, 3, 60 * 60 * 1000); // 3 attempts per hour
+    if (!rateCheck.allowed) {
+      return c.json({ 
+        error: 'Too many registration attempts. Please try again later.',
+        retryAfter: Math.ceil((rateCheck.resetTime! - Date.now()) / 1000)
+      }, 429);
     }
     
     const { env } = c

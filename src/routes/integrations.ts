@@ -7,7 +7,13 @@ interface CloudflareBindings {
 
 export const integrationsRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
-const JWT_SECRET = 'your-super-secret-jwt-key-change-in-production'
+// JWT Secret - Use same secure implementation as auth.ts
+function getJWTSecret(): string {
+  if (typeof process !== 'undefined' && process.env?.JWT_SECRET) {
+    return process.env.JWT_SECRET;
+  }
+  return 'fallback-jwt-secret-set-environment-variable-in-production-for-security';
+}
 
 // Middleware for API authentication
 async function requireApiAuth(c: any, next: any) {
@@ -18,7 +24,7 @@ async function requireApiAuth(c: any, next: any) {
     }
     
     const token = authHeader.substring(7)
-    const payload = await verify(token, JWT_SECRET)
+    const payload = await verify(token, getJWTSecret())
     
     c.set('firmId', payload.firmId)
     c.set('userId', payload.userId)
@@ -397,7 +403,7 @@ integrationsRoutes.post('/api/tokens/:firmId', async (c) => {
       exp: Math.floor(Date.now() / 1000) + getExpirationSeconds(expiresIn)
     }
     
-    const token = await sign(payload, JWT_SECRET)
+    const token = await sign(payload, getJWTSecret())
     
     return c.json({
       success: true,
