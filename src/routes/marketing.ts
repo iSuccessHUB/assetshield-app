@@ -1427,10 +1427,10 @@ app.get('/', (c) => {
                 </button>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="scheduleCall()" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30">
-                        <i class="fas fa-calendar mr-2"></i>
-                        Schedule Strategy Call
-                    </button>
+                    <a href="#contact" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30 inline-block">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Contact Us Today
+                    </a>
                     <a href="/#assessment" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30 inline-block">
                         <i class="fas fa-rocket mr-2"></i>
                         Try Live Demo
@@ -1498,7 +1498,7 @@ app.get('/', (c) => {
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-1">Schedule a Demo</h4>
                                 <p class="text-gray-600 mb-2">Book a personalized consultation</p>
-                                <button onclick="scheduleCall()" class="text-blue-600 font-semibold hover:text-blue-700">Schedule Now</button>
+                                <a href="#contact" class="text-blue-600 font-semibold hover:text-blue-700">Contact Us</a>
                             </div>
                         </div>
                     </div>
@@ -1629,9 +1629,6 @@ app.get('/', (c) => {
                     <h4 class="text-lg font-semibold mb-4">Support</h4>
                     <ul class="space-y-3">
                         <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors">Contact Us</a></li>
-
-                        <li><button onclick="scheduleCall()" class="text-gray-300 hover:text-white transition-colors text-left">Schedule Call</button></li>
-
                     </ul>
                 </div>
             </div>
@@ -1875,11 +1872,7 @@ app.get('/', (c) => {
             window.location.href = \`/#pricing\`;
         }
 
-        // Schedule Call
-        function scheduleCall() {
-            // In a real implementation, this would open a calendar booking widget
-            alert('Calendar booking system would open here. For now, please call +1 (800) 555-0123 to schedule your consultation.');
-        }
+
 
 
     </script>
