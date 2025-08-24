@@ -162,7 +162,21 @@ dashboardRoutes.get('/', async (c) => {
         <script>
             // Check authentication and load dashboard
             document.addEventListener('DOMContentLoaded', async function() {
-                const token = localStorage.getItem('assetshield_token');
+                // Check for admin impersonation token in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const impersonateToken = urlParams.get('impersonate');
+                
+                let token = localStorage.getItem('assetshield_token');
+                
+                // If admin is impersonating, use that token
+                if (impersonateToken) {
+                    token = impersonateToken;
+                    // Store impersonation token temporarily
+                    sessionStorage.setItem('admin_impersonation', 'true');
+                    sessionStorage.setItem('impersonate_token', impersonateToken);
+                    // Clean URL
+                    window.history.replaceState({}, document.title, '/dashboard');
+                }
                 
                 if (!token) {
                     window.location.href = '/dashboard/login';
@@ -186,7 +200,11 @@ dashboardRoutes.get('/', async (c) => {
                     
                 } catch (error) {
                     console.error('Authentication error:', error);
-                    localStorage.removeItem('assetshield_token');
+                    if (!impersonateToken) {
+                        localStorage.removeItem('assetshield_token');
+                    }
+                    sessionStorage.removeItem('admin_impersonation');
+                    sessionStorage.removeItem('impersonate_token');
                     window.location.href = '/dashboard/login';
                 }
             });
@@ -203,6 +221,17 @@ dashboardRoutes.get('/', async (c) => {
                                 <h1 class="text-xl font-semibold text-gray-900">AssetShield Dashboard</h1>
                             </div>
                             <div class="flex items-center space-x-4">
+                                \${sessionStorage.getItem('admin_impersonation') ? \`
+                                    <div class="bg-red-100 border border-red-200 rounded-lg px-3 py-1">
+                                        <span class="text-red-800 text-sm font-medium">
+                                            <i class="fas fa-user-shield mr-1"></i>
+                                            Admin View
+                                        </span>
+                                        <button onclick="exitImpersonation()" class="ml-2 text-red-600 hover:text-red-800 text-xs">
+                                            <i class="fas fa-times"></i> Exit
+                                        </button>
+                                    </div>
+                                \` : ''}
                                 <span class="text-sm text-gray-600">Welcome, \${customer.owner_name}</span>
                                 <div class="flex items-center space-x-1">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium \${
@@ -911,6 +940,13 @@ Continue?\`);
                     }
                 });
             });
+            
+            // Exit admin impersonation
+            function exitImpersonation() {
+                sessionStorage.removeItem('admin_impersonation');
+                sessionStorage.removeItem('impersonate_token');
+                window.close(); // Close the impersonation tab
+            }
         </script>
     </body>
     </html>

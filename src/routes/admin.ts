@@ -925,6 +925,205 @@ adminRoutes.get('/api/support-messages', requireAdminAuth, async (c) => {
   }
 })
 
+// API endpoint to list all customers for master control
+adminRoutes.get('/api/customers', requireAdminAuth, async (c) => {
+  try {
+    const { env } = c
+    const db = new SecureDatabase(env.DB)
+    
+    // Get customers from the centralized customers table
+    const customers = await db.secureSelect(`
+      SELECT 
+        c.id,
+        c.firm_name,
+        c.owner_name as name,
+        c.owner_email as email,
+        c.tier,
+        c.status,
+        c.created_at,
+        c.last_login,
+        c.trial_ends_at,
+        COUNT(pt.id) as total_payments,
+        SUM(CASE WHEN pt.status = 'succeeded' THEN pt.amount ELSE 0 END) as total_revenue
+      FROM customers c
+      LEFT JOIN payment_transactions pt ON c.id = pt.user_id
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+      LIMIT 50
+    `)
+    
+    // If no customers in centralized table, check legacy users table
+    if (!customers.data || customers.data.length === 0) {
+      const legacyUsers = await db.secureSelect(`
+        SELECT 
+          u.id,
+          u.name,
+          u.email,
+          'starter' as tier,
+          'active' as status,
+          u.created_at,
+          u.last_login,
+          NULL as trial_ends_at,
+          COUNT(pt.id) as total_payments,
+          SUM(CASE WHEN pt.status = 'succeeded' THEN pt.amount ELSE 0 END) as total_revenue
+        FROM users u
+        LEFT JOIN payment_transactions pt ON u.id = pt.user_id
+        GROUP BY u.id
+        ORDER BY u.created_at DESC
+        LIMIT 50
+      `)
+      
+      return c.json(legacyUsers.data || [])
+    }
+    
+    return c.json(customers.data || [])
+    
+  } catch (error) {
+    console.error('Customers list error:', error)
+    return c.json([])
+  }
+})
+
+// API endpoint for customer impersonation (master access)
+adminRoutes.post('/api/impersonate', requireAdminAuth, async (c) => {
+  try {
+    const { customerId } = await c.req.json()
+    const { env } = c
+    const db = new SecureDatabase(env.DB)
+    
+    // Get customer details
+    const customer = await db.secureSelect(`
+      SELECT id, firm_name, owner_email, tier, status
+      FROM customers 
+      WHERE id = ?
+    `, [customerId])
+    
+    if (!customer.data || customer.data.length === 0) {
+      return c.json({ success: false, error: 'Customer not found' })
+    }
+    
+    const customerData = customer.data[0]
+    
+    // Create impersonation token (admin can access any customer account)
+    const impersonationToken = await sign({
+      userId: customerId,
+      email: customerData.owner_email,
+      role: 'customer',
+      impersonatedBy: 'admin',
+      tier: customerData.tier,
+      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 2) // 2 hours
+    }, getJWTSecret())
+    
+    // Log the impersonation for audit
+    await db.secureInsert(`
+      INSERT INTO audit_logs (action, details, user_type, user_id, ip_address)
+      VALUES (?, ?, ?, ?, ?)
+    `, [
+      'admin_impersonation',
+      JSON.stringify({
+        adminAction: 'impersonate_customer',
+        customerId: customerId,
+        customerEmail: customerData.owner_email,
+        timestamp: new Date().toISOString()
+      }),
+      'admin',
+      customerId,
+      c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown'
+    ])
+    
+    return c.json({
+      success: true,
+      dashboardUrl: \`/dashboard?impersonate=\${impersonationToken}\`,
+      customerInfo: {
+        name: customerData.firm_name,
+        email: customerData.owner_email,
+        tier: customerData.tier
+      }
+    })
+    
+  } catch (error) {
+    console.error('Impersonation error:', error)
+    return c.json({ 
+      success: false, 
+      error: 'Failed to create impersonation session'
+    }, 500)
+  }
+})
+
+// Customer detail view for admin
+adminRoutes.get('/customer/:id', requireAdminAuth, async (c) => {
+  const customerId = c.req.param('id')
+  const { env } = c
+  const db = new SecureDatabase(env.DB)
+  
+  try {
+    // Get detailed customer information
+    const customer = await db.secureSelect(`
+      SELECT * FROM customers WHERE id = ?
+    `, [customerId])
+    
+    if (!customer.data || customer.data.length === 0) {
+      return c.html('<h1>Customer not found</h1>')
+    }
+    
+    const customerData = customer.data[0]
+    
+    return c.html(\`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Customer Details - \${customerData.firm_name}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      </head>
+      <body class="bg-gray-50">
+          <div class="max-w-4xl mx-auto py-8 px-4">
+              <div class="bg-white rounded-lg shadow-lg p-8">
+                  <h1 class="text-2xl font-bold text-gray-800 mb-6">
+                      <i class="fas fa-building mr-2"></i>
+                      \${customerData.firm_name}
+                  </h1>
+                  
+                  <div class="grid md:grid-cols-2 gap-6">
+                      <div>
+                          <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
+                          <p><strong>Owner:</strong> \${customerData.owner_name}</p>
+                          <p><strong>Email:</strong> \${customerData.owner_email}</p>
+                          <p><strong>Phone:</strong> \${customerData.owner_phone || 'Not provided'}</p>
+                      </div>
+                      
+                      <div>
+                          <h3 class="text-lg font-semibold mb-4">Subscription Details</h3>
+                          <p><strong>Tier:</strong> \${customerData.tier}</p>
+                          <p><strong>Status:</strong> \${customerData.status}</p>
+                          <p><strong>Setup Fee:</strong> $\${(customerData.setup_fee_paid / 100).toLocaleString()}</p>
+                          <p><strong>Monthly Fee:</strong> $\${(customerData.monthly_fee / 100).toLocaleString()}</p>
+                      </div>
+                  </div>
+                  
+                  <div class="mt-8 flex gap-4">
+                      <button onclick="window.open('/dashboard?impersonate=token', '_blank')" 
+                              class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                          <i class="fas fa-sign-in-alt mr-2"></i>Access Their Dashboard
+                      </button>
+                      <button onclick="window.close()" 
+                              class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                          <i class="fas fa-times mr-2"></i>Close
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </body>
+      </html>
+    \`)
+    
+  } catch (error) {
+    return c.html('<h1>Error loading customer details</h1>')
+  }
+})
+
 // Main Admin Dashboard
 adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
   const { env } = c
@@ -1073,7 +1272,31 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
             </div>
 
             <!-- Additional Analytics -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                <!-- Master Control Panel - Customer Access -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Master Control Panel</h3>
+                        <p class="text-sm text-gray-500">Direct access to all customer accounts</p>
+                    </div>
+                    <div class="p-6">
+                        <div id="customerList" class="space-y-3">
+                            <div class="text-center py-8">
+                                <i class="fas fa-users text-blue-500 text-2xl mb-2"></i>
+                                <p class="text-gray-600 text-sm">Loading customers...</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="refreshCustomerList()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-sync-alt mr-1"></i>Refresh
+                            </button>
+                            <button onclick="previewPaymentFlow()" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-eye mr-1"></i>Preview Payment Flow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Security Overview -->
                 <div class="bg-white rounded-lg shadow">
                     <div class="p-6 border-b border-gray-200">
@@ -1269,6 +1492,100 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
                 // For now, just show alert - can be expanded to full messaging system
                 alert('Enterprise Support Feature: Direct response functionality can be implemented based on your preferred communication method (email, phone, etc.)');
             }
+            
+            // Master Control Panel Functions
+            async function refreshCustomerList() {
+                try {
+                    const response = await fetch('/admin/api/customers');
+                    const customers = await response.json();
+                    
+                    const container = document.getElementById('customerList');
+                    
+                    if (customers.length === 0) {
+                        container.innerHTML = \`
+                            <div class="text-center py-8">
+                                <i class="fas fa-users text-gray-400 text-2xl mb-2"></i>
+                                <p class="text-gray-600 text-sm">No customers yet</p>
+                                <p class="text-xs text-gray-500 mt-1">Customers will appear here when they sign up</p>
+                            </div>
+                        \`;
+                    } else {
+                        container.innerHTML = customers.map(customer => \`
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">\${customer.firm_name || customer.name}</h4>
+                                        <p class="text-sm text-gray-600">\${customer.owner_email || customer.email}</p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="px-2 py-1 text-xs bg-\${customer.tier === 'enterprise' ? 'purple' : customer.tier === 'professional' ? 'blue' : 'green'}-100 text-\${customer.tier === 'enterprise' ? 'purple' : customer.tier === 'professional' ? 'blue' : 'green'}-800 rounded-full">
+                                                \${customer.tier || 'starter'}
+                                            </span>
+                                            <span class="px-2 py-1 text-xs bg-\${customer.status === 'active' ? 'green' : customer.status === 'trial' ? 'yellow' : 'red'}-100 text-\${customer.status === 'active' ? 'green' : customer.status === 'trial' ? 'yellow' : 'red'}-800 rounded-full">
+                                                \${customer.status || 'trial'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <button onclick="impersonateCustomer('\${customer.id}')" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+                                            <i class="fas fa-sign-in-alt mr-1"></i>Access Dashboard
+                                        </button>
+                                        <button onclick="viewCustomerDetails('\${customer.id}')" class="px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors">
+                                            <i class="fas fa-eye mr-1"></i>View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        \`).join('');
+                    }
+                } catch (error) {
+                    console.error('Failed to load customers:', error);
+                    const container = document.getElementById('customerList');
+                    container.innerHTML = \`
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+                            <p class="text-red-600 text-sm">Failed to load customers</p>
+                        </div>
+                    \`;
+                }
+            }
+            
+            async function impersonateCustomer(customerId) {
+                try {
+                    const response = await fetch('/admin/api/impersonate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ customerId })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Open customer dashboard in new tab with impersonation token
+                        window.open(result.dashboardUrl, '_blank');
+                    } else {
+                        alert('Failed to access customer dashboard: ' + result.error);
+                    }
+                } catch (error) {
+                    alert('Error accessing customer dashboard: ' + error.message);
+                }
+            }
+            
+            function viewCustomerDetails(customerId) {
+                // Open detailed customer view (can be expanded)
+                window.open(\`/admin/customer/\${customerId}\`, '_blank');
+            }
+            
+            function previewPaymentFlow() {
+                // Open payment flow preview in new tab
+                window.open('/?preview=admin', '_blank');
+            }
+            
+            // Load customer list on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(refreshCustomerList, 1000);
+            });
         </script>
     </body>
     </html>

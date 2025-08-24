@@ -473,6 +473,10 @@ app.get('/', (c) => {
   const whiteLabelConfig = c.get('whiteLabelConfig');
   const isWhiteLabel = whiteLabelConfig !== null;
   
+  // Check for admin preview mode
+  const previewParam = c.req.query('preview');
+  const isAdminPreview = previewParam === 'admin';
+  
   // Generate white-label CSS if needed
   const customCSS = isWhiteLabel ? generateWhiteLabelCSS(whiteLabelConfig) : '';
   
@@ -505,15 +509,29 @@ app.get('/', (c) => {
               <i className="fas fa-bars text-xl"></i>
             </button>
             
+            {/* Admin Preview Indicator */}
+            {isAdminPreview && (
+              <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                <i className="fas fa-user-shield mr-1"></i>
+                ADMIN PREVIEW
+              </div>
+            )}
+            
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
               <a href="#assessment" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('assessment')">Risk Assessment</a>
               <a href="#strategies" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('strategies')">Strategies</a>
               <a href="#education" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('education')">Education</a>
               <a href="#pricing" className="text-white/90 hover:text-white transition-colors" onClick="navigateToSection('pricing')">For Law Firms</a>
-              <button onclick="showLoginModal()" className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
-                <i className="fas fa-user mr-2"></i>Login
-              </button>
+              {isAdminPreview ? (
+                <button onclick="window.close()" className="px-4 py-2 bg-red-500/20 backdrop-blur-md text-white font-semibold rounded-lg border border-red-300/50 hover:bg-red-500/30 transition-all">
+                  <i className="fas fa-times mr-2"></i>Close Preview
+                </button>
+              ) : (
+                <button onclick="showLoginModal()" className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all">
+                  <i className="fas fa-user mr-2"></i>Login
+                </button>
+              )}
             </div>
           </div>
           
