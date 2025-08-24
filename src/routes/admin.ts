@@ -143,6 +143,7 @@ adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+        <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
     </head>
     <body class="bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 min-h-screen">
         <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -159,12 +160,27 @@ adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
                     <div class="space-y-6">
                         <div class="text-center">
                             <h3 class="text-lg font-medium text-white mb-4">Scan QR Code with Authenticator App</h3>
-                            <div id="qrcode" class="bg-white p-4 rounded-lg mx-auto inline-block"></div>
+                            <div id="qrcode" class="bg-white p-4 rounded-lg mx-auto inline-block min-h-[200px] flex items-center justify-center">
+                                <div class="text-gray-500">Loading QR Code...</div>
+                            </div>
+                            <div id="qrcode-error" class="hidden mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
+                                <p class="text-red-200 text-sm">QR Code failed to load. Please use the manual entry secret below.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800/50 rounded-lg p-4">
+                            <p class="text-sm text-gray-300 mb-2">Alternative: Direct QR Code Link</p>
+                            <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}" 
+                               target="_blank" 
+                               class="text-blue-400 hover:text-blue-300 underline text-sm">
+                               Click to view QR Code in new tab
+                            </a>
                         </div>
                         
                         <div class="bg-gray-800/50 rounded-lg p-4">
                             <p class="text-sm text-gray-300 mb-2">Manual Entry Secret:</p>
                             <code class="bg-gray-900 text-green-400 px-3 py-2 rounded font-mono text-sm break-all">${secret}</code>
+                            <p class="text-xs text-gray-400 mt-2">Enter this in your authenticator app manually</p>
                         </div>
                         
                         <form id="verify2FA" class="space-y-4">
@@ -203,14 +219,58 @@ adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
         </div>
         
         <script>
-            // Generate QR Code
-            QRCode.toCanvas(document.getElementById('qrcode'), '${qrUrl}', {
-                width: 200,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
+            // Generate QR Code with error handling
+            function generateQRCode() {
+                const qrCodeDiv = document.getElementById('qrcode');
+                const qrErrorDiv = document.getElementById('qrcode-error');
+                
+                try {
+                    // Check if QRCode library loaded
+                    if (typeof QRCode === 'undefined') {
+                        throw new Error('QRCode library not loaded');
+                    }
+                    
+                    // Clear loading message
+                    qrCodeDiv.innerHTML = '';
+                    
+                    // Generate QR Code
+                    QRCode.toCanvas(qrCodeDiv, '${qrUrl}', {
+                        width: 200,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, function (error) {
+                        if (error) {
+                            console.error('QR Code generation error:', error);
+                            showQRError();
+                        } else {
+                            console.log('QR Code generated successfully');
+                        }
+                    });
+                } catch (error) {
+                    console.error('QR Code setup error:', error);
+                    showQRError();
                 }
+            }
+            
+            function showQRError() {
+                document.getElementById('qrcode').innerHTML = '<div class="text-red-500 p-4">QR Code unavailable<br>Use manual entry below</div>';
+                document.getElementById('qrcode-error').classList.remove('hidden');
+            }
+            
+            // Try to generate QR code when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                // Wait a bit for scripts to load
+                setTimeout(generateQRCode, 500);
+                
+                // Fallback: try again after longer delay if first attempt fails
+                setTimeout(function() {
+                    if (document.getElementById('qrcode').innerHTML.includes('Loading')) {
+                        generateQRCode();
+                    }
+                }, 2000);
             });
             
             // Handle 2FA verification
