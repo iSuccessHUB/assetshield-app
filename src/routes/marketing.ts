@@ -3,7 +3,7 @@ import type { CloudflareBindings } from '../types'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
-// Marketing landing page - Ultimate sales page for AssetShield SaaS platform
+// Marketing landing page - Ultimate sales page for AssetShield SaaS platform v2.0
 app.get('/', (c) => {
   return c.html(`
 <!DOCTYPE html>
