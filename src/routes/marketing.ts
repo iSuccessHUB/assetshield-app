@@ -11,19 +11,24 @@ app.get('/', (c) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AssetShield Pro - White-Label Asset Protection Platform for Law Firms</title>
+    <title>AssetShield App - White-Label Asset Protection Platform for Law Firms</title>
     <meta name="description" content="Launch your own branded asset protection platform in 24 hours. Complete SaaS solution with client portal, risk assessments, and enterprise tools. Starting at $5K setup + $500/month.">
     <meta name="keywords" content="white-label asset protection software, law firm SaaS, client portal platform, asset protection tools, legal technology">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJkNjNhNCIvPgo8cGF0aCBkPSJNMTYgNEw4IDEwVjE4TDE2IDI4TDI0IDE4VjEwTDE2IDRaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTYgOEwxMiAxMlYxOEwxNiAyMkwyMCAxOFYxMkwxNiA4WiIgZmlsbD0iIzJkNjNhNCIvPgo8L3N2Zz4=" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9IiMyZDYzYTQiLz4KPHBhdGggZD0iTTkwIDIwTDQ1IDUwVjEwMEw5MCA0NjBMMTM1IDEwMFY1MEw5MCAyMFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik05MCA0MEw2NyA2MFYxMDBMOTAgMTIwTDExMyAxMDBWNjBMOTAgNDBaIiBmaWxsPSIjMmQ2M2E0Ii8+Cjwvc3ZnPg==" />
+    <link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJkNjNhNCIvPgo8cGF0aCBkPSJNMTYgNEw4IDEwVjE4TDE2IDI4TDI0IDE4VjEwTDE2IDRaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTYgOEwxMiAxMlYxOEwxNiAyMkwyMCAxOFYxMkwxNiA4WiIgZmlsbD0iIzJkNjNhNCIvPgo8L3N2Zz4=" />
+    
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AssetShield Pro - White-Label Asset Protection Platform for Law Firms">
+    <meta property="og:title" content="AssetShield App - White-Label Asset Protection Platform for Law Firms">
     <meta property="og:description" content="Launch your own branded asset protection platform in 24 hours. Complete SaaS solution starting at $5K setup + $500/month.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/static/assetshield-social-preview.jpg">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AssetShield Pro - White-Label Asset Protection Platform">
+    <meta name="twitter:title" content="AssetShield App - White-Label Asset Protection Platform">
     <meta name="twitter:description" content="Launch your own branded asset protection platform in 24 hours. Starting at $5K setup + $500/month.">
     
     <!-- Fonts -->
@@ -166,14 +171,14 @@ app.get('/', (c) => {
                     <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-shield-alt text-white text-lg"></i>
                     </div>
-                    <span class="text-xl font-bold text-gray-900">AssetShield Pro</span>
+                    <span class="text-xl font-bold text-gray-900">AssetShield App</span>
                 </div>
                 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
                     <a href="#pricing" class="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
-                    <a href="#demo" class="text-gray-600 hover:text-blue-600 transition-colors">Demo</a>
+                    <a href="/#assessment" class="text-gray-600 hover:text-blue-600 transition-colors">Try Demo</a>
                     <a href="#testimonials" class="text-gray-600 hover:text-blue-600 transition-colors">Reviews</a>
                     <a href="#contact" class="text-gray-600 hover:text-blue-600 transition-colors">Contact</a>
                     <button onclick="scrollToPricing()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
@@ -193,7 +198,7 @@ app.get('/', (c) => {
             <div class="px-4 py-4 space-y-3">
                 <a href="#features" class="block text-gray-600 hover:text-blue-600">Features</a>
                 <a href="#pricing" class="block text-gray-600 hover:text-blue-600">Pricing</a>
-                <a href="#demo" class="block text-gray-600 hover:text-blue-600">Demo</a>
+                <a href="/#assessment" class="block text-gray-600 hover:text-blue-600">Try Demo</a>
                 <a href="#testimonials" class="block text-gray-600 hover:text-blue-600">Reviews</a>
                 <a href="#contact" class="block text-gray-600 hover:text-blue-600">Contact</a>
                 <button onclick="scrollToPricing()" class="w-full bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
@@ -260,9 +265,9 @@ app.get('/', (c) => {
                             <i class="fas fa-rocket mr-2"></i>
                             Start Your Platform Today
                         </button>
-                        <button onclick="openDemoVideo()" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/30 transition-all border border-white/30">
+                        <button onclick="window.location.href='/#assessment'" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/30 transition-all border border-white/30">
                             <i class="fas fa-play mr-2"></i>
-                            Watch 2-Minute Demo
+                            Try the Demo
                         </button>
                     </div>
                     
@@ -442,7 +447,7 @@ app.get('/', (c) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-gray-900 mb-6">
-                    Introducing <span class="text-blue-600">AssetShield Pro</span>: Your Complete White-Label Platform
+                    Introducing <span class="text-blue-600">AssetShield App</span>: Your Complete White-Label Platform
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Transform your asset protection practice with a fully-branded SaaS platform that positions you as the technology leader in your market.
@@ -668,10 +673,10 @@ app.get('/', (c) => {
                         </div>
                         
                         <div class="mt-8">
-                            <button onclick="openDemoVideo()" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-play mr-2"></i>
-                                See Admin Panel Demo
-                            </button>
+                            <a href="/#assessment" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-block">
+                                <i class="fas fa-rocket mr-2"></i>
+                                Try Live Demo
+                            </a>
                         </div>
                     </div>
                     
@@ -685,7 +690,7 @@ app.get('/', (c) => {
                                     <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                                 </div>
                                 <div class="flex-1 text-center">
-                                    <span class="text-gray-300 text-sm">AssetShield Pro Admin</span>
+                                    <span class="text-gray-300 text-sm">AssetShield App Admin</span>
                                 </div>
                             </div>
                             
@@ -930,7 +935,7 @@ app.get('/', (c) => {
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-4">60-Day Money-Back Guarantee</h3>
                     <p class="text-lg text-gray-600 mb-6">
-                        If AssetShield Pro doesn't increase your client acquisition by at least 50% within 60 days, we'll refund your setup fee completely. We're that confident in our platform.
+                        If AssetShield App doesn't increase your client acquisition by at least 50% within 60 days, we'll refund your setup fee completely. We're that confident in our platform.
                     </p>
                     <div class="flex flex-wrap justify-center gap-8 text-sm text-gray-500">
                         <div class="flex items-center">
@@ -956,33 +961,137 @@ app.get('/', (c) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold mb-6">
-                    See AssetShield Pro in <span class="text-blue-400">Action</span>
+                    See AssetShield App in <span class="text-blue-400">Action</span>
                 </h2>
                 <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Watch how AssetShield Pro transforms your client experience and automates your practice in less than 2 minutes.
+                    Explore the powerful backend features and client experience that make AssetShield App the premium choice for law firms.
                 </p>
             </div>
             
-            <div class="relative max-w-4xl mx-auto">
-                <!-- Video Thumbnail -->
-                <div class="relative bg-gray-800 rounded-2xl overflow-hidden shadow-2xl cursor-pointer" onclick="openDemoVideo()">
-                    <div class="aspect-w-16 aspect-h-9 bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
-                        <div class="text-center">
-                            <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-white/30 transition-colors">
-                                <i class="fas fa-play text-white text-2xl ml-1"></i>
+            <div class="relative max-w-6xl mx-auto">
+                <!-- Screenshots Collage -->
+                <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Admin Dashboard Screenshot -->
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                        <div class="bg-gray-800 px-4 py-2 flex items-center">
+                            <div class="flex space-x-1">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                             </div>
-                            <h3 class="text-2xl font-bold mb-2">Watch the Complete Demo</h3>
-                            <p class="text-blue-200">See real client interactions and results</p>
+                            <div class="flex-1 text-center">
+                                <span class="text-gray-300 text-xs">Admin Dashboard</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-100 h-48">
+                            <div class="mb-4">
+                                <h4 class="text-lg font-bold text-gray-800 mb-2">Master Control Panel</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-white p-3 rounded shadow">
+                                        <div class="text-blue-600 font-bold text-xl">247</div>
+                                        <div class="text-gray-600 text-xs">Active Clients</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded shadow">
+                                        <div class="text-green-600 font-bold text-xl">$2.4M</div>
+                                        <div class="text-gray-600 text-xs">Revenue</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="bg-white p-2 rounded flex justify-between items-center text-xs">
+                                    <span>Client Management</span>
+                                    <i class="fas fa-check text-green-500"></i>
+                                </div>
+                                <div class="bg-white p-2 rounded flex justify-between items-center text-xs">
+                                    <span>Analytics Dashboard</span>
+                                    <i class="fas fa-check text-green-500"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Play Button Overlay -->
-                    <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <div class="w-24 h-24 bg-white/90 rounded-full flex items-center justify-center">
-                            <i class="fas fa-play text-gray-900 text-3xl ml-1"></i>
+                    <!-- Client Portal Screenshot -->
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                        <div class="bg-gray-800 px-4 py-2 flex items-center">
+                            <div class="flex space-x-1">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <div class="flex-1 text-center">
+                                <span class="text-gray-300 text-xs">Client Portal</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gradient-to-br from-green-50 to-blue-100 h-48">
+                            <div class="mb-4">
+                                <h4 class="text-lg font-bold text-gray-800 mb-2">Client Dashboard</h4>
+                                <div class="bg-white p-3 rounded shadow mb-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-gray-700 text-sm">Risk Assessment</span>
+                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Complete</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="bg-white p-2 rounded flex justify-between items-center text-xs">
+                                    <span>Asset Protection Plan</span>
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full w-3/4"></div>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-2 rounded flex justify-between items-center text-xs">
+                                    <span>Document Library</span>
+                                    <i class="fas fa-folder text-blue-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Risk Assessment Screenshot -->
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                        <div class="bg-gray-800 px-4 py-2 flex items-center">
+                            <div class="flex space-x-1">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <div class="flex-1 text-center">
+                                <span class="text-gray-300 text-xs">Risk Assessment</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gradient-to-br from-yellow-50 to-orange-100 h-48">
+                            <div class="mb-4">
+                                <h4 class="text-lg font-bold text-gray-800 mb-2">AI-Powered Assessment</h4>
+                                <div class="bg-white p-3 rounded shadow mb-3">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-orange-600">HIGH RISK</div>
+                                        <div class="text-gray-600 text-xs">Protection Level</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="bg-white p-2 rounded text-xs">
+                                    <span class="font-semibold">Wealth at Risk:</span>
+                                    <span class="text-red-600 ml-1">$850,000</span>
+                                </div>
+                                <div class="bg-white p-2 rounded text-xs">
+                                    <span class="font-semibold">Recommendations:</span>
+                                    <span class="text-blue-600 ml-1">4 Strategies</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Try Demo Button -->
+                <div class="text-center">
+                    <a href="/#assessment" class="inline-flex items-center bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-rocket mr-3"></i>
+                        Try the Live Demo
+                    </a>
+                    <p class="text-gray-400 text-sm mt-3">Experience the complete platform yourself</p>
+                </div>
+            </div>
                 
                 <!-- Demo Features -->
                 <div class="grid md:grid-cols-3 gap-6 mt-12">
@@ -1019,10 +1128,10 @@ app.get('/', (c) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-gray-900 mb-6">
-                    What Law Firms Are Saying About <span class="text-blue-600">AssetShield Pro</span>
+                    What Law Firms Are Saying About <span class="text-blue-600">AssetShield App</span>
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Join hundreds of successful law firms who have transformed their practices with AssetShield Pro.
+                    Join hundreds of successful law firms who have transformed their practices with AssetShield App.
                 </p>
             </div>
             
@@ -1047,7 +1156,7 @@ app.get('/', (c) => {
                                     <i class="fas fa-star"></i>
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <p class="text-gray-700 mb-4">"AssetShield Pro increased our client acquisition by 230% in the first 90 days. The automated risk assessments save us 15 hours per week while providing better client experiences."</p>
+                                <p class="text-gray-700 mb-4">"AssetShield App increased our client acquisition by 230% in the first 90 days. The automated risk assessments save us 15 hours per week while providing better client experiences."</p>
                                 <div class="text-sm text-gray-500">
                                     <span class="font-semibold text-green-600">+230% client growth</span> • 6 months
                                 </div>
@@ -1206,7 +1315,7 @@ app.get('/', (c) => {
                     Frequently Asked <span class="text-blue-600">Questions</span>
                 </h2>
                 <p class="text-xl text-gray-600">
-                    Everything you need to know about AssetShield Pro
+                    Everything you need to know about AssetShield App
                 </p>
             </div>
             
@@ -1218,7 +1327,7 @@ app.get('/', (c) => {
                         <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-1"></i>
                     </button>
                     <div id="faq-content-1" class="hidden px-6 pb-6">
-                        <p class="text-gray-600">Your fully-branded AssetShield Pro platform will be live within 24 hours of order completion. Our team handles all the technical setup, domain configuration, and branding customization while you focus on your practice.</p>
+                        <p class="text-gray-600">Your fully-branded AssetShield App platform will be live within 24 hours of order completion. Our team handles all the technical setup, domain configuration, and branding customization while you focus on your practice.</p>
                     </div>
                 </div>
                 
@@ -1229,7 +1338,7 @@ app.get('/', (c) => {
                         <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-2"></i>
                     </button>
                     <div id="faq-content-2" class="hidden px-6 pb-6">
-                        <p class="text-gray-600">Not at all! AssetShield Pro is designed for lawyers, not developers. Everything is managed through an intuitive admin dashboard. Our team provides complete onboarding and ongoing support to ensure your success.</p>
+                        <p class="text-gray-600">Not at all! AssetShield App is designed for lawyers, not developers. Everything is managed through an intuitive admin dashboard. Our team provides complete onboarding and ongoing support to ensure your success.</p>
                     </div>
                 </div>
                 
@@ -1287,7 +1396,7 @@ app.get('/', (c) => {
                 Ready to Transform Your Practice?
             </h2>
             <p class="text-xl mb-8 text-blue-100">
-                Join the leading law firms who've chosen AssetShield Pro to dominate their markets. Your competitors are already evaluating similar solutions.
+                Join the leading law firms who've chosen AssetShield App to dominate their markets. Your competitors are already evaluating similar solutions.
             </p>
             
             <!-- Urgency Elements -->
@@ -1322,10 +1431,10 @@ app.get('/', (c) => {
                         <i class="fas fa-calendar mr-2"></i>
                         Schedule Strategy Call
                     </button>
-                    <button onclick="openDemoVideo()" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30">
-                        <i class="fas fa-play mr-2"></i>
-                        Watch Demo Again
-                    </button>
+                    <a href="/#assessment" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all border border-white/30 inline-block">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Try Live Demo
+                    </a>
                 </div>
             </div>
             
@@ -1372,24 +1481,13 @@ app.get('/', (c) => {
                     
                     <div class="space-y-6">
                         <div class="flex items-start">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                                <i class="fas fa-phone text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900 mb-1">Phone Support</h4>
-                                <p class="text-gray-600 mb-2">Call us for immediate assistance</p>
-                                <a href="tel:+1-800-555-0123" class="text-blue-600 font-semibold hover:text-blue-700">+1 (800) 555-0123</a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start">
                             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                                 <i class="fas fa-envelope text-green-600"></i>
                             </div>
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-1">Email Support</h4>
                                 <p class="text-gray-600 mb-2">Send us a message anytime</p>
-                                <a href="mailto:support@assetshieldpro.com" class="text-blue-600 font-semibold hover:text-blue-700">support@assetshieldpro.com</a>
+                                <a href="mailto:support@isuccesshub.com" class="text-blue-600 font-semibold hover:text-blue-700">support@isuccesshub.com</a>
                             </div>
                         </div>
                         
@@ -1474,7 +1572,7 @@ app.get('/', (c) => {
                         
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">What interests you most?</label>
-                            <textarea name="interest" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors" placeholder="Tell us about your goals for implementing AssetShield Pro..."></textarea>
+                            <textarea name="interest" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors" placeholder="Tell us about your goals for implementing AssetShield App..."></textarea>
                         </div>
                         
                         <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
@@ -1497,7 +1595,7 @@ app.get('/', (c) => {
                         <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
                             <i class="fas fa-shield-alt text-white text-lg"></i>
                         </div>
-                        <span class="text-2xl font-bold">AssetShield Pro</span>
+                        <span class="text-2xl font-bold">AssetShield App</span>
                     </div>
                     <p class="text-gray-300 mb-6 max-w-lg">
                         The complete white-label asset protection platform for forward-thinking law firms. Transform your practice with enterprise-grade technology in 24 hours.
@@ -1531,16 +1629,16 @@ app.get('/', (c) => {
                     <h4 class="text-lg font-semibold mb-4">Support</h4>
                     <ul class="space-y-3">
                         <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="tel:+1-800-555-0123" class="text-gray-300 hover:text-white transition-colors">Phone Support</a></li>
+
                         <li><button onclick="scheduleCall()" class="text-gray-300 hover:text-white transition-colors text-left">Schedule Call</button></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Help Center</a></li>
+
                     </ul>
                 </div>
             </div>
             
             <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-400 text-sm">
-                    © 2024 AssetShield Pro. All rights reserved.
+                    © 2024 AssetShield App. All rights reserved.
                 </p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
                     <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
@@ -1551,31 +1649,7 @@ app.get('/', (c) => {
         </div>
     </footer>
 
-    <!-- Video Modal -->
-    <div id="videoModal" class="video-modal fixed inset-0 z-50 hidden items-center justify-center">
-        <div class="relative max-w-4xl w-full mx-4">
-            <button onclick="closeVideoModal()" class="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="bg-black rounded-lg overflow-hidden">
-                <div class="aspect-w-16 aspect-h-9 bg-gray-800 flex items-center justify-center">
-                    <div class="text-center text-white">
-                        <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-play text-2xl ml-1"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">AssetShield Pro Demo</h3>
-                        <p class="text-gray-300">See the complete platform in action</p>
-                        <!-- In a real implementation, you would embed an actual video here -->
-                        <div class="mt-6">
-                            <button onclick="startPurchaseFlow('professional')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                                Start Your Platform Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- JavaScript -->
     <script>
@@ -1704,7 +1778,7 @@ app.get('/', (c) => {
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         tension: 0.4
                     }, {
-                        label: 'AssetShield Pro Firms',
+                        label: 'AssetShield App Firms',
                         data: [100, 180, 290, 420, 580],
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -1772,7 +1846,7 @@ app.get('/', (c) => {
         }
 
         // Video Modal
-        function openDemoVideo() {
+        function window.location.href='/#assessment' {
             document.getElementById('videoModal').classList.remove('hidden');
             document.getElementById('videoModal').classList.add('flex');
             document.body.style.overflow = 'hidden';
@@ -1789,7 +1863,7 @@ app.get('/', (c) => {
             e.preventDefault();
             
             // Show success message
-            alert('Thank you for your interest! We will contact you within 24 hours to discuss your AssetShield Pro implementation.');
+            alert('Thank you for your interest! We will contact you within 24 hours to discuss your AssetShield App implementation.');
             
             // In a real implementation, you would send this data to your backend
             console.log('Contact form submitted:', new FormData(this));
@@ -1808,12 +1882,7 @@ app.get('/', (c) => {
             alert('Calendar booking system would open here. For now, please call +1 (800) 555-0123 to schedule your consultation.');
         }
 
-        // Close video modal when clicking outside
-        document.getElementById('videoModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeVideoModal();
-            }
-        });
+
     </script>
 </body>
 </html>
