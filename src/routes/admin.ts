@@ -1124,6 +1124,211 @@ adminRoutes.get('/customer/:id', requireAdminAuth, async (c) => {
   }
 })
 
+// Admin Demo Dashboard - Shows exactly what customers see
+adminRoutes.get('/demo-dashboard', requireAdminAuth, async (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Customer Dashboard Preview - AssetShield Admin</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body class="bg-gray-50">
+        <!-- Admin Preview Header -->
+        <div class="bg-red-500 text-white px-4 py-2 text-center">
+            <i class="fas fa-user-shield mr-2"></i>
+            <strong>ADMIN PREVIEW</strong> - This is what customers see in their dashboard
+            <button onclick="window.close()" class="float-right bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">
+                <i class="fas fa-times mr-1"></i>Close Preview
+            </button>
+        </div>
+
+        <!-- Customer Dashboard Content -->
+        <div class="min-h-screen bg-gray-50">
+            <!-- Navigation -->
+            <nav class="bg-white border-b border-gray-200 px-4 py-4">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <h1 class="text-xl font-semibold text-gray-900">AssetShield Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">Welcome, Demo Law Firm</span>
+                        <div class="flex items-center space-x-1">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Professional Tier
+                            </span>
+                        </div>
+                        <button class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-user-circle text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Dashboard Content -->
+            <div class="max-w-7xl mx-auto py-6 px-4">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-blue-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Clients</p>
+                                <p class="text-2xl font-bold text-gray-900">24</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Active Cases</p>
+                                <p class="text-2xl font-bold text-gray-900">18</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-alt text-yellow-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Documents</p>
+                                <p class="text-2xl font-bold text-gray-900">156</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Revenue</p>
+                                <p class="text-2xl font-bold text-gray-900">$287K</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Activity -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900">Recent Client Activity</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center py-3 border-b border-gray-100">
+                                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                                        <i class="fas fa-user-plus text-white text-sm"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm font-medium text-gray-900">New client onboarded: Sarah Johnson</p>
+                                        <p class="text-xs text-gray-500">2 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center py-3 border-b border-gray-100">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <i class="fas fa-file text-white text-sm"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm font-medium text-gray-900">Trust documents generated for Michael Corp</p>
+                                        <p class="text-xs text-gray-500">4 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center py-3 border-b border-gray-100">
+                                    <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
+                                        <i class="fas fa-chart-bar text-white text-sm"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm font-medium text-gray-900">Risk assessment completed for Tech Startup LLC</p>
+                                        <p class="text-xs text-gray-500">6 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <button class="w-full flex items-center px-4 py-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                <i class="fas fa-plus text-blue-600 mr-3"></i>
+                                <span class="text-blue-600 font-medium">Add New Client</span>
+                            </button>
+                            <button class="w-full flex items-center px-4 py-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                                <i class="fas fa-file-alt text-green-600 mr-3"></i>
+                                <span class="text-green-600 font-medium">Generate Documents</span>
+                            </button>
+                            <button class="w-full flex items-center px-4 py-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                                <i class="fas fa-chart-line text-purple-600 mr-3"></i>
+                                <span class="text-purple-600 font-medium">View Analytics</span>
+                            </button>
+                            <button class="w-full flex items-center px-4 py-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
+                                <i class="fas fa-cog text-yellow-600 mr-3"></i>
+                                <span class="text-yellow-600 font-medium">Settings</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (What customers can access) -->
+                <div class="mt-8 bg-white rounded-lg shadow">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-8 px-6">
+                            <a href="#" class="border-b-2 border-blue-500 py-4 text-blue-600 font-medium">Dashboard</a>
+                            <a href="#" class="py-4 text-gray-500 hover:text-gray-700">Clients</a>
+                            <a href="#" class="py-4 text-gray-500 hover:text-gray-700">Documents</a>
+                            <a href="#" class="py-4 text-gray-500 hover:text-gray-700">Analytics</a>
+                            <a href="#" class="py-4 text-gray-500 hover:text-gray-700">White-Label Settings</a>
+                        </nav>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-center py-12">
+                            <i class="fas fa-tachometer-alt text-gray-400 text-4xl mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Customer Dashboard Preview</h3>
+                            <p class="text-gray-500">This is exactly what your paying customers see when they login to their dashboard.</p>
+                            <p class="text-sm text-gray-400 mt-2">Features shown depend on their subscription tier (Starter/Professional/Enterprise)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Add some interactivity to make it feel real
+            document.addEventListener('DOMContentLoaded', function() {
+                // Simulate real-time updates
+                setInterval(() => {
+                    const timestamp = new Date().toLocaleTimeString();
+                    console.log('Dashboard updated at:', timestamp);
+                }, 10000);
+            });
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 // Main Admin Dashboard
 adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
   const { env } = c
@@ -1286,12 +1491,15 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
                                 <p class="text-gray-600 text-sm">Loading customers...</p>
                             </div>
                         </div>
-                        <div class="mt-4 flex gap-2">
+                        <div class="mt-4 flex gap-2 flex-wrap">
                             <button onclick="refreshCustomerList()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                                 <i class="fas fa-sync-alt mr-1"></i>Refresh
                             </button>
                             <button onclick="previewPaymentFlow()" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
                                 <i class="fas fa-eye mr-1"></i>Preview Payment Flow
+                            </button>
+                            <button onclick="previewCustomerDashboard()" class="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-tachometer-alt mr-1"></i>Preview Customer Dashboard
                             </button>
                         </div>
                     </div>
@@ -1580,6 +1788,11 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
             function previewPaymentFlow() {
                 // Open payment flow preview in new tab
                 window.open('/?preview=admin', '_blank');
+            }
+            
+            function previewCustomerDashboard() {
+                // Open customer dashboard preview in new tab with admin demo account
+                window.open('/admin/demo-dashboard', '_blank');
             }
             
             // Load customer list on page load
