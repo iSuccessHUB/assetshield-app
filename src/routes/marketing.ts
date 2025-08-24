@@ -265,7 +265,7 @@ app.get('/', (c) => {
                             <i class="fas fa-rocket mr-2"></i>
                             Start Your Platform Today
                         </button>
-                        <button onclick="window.location.href='/#assessment'" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/30 transition-all border border-white/30">
+                        <button onclick="openDemoModal()" class="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/30 transition-all border border-white/30">
                             <i class="fas fa-play mr-2"></i>
                             Try the Demo
                         </button>
@@ -1845,11 +1845,10 @@ app.get('/', (c) => {
             icon.classList.toggle('rotate-180');
         }
 
-        // Video Modal
-        function window.location.href='/#assessment' {
-            document.getElementById('videoModal').classList.remove('hidden');
-            document.getElementById('videoModal').classList.add('flex');
-            document.body.style.overflow = 'hidden';
+        // Video Modal - Fixed function name and redirect to demo
+        function openDemoModal() {
+            // Redirect to main app demo instead of showing video modal
+            window.location.href = '/#assessment';
         }
 
         function closeVideoModal() {
