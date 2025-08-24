@@ -1033,7 +1033,7 @@ adminRoutes.post('/api/impersonate', requireAdminAuth, async (c) => {
     
     return c.json({
       success: true,
-      dashboardUrl: \`/dashboard?impersonate=\${impersonationToken}\`,
+      dashboardUrl: `/dashboard?impersonate=${impersonationToken}`,
       customerInfo: {
         name: customerData.firm_name,
         email: customerData.owner_email,
@@ -1068,13 +1068,13 @@ adminRoutes.get('/customer/:id', requireAdminAuth, async (c) => {
     
     const customerData = customer.data[0]
     
-    return c.html(\`
+    return c.html(`
       <!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Customer Details - \${customerData.firm_name}</title>
+          <title>Customer Details - ${customerData.firm_name}</title>
           <script src="https://cdn.tailwindcss.com"></script>
           <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
       </head>
@@ -1083,23 +1083,23 @@ adminRoutes.get('/customer/:id', requireAdminAuth, async (c) => {
               <div class="bg-white rounded-lg shadow-lg p-8">
                   <h1 class="text-2xl font-bold text-gray-800 mb-6">
                       <i class="fas fa-building mr-2"></i>
-                      \${customerData.firm_name}
+                      ${customerData.firm_name}
                   </h1>
                   
                   <div class="grid md:grid-cols-2 gap-6">
                       <div>
                           <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
-                          <p><strong>Owner:</strong> \${customerData.owner_name}</p>
-                          <p><strong>Email:</strong> \${customerData.owner_email}</p>
-                          <p><strong>Phone:</strong> \${customerData.owner_phone || 'Not provided'}</p>
+                          <p><strong>Owner:</strong> ${customerData.owner_name}</p>
+                          <p><strong>Email:</strong> ${customerData.owner_email}</p>
+                          <p><strong>Phone:</strong> ${customerData.owner_phone || 'Not provided'}</p>
                       </div>
                       
                       <div>
                           <h3 class="text-lg font-semibold mb-4">Subscription Details</h3>
-                          <p><strong>Tier:</strong> \${customerData.tier}</p>
-                          <p><strong>Status:</strong> \${customerData.status}</p>
-                          <p><strong>Setup Fee:</strong> $\${(customerData.setup_fee_paid / 100).toLocaleString()}</p>
-                          <p><strong>Monthly Fee:</strong> $\${(customerData.monthly_fee / 100).toLocaleString()}</p>
+                          <p><strong>Tier:</strong> ${customerData.tier}</p>
+                          <p><strong>Status:</strong> ${customerData.status}</p>
+                          <p><strong>Setup Fee:</strong> $${(customerData.setup_fee_paid / 100).toLocaleString()}</p>
+                          <p><strong>Monthly Fee:</strong> $${(customerData.monthly_fee / 100).toLocaleString()}</p>
                       </div>
                   </div>
                   
@@ -1117,7 +1117,7 @@ adminRoutes.get('/customer/:id', requireAdminAuth, async (c) => {
           </div>
       </body>
       </html>
-    \`)
+    `)
     
   } catch (error) {
     return c.html('<h1>Error loading customer details</h1>')
