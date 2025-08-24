@@ -199,6 +199,11 @@ adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
                                 <i class="fas fa-check mr-2"></i>
                                 Verify and Enable 2FA
                             </button>
+                            
+                            <button type="button" id="resetButton" class="w-full flex justify-center py-2 px-4 border border-gray-500 rounded-lg shadow-sm text-sm font-medium text-gray-300 bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
+                                <i class="fas fa-refresh mr-2"></i>
+                                Reset & Get New Secret
+                            </button>
                         </form>
                         
                         <div class="text-center">
@@ -298,7 +303,9 @@ adminRoutes.get('/setup-2fa', requireAdminAuth, async (c) => {
                         alert('2FA successfully enabled! Please save your backup codes.');
                         window.location.href = '/admin/dashboard';
                     } else {
-                        alert('Invalid code. Please try again.');
+                        document.getElementById('totp').value = '';
+                        document.getElementById('totp').focus();
+                        alert('Invalid code. Please check your authenticator app and try again.\\n\\nTip: Make sure your phone\\'s time is synchronized.');
                     }
                 } catch (error) {
                     alert('Error setting up 2FA. Please try again.');
@@ -614,6 +621,13 @@ adminRoutes.get('/login', async (c) => {
             // Format TOTP input
             document.getElementById('totp')?.addEventListener('input', function(e) {
                 e.target.value = e.target.value.replace(/\\D/g, '');
+            });
+            
+            // Handle reset button
+            document.getElementById('resetButton')?.addEventListener('click', function() {
+                if (confirm('This will generate a new secret. You\\'ll need to scan the QR code again. Continue?')) {
+                    window.location.reload();
+                }
             });
         </script>
     </body>
