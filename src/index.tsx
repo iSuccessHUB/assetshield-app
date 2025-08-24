@@ -223,6 +223,7 @@ import { officesRoutes } from './routes/offices'
 import { integrationsRoutes } from './routes/integrations'
 import { provisioningRoutes } from './routes/provisioning'
 import { stripeCheckoutRoutes } from './routes/stripe-checkout'
+import { marketingRoutes } from './routes/marketing'
 
 // API Routes
 app.route('/api/assessment', assessmentRoutes)
@@ -257,6 +258,9 @@ app.route('/provisioning', provisioningRoutes)
 app.route('/stripe-checkout', stripeCheckoutRoutes)
 app.route('/stripe-webhooks', stripeWebhookRoutes)
 app.route('/api/platform', platformApiRoutes)
+
+// Marketing landing page route
+app.route('/marketing', marketingRoutes)
 
 // Automated purchase success routes
 app.get('/purchase-success', (c) => c.redirect('/stripe-checkout/purchase-success?' + c.req.url.split('?')[1]))
@@ -548,6 +552,21 @@ app.get('/', (c) => {
             </div>
           </div>
         </nav>
+
+        {/* Marketing Banner - For Law Firms */}
+        {!isWhiteLabel && (
+          <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white text-center py-3 px-4">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
+              <span className="text-sm font-medium">
+                <i className="fas fa-briefcase mr-2"></i>
+                Are you a law firm looking to offer this platform to your clients?
+              </span>
+              <a href="/marketing" className="bg-white/20 backdrop-blur-sm text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-white/30 transition-all">
+                Learn About AssetShield Pro →
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Hero Section */}
         <section className="px-4 sm:px-6 py-12 sm:py-20">
