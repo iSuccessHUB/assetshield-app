@@ -1592,7 +1592,7 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
   `)
 })
 
-// Helper functions
+// Helper functions for admin dashboard analytics
 async function getVisitorAnalytics(db: SecureDatabase) {
   try {
     const result = await db.secureSelect(`
