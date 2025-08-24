@@ -831,6 +831,100 @@ adminRoutes.post('/logout', requireAdminAuth, async (c) => {
   return c.redirect('/admin/login')
 })
 
+// API endpoint for real-time sales chart data
+adminRoutes.get('/api/sales-chart-data', requireAdminAuth, async (c) => {
+  try {
+    const { env } = c
+    const db = new SecureDatabase(env.DB)
+    
+    // Get monthly sales data for the last 12 months
+    const salesData = await db.secureSelect(`
+      SELECT 
+        strftime('%Y-%m', created_at) as month,
+        SUM(amount) as revenue,
+        COUNT(*) as transactions
+      FROM payment_transactions 
+      WHERE status = 'succeeded' 
+        AND created_at >= date('now', '-12 months')
+      GROUP BY strftime('%Y-%m', created_at)
+      ORDER BY month ASC
+    `)
+    
+    if (!salesData.data || salesData.data.length === 0) {
+      // No sales data - return empty chart structure
+      return c.json({
+        labels: ['No Sales Yet'],
+        data: [0],
+        message: 'No sales data available'
+      })
+    }
+    
+    // Process data for Chart.js
+    const labels = salesData.data.map(row => {
+      const date = new Date(row.month + '-01')
+      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    })
+    
+    // Convert revenue from cents to dollars for display
+    const data = salesData.data.map(row => (row.revenue || 0) / 100)
+    
+    return c.json({
+      labels,
+      data,
+      totalRevenue: data.reduce((sum, val) => sum + val, 0),
+      totalTransactions: salesData.data.reduce((sum, row) => sum + (row.transactions || 0), 0)
+    })
+    
+  } catch (error) {
+    console.error('Sales chart data error:', error)
+    return c.json({
+      labels: ['Error Loading Data'],
+      data: [0],
+      error: error.message
+    }, 500)
+  }
+})
+
+// API endpoint for customer support messages (working with existing schema)
+adminRoutes.get('/api/support-messages', requireAdminAuth, async (c) => {
+  try {
+    const { env } = c
+    const db = new SecureDatabase(env.DB)
+    
+    // Get recent support messages from existing support_tickets and support_messages tables
+    const messages = await db.secureSelect(`
+      SELECT 
+        st.id,
+        st.user_id,
+        st.subject as message,
+        st.priority,
+        st.status,
+        st.created_at as timestamp,
+        u.name as customerName,
+        u.email as contact_email,
+        'N/A' as subscription_tier
+      FROM support_tickets st
+      LEFT JOIN users u ON st.user_id = u.id
+      WHERE st.status != 'resolved'
+      ORDER BY 
+        CASE st.priority 
+          WHEN 'high' THEN 1 
+          WHEN 'medium' THEN 2 
+          ELSE 3 
+        END,
+        st.created_at DESC
+      LIMIT 20
+    `)
+    
+    return c.json(messages.data || [])
+    
+  } catch (error) {
+    console.error('Support messages error:', error)
+    // Return empty array if tables don't exist yet or no data
+    return c.json([])
+  }
+})
+
 // Main Admin Dashboard
 adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
   const { env } = c
@@ -979,7 +1073,7 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
             </div>
 
             <!-- Additional Analytics -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                 <!-- Security Overview -->
                 <div class="bg-white rounded-lg shadow">
                     <div class="p-6 border-b border-gray-200">
@@ -987,15 +1081,40 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
                     </div>
                     <div class="p-6">
                         <div class="space-y-4">
-                            ${(securityEvents || []).map(event => `
+                            ${(securityEvents || []).length > 0 ? securityEvents.map(event => `
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm text-gray-600">${event.type}</span>
                                     <span class="px-2 py-1 text-xs rounded-full ${getSecurityBadgeClass(event.level)}">
                                         ${event.count} events
                                     </span>
                                 </div>
-                            `).join('')}
+                            `).join('') : `
+                                <div class="text-center py-8">
+                                    <i class="fas fa-shield-check text-green-500 text-2xl mb-2"></i>
+                                    <p class="text-gray-600 text-sm">No security incidents</p>
+                                </div>
+                            `}
                         </div>
+                    </div>
+                </div>
+
+                <!-- Customer Support Messages (Enterprise) -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Customer Support</h3>
+                        <p class="text-sm text-gray-500">Direct Enterprise Support Channel</p>
+                    </div>
+                    <div class="p-6">
+                        <div id="supportMessages" class="space-y-3 max-h-64 overflow-y-auto mb-4">
+                            <div class="text-center py-8">
+                                <i class="fas fa-headset text-blue-500 text-2xl mb-2"></i>
+                                <p class="text-gray-600 text-sm">No support requests</p>
+                                <p class="text-xs text-gray-500 mt-1">Enterprise customers can contact you directly here</p>
+                            </div>
+                        </div>
+                        <button onclick="refreshSupportMessages()" class="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-sync-alt mr-1"></i>Refresh Messages
+                        </button>
                     </div>
                 </div>
 
@@ -1025,34 +1144,131 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
         </div>
 
         <script>
-            // Initialize sales chart
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            const salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Revenue ($)',
-                        data: [12000, 19000, 15000, 25000, 32000, 45000],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+            // Initialize sales chart with REAL data
+            async function loadSalesChart() {
+                try {
+                    const response = await fetch('/admin/api/sales-chart-data');
+                    const chartData = await response.json();
+                    
+                    const ctx = document.getElementById('salesChart').getContext('2d');
+                    const salesChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: chartData.labels || ['No Data'],
+                            datasets: [{
+                                label: 'Revenue ($)',
+                                data: chartData.data || [0],
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Revenue: $' + context.raw.toLocaleString();
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    }
+                    });
+                } catch (error) {
+                    console.error('Failed to load sales chart:', error);
+                    
+                    // Fallback: Show empty chart if no data
+                    const ctx = document.getElementById('salesChart').getContext('2d');
+                    const salesChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['No Sales Yet'],
+                            datasets: [{
+                                label: 'Revenue ($)',
+                                data: [0],
+                                borderColor: 'rgb(156, 163, 175)',
+                                backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: { y: { beginAtZero: true } },
+                            plugins: {
+                                legend: { display: true }
+                            }
+                        }
+                    });
                 }
-            });
+            }
+            
+            // Load chart on page load
+            loadSalesChart();
 
-            // Auto-refresh every 30 seconds
+            // Auto-refresh every 60 seconds (reduced frequency for better performance)
             setInterval(() => {
                 window.location.reload();
-            }, 30000);
+            }, 60000);
+            
+            // Customer support functions
+            async function refreshSupportMessages() {
+                try {
+                    const response = await fetch('/admin/api/support-messages');
+                    const messages = await response.json();
+                    
+                    const container = document.getElementById('supportMessages');
+                    
+                    if (messages.length === 0) {
+                        container.innerHTML = \`
+                            <div class="text-center py-8">
+                                <i class="fas fa-headset text-blue-500 text-2xl mb-2"></i>
+                                <p class="text-gray-600 text-sm">No support requests</p>
+                                <p class="text-xs text-gray-500 mt-1">Enterprise customers can contact you directly here</p>
+                            </div>
+                        \`;
+                    } else {
+                        container.innerHTML = messages.map(msg => \`
+                            <div class="border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-sm text-gray-900">\${msg.customerName}</span>
+                                    <span class="text-xs text-gray-500">\${new Date(msg.timestamp).toLocaleString()}</span>
+                                </div>
+                                <p class="text-sm text-gray-700">\${msg.message}</p>
+                                <div class="mt-2 flex items-center justify-between">
+                                    <span class="px-2 py-1 text-xs bg-\${msg.priority === 'high' ? 'red' : msg.priority === 'medium' ? 'yellow' : 'green'}-100 text-\${msg.priority === 'high' ? 'red' : msg.priority === 'medium' ? 'yellow' : 'green'}-800 rounded-full">
+                                        \${msg.priority} priority
+                                    </span>
+                                    <button onclick="respondToMessage('\${msg.id}')" class="text-blue-600 hover:text-blue-800 text-xs">
+                                        <i class="fas fa-reply mr-1"></i>Respond
+                                    </button>
+                                </div>
+                            </div>
+                        \`).join('');
+                    }
+                } catch (error) {
+                    console.error('Failed to load support messages:', error);
+                }
+            }
+            
+            function respondToMessage(messageId) {
+                // For now, just show alert - can be expanded to full messaging system
+                alert('Enterprise Support Feature: Direct response functionality can be implemented based on your preferred communication method (email, phone, etc.)');
+            }
         </script>
     </body>
     </html>
@@ -1061,63 +1277,91 @@ adminRoutes.get('/dashboard', requireAdminAuth, async (c) => {
 
 // Helper functions
 async function getVisitorAnalytics(db: SecureDatabase) {
-  const result = await db.secureSelect(`
-    SELECT 
-      COUNT(DISTINCT ip_address) as totalVisitors,
-      COUNT(*) as totalPageViews,
-      COUNT(CASE WHEN created_at > datetime('now', '-24 hours') THEN 1 END) as visitorsToday
-    FROM audit_logs 
-    WHERE action LIKE '%GET%'
-  `)
-  
-  return result.data?.[0] || { totalVisitors: 0, totalPageViews: 0, visitorsToday: 0 }
+  try {
+    const result = await db.secureSelect(`
+      SELECT 
+        COUNT(DISTINCT ip_address) as totalVisitors,
+        COUNT(*) as totalPageViews,
+        COUNT(CASE WHEN created_at > datetime('now', '-24 hours') THEN 1 END) as visitorsToday
+      FROM audit_logs 
+      WHERE action LIKE '%GET%' OR action LIKE '%visit%'
+    `)
+    
+    return result.data?.[0] || { totalVisitors: 0, totalPageViews: 0, visitorsToday: 0 }
+  } catch (error) {
+    // Return zero state if table doesn't exist yet
+    return { totalVisitors: 0, totalPageViews: 0, visitorsToday: 0 }
+  }
 }
 
 async function getSalesAnalytics(db: SecureDatabase) {
-  const result = await db.secureSelect(`
-    SELECT 
-      COUNT(*) as totalSales,
-      SUM(amount) as totalRevenue,
-      COUNT(DISTINCT user_id) as activeLawFirms,
-      CAST(COUNT(*) AS FLOAT) / NULLIF(
-        (SELECT COUNT(*) FROM audit_logs WHERE action LIKE '%assessment%'), 0
-      ) as conversionRate
-    FROM payment_transactions 
-    WHERE status = 'succeeded'
-  `)
-  
-  return result.data?.[0] || { totalSales: 0, totalRevenue: 0, activeLawFirms: 0, conversionRate: 0 }
+  try {
+    const result = await db.secureSelect(`
+      SELECT 
+        COUNT(*) as totalSales,
+        COALESCE(SUM(amount), 0) as totalRevenue,
+        COUNT(DISTINCT user_id) as activeLawFirms,
+        CASE 
+          WHEN (SELECT COUNT(*) FROM audit_logs WHERE action LIKE '%assessment%') > 0 
+          THEN CAST(COUNT(*) AS FLOAT) / (SELECT COUNT(*) FROM audit_logs WHERE action LIKE '%assessment%')
+          ELSE 0 
+        END as conversionRate
+      FROM payment_transactions 
+      WHERE status = 'succeeded'
+    `)
+    
+    const data = result.data?.[0] || { totalSales: 0, totalRevenue: 0, activeLawFirms: 0, conversionRate: 0 }
+    
+    // Convert revenue from cents to dollars  
+    data.totalRevenue = (data.totalRevenue || 0) / 100
+    
+    return data
+  } catch (error) {
+    // Return zero state if table doesn't exist yet
+    return { totalSales: 0, totalRevenue: 0, activeLawFirms: 0, conversionRate: 0 }
+  }
 }
 
 async function getRecentActivity(db: SecureDatabase) {
-  const result = await db.secureSelect(`
-    SELECT 
-      action as type,
-      details as description,
-      created_at as timestamp,
-      ip_address
-    FROM audit_logs 
-    ORDER BY created_at DESC 
-    LIMIT 10
-  `)
-  
-  return result.data || []
+  try {
+    const result = await db.secureSelect(`
+      SELECT 
+        action as type,
+        COALESCE(details, action) as description,
+        created_at as timestamp,
+        ip_address,
+        user_email
+      FROM audit_logs 
+      ORDER BY created_at DESC 
+      LIMIT 10
+    `)
+    
+    return result.data || []
+  } catch (error) {
+    // Return empty array if table doesn't exist yet
+    return []
+  }
 }
 
 async function getSecuritySummary(db: SecureDatabase) {
-  const result = await db.secureSelect(`
-    SELECT 
-      event_type as type,
-      risk_level as level,
-      COUNT(*) as count
-    FROM security_events 
-    WHERE created_at > datetime('now', '-24 hours')
-    GROUP BY event_type, risk_level
-    ORDER BY count DESC
-    LIMIT 10
-  `)
-  
-  return result.data || []
+  try {
+    const result = await db.secureSelect(`
+      SELECT 
+        event_type as type,
+        risk_level as level,
+        COUNT(*) as count
+      FROM security_events 
+      WHERE created_at > datetime('now', '-24 hours')
+      GROUP BY event_type, risk_level
+      ORDER BY count DESC
+      LIMIT 10
+    `)
+    
+    return result.data || []
+  } catch (error) {
+    // Return empty array if table doesn't exist yet
+    return []
+  }
 }
 
 async function getPlatformMetrics(db: SecureDatabase) {
