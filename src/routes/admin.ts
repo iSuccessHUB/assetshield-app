@@ -590,19 +590,24 @@ adminRoutes.post('/api/login', async (c) => {
     
     // Validate basic credentials first
     if (username !== ADMIN_CREDENTIALS.username || password !== ADMIN_CREDENTIALS.password) {
-      await c.env.DB.prepare(`
-        INSERT INTO security_events (
-          event_type, ip_address, user_agent, event_data, 
-          risk_level, action_taken, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-      `).bind(
-        'admin_login_failed',
-        ip,
-        c.req.header('User-Agent') || 'unknown',
-        JSON.stringify({ attempted_username: username, timestamp: new Date().toISOString() }),
-        'high',
-        'login_rejected'
-      ).run()
+      try {
+        await c.env.DB.prepare(`
+          INSERT INTO security_events (
+            event_type, ip_address, user_agent, event_data, 
+            risk_level, action_taken, created_at
+          ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        `).bind(
+          'admin_login_failed',
+          ip,
+          c.req.header('User-Agent') || 'unknown',
+          JSON.stringify({ attempted_username: username, timestamp: new Date().toISOString() }),
+          'high',
+          'login_rejected'
+        ).run()
+      } catch (dbError) {
+        // Skip logging if security_events table doesn't exist
+        console.log('Security logging skipped:', dbError.message)
+      }
       
       return c.json({ error: 'Invalid admin credentials' }, 401)
     }
@@ -627,19 +632,24 @@ adminRoutes.post('/api/login', async (c) => {
       
       const isValidTOTP = await TOTP.verifyToken(totpSecret, totp)
       if (!isValidTOTP) {
-        await c.env.DB.prepare(`
-          INSERT INTO security_events (
-            event_type, ip_address, user_agent, event_data, 
-            risk_level, action_taken, created_at
-          ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-        `).bind(
-          'admin_2fa_failed',
-          ip,
-          c.req.header('User-Agent') || 'unknown',
-          JSON.stringify({ username, attempted_totp: totp, timestamp: new Date().toISOString() }),
-          'high',
-          '2fa_rejected'
-        ).run()
+        try {
+          await c.env.DB.prepare(`
+            INSERT INTO security_events (
+              event_type, ip_address, user_agent, event_data, 
+              risk_level, action_taken, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+          `).bind(
+            'admin_2fa_failed',
+            ip,
+            c.req.header('User-Agent') || 'unknown',
+            JSON.stringify({ username, attempted_totp: totp, timestamp: new Date().toISOString() }),
+            'high',
+            '2fa_rejected'
+          ).run()
+        } catch (dbError) {
+          // Skip logging if security_events table doesn't exist
+          console.log('Security logging skipped:', dbError.message)
+        }
         
         return c.json({ error: 'Invalid 2FA code' }, 401)
       }
@@ -666,43 +676,53 @@ adminRoutes.post('/api/login', async (c) => {
       path: '/admin'
     })
     
-    // Log successful admin login
-    await c.env.DB.prepare(`
-      INSERT INTO security_events (
-        event_type, ip_address, user_agent, event_data, 
-        risk_level, action_taken, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-    `).bind(
-      'admin_login_success',
-      ip,
-      c.req.header('User-Agent') || 'unknown',
-      JSON.stringify({ 
-        username, 
-        has2FA: !!totpSecret,
-        timestamp: new Date().toISOString() 
-      }),
-      'low',
-      'admin_access_granted'
-    ).run()
+    // Log successful admin login (skip if table doesn't exist)
+    try {
+      await c.env.DB.prepare(`
+        INSERT INTO security_events (
+          event_type, ip_address, user_agent, event_data, 
+          risk_level, action_taken, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `).bind(
+        'admin_login_success',
+        ip,
+        c.req.header('User-Agent') || 'unknown',
+        JSON.stringify({ 
+          username, 
+          has2FA: !!totpSecret,
+          timestamp: new Date().toISOString() 
+        }),
+        'low',
+        'admin_access_granted'
+      ).run()
+    } catch (dbError) {
+      // Skip logging if security_events table doesn't exist
+      console.log('Security logging skipped:', dbError.message)
+    }
     
     return c.json({ success: true })
     
   } catch (error) {
     console.error('Admin login error:', error)
-    // Log the error for debugging
-    await c.env.DB.prepare(`
-      INSERT INTO security_events (
-        event_type, ip_address, user_agent, event_data, 
-        risk_level, action_taken, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-    `).bind(
-      'admin_login_error',
-      c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown',
-      c.req.header('User-Agent') || 'unknown',
-      JSON.stringify({ error: error.message, timestamp: new Date().toISOString() }),
-      'high',
-      'error_logged'
-    ).run().catch(() => {}) // Ignore DB errors during error logging
+    // Log the error for debugging (skip if table doesn't exist)
+    try {
+      await c.env.DB.prepare(`
+        INSERT INTO security_events (
+          event_type, ip_address, user_agent, event_data, 
+          risk_level, action_taken, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `).bind(
+        'admin_login_error',
+        c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown',
+        c.req.header('User-Agent') || 'unknown',
+        JSON.stringify({ error: error.message, timestamp: new Date().toISOString() }),
+        'high',
+        'error_logged'
+      ).run()
+    } catch (dbError) {
+      // Skip logging if security_events table doesn't exist
+      console.log('Security logging skipped:', dbError.message)
+    }
     
     return c.json({ error: 'Login failed', debug: error.message }, 500)
   }
